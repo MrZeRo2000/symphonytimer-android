@@ -51,8 +51,10 @@ public class AddItemActivity extends Activity {
 	private final void updateEditRec(){
 		editId = editRec.id;
 		((EditText)findViewById(R.id.title_edit_text)).setText(editRec.title);
-		long minutes = (long) editRec.time_sec / 60;
+		long hours =  (long) editRec.time_sec / 3600;
+		long minutes = (long) editRec.time_sec % 3600 / 60;
 		long seconds = (long) editRec.time_sec % 60;
+		((EditText)findViewById(R.id.hours_edit_text)).setText(String.valueOf(hours));
 		((EditText)findViewById(R.id.minutes_edit_text)).setText(String.valueOf(minutes));
 		((EditText)findViewById(R.id.seconds_edit_text)).setText(String.valueOf(seconds));
 		
@@ -104,11 +106,13 @@ public class AddItemActivity extends Activity {
 			throw new AddItemInputException(getResources().getString(R.string.error_title_not_assigned));
 		}
 		
+		String hoursString = ((EditText)findViewById(R.id.hours_edit_text)).getText().toString().trim();
 		String minutesString = ((EditText)findViewById(R.id.minutes_edit_text)).getText().toString().trim();
 		String secondsString = ((EditText)findViewById(R.id.seconds_edit_text)).getText().toString().trim();
+		long hours = Long.valueOf(hoursString);
 		long minutes = Long.valueOf(minutesString); 
 		long seconds = Long.valueOf(secondsString);
-		rec.time_sec = minutes * 60 + seconds;
+		rec.time_sec = hours * 3600 + minutes * 60 + seconds;
 		
 		if (0 == rec.time_sec) {
 			throw new AddItemInputException(getResources().getString(R.string.error_time_zero));

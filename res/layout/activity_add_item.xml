@@ -49,14 +49,24 @@
 	    <TableRow android:layout_height="fill_parent" >
 
 	       <TextView
-	           android:layout_width="fill_parent"
+	           android:layout_width="0dp"
+	           android:layout_height="wrap_content"
+  	           android:layout_weight="1"
+	           android:gravity="center"
+	           android:text="@string/label_time_hours"  
+	        />	        
+	        
+	        <TextView
+	           android:layout_width="0dp"
+	           android:layout_height="wrap_content"
   	           android:layout_weight="1"
 	           android:gravity="center"
 	           android:text="@string/label_time_minutes"  
 	        />
 
 	       <TextView
-	           android:layout_width="fill_parent"
+	           android:layout_width="0dp"
+	           android:layout_height="wrap_content"
 	           android:layout_weight="1"
 	           android:gravity="center"
 	           android:text="@string/label_time_seconds"  
@@ -64,9 +74,17 @@
 	    </TableRow>
 	    
 	    <TableRow>
+	        <EditText
+	    		android:id="@+id/hours_edit_text"
+	    		android:layout_width="0dp"
+	    		android:layout_weight="1"
+	    		android:gravity="center"
+	    		android:maxLength="2"
+	    		android:ems="10"
+	    		android:inputType="number" />
 	    	<EditText
 	    		android:id="@+id/minutes_edit_text"
-	    		android:layout_width="wrap_content"
+	    		android:layout_width="0dp"
 	    		android:layout_weight="1"
 	    		android:gravity="center"
 	    		android:maxLength="2"
@@ -74,7 +92,7 @@
 	    		android:inputType="number" />
 	    	<EditText
 	    		android:id="@+id/seconds_edit_text"
-	    		android:layout_width="wrap_content"
+	    		android:layout_width="0dp"
 	    		android:layout_weight="1"
 	    		android:gravity="center"
 	    		android:maxLength="2"

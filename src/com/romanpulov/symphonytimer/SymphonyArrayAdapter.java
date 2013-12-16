@@ -63,7 +63,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 		
 		//display text
 		TextView progressTextView = (TextView)rowView.findViewById(R.id.progress_text_view);			
-		progressTextView.setText(String.format("%02d:%02d", (long) displayProgress / 60, displayProgress % 60));
+		progressTextView.setText(String.format("%02d:%02d:%02d", (long) displayProgress / 3600, (long) displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display progress bar
 		ProgressBar progressBar = (ProgressBar)rowView.findViewById(R.id.progress_bar);
