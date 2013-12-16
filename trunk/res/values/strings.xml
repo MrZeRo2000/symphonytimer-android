@@ -8,6 +8,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="label_title">Title</string>
     <string name="label_time">Time</string>
+    <string name="label_time_hours">Hours</string>
     <string name="label_time_minutes">Minutes</string>
     <string name="label_time_seconds">Seconds</string>
     <string name="label_sound">Sound</string>
