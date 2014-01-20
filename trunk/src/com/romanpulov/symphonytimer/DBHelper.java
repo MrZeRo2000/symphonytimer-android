@@ -59,6 +59,14 @@ public class DBHelper {
 		return db.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.id, null);
 	}
 	
+	public long insertTimerHistory(DMTaskItem dmTaskItem) {
+		ContentValues cv = new ContentValues();
+		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], dmTaskItem.getId());
+		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], dmTaskItem.getStartTime());
+		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], dmTaskItem.getCurrentTime());
+		return db.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
+	}
+	
 	private long getLongSQL(String sql) {
 		Cursor c = db.rawQuery(sql, null);
 		

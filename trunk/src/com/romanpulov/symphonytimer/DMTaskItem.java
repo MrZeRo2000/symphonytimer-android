@@ -9,26 +9,26 @@ public class DMTaskItem implements Parcelable {
 		public void OnTaskItemCompletedEvent (DMTaskItem dmTaskItem); 
 	}	
 	
-	private long id;
-	private String title; 
-	private long maxTimeSec;	
-	private String soundFile;
-	private OnTaskItemCompleted taskItemCompletedListener;
+	private long mId;
+	private String mTitle; 
+	private long mMaxTimeSec;	
+	private String mSoundFile;
+	private OnTaskItemCompleted mTaskItemCompletedListener;
 	
-	private long startTime;
-	private long currentTime;
-	private boolean completedFlag = false;
+	private long mStartTime;
+	private long mCurrentTime;
+	private boolean mCompletedFlag = false;
 	
 	
 	public DMTaskItem(long id, String title, long timeSec, String soundFile) {
-		this.id = id;
-		this.title = title;
-		this.maxTimeSec = timeSec;		
-		this.soundFile = soundFile;
+		this.mId = id;
+		this.mTitle = title;
+		this.mMaxTimeSec = timeSec;		
+		this.mSoundFile = soundFile;
 	}
 	
 	public void setTaskItemCompleted(OnTaskItemCompleted taskItemCompletedListener) {
-		this.taskItemCompletedListener = taskItemCompletedListener;
+		this.mTaskItemCompletedListener = taskItemCompletedListener;
 	}
 	
 	@Override
@@ -40,19 +40,19 @@ public class DMTaskItem implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		// TODO Auto-generated method stub
-		dest.writeLong(id);
-		dest.writeString(title);
-		dest.writeLong(maxTimeSec);
-		dest.writeLong(startTime);
-		dest.writeString(soundFile);
+		dest.writeLong(mId);
+		dest.writeString(mTitle);
+		dest.writeLong(mMaxTimeSec);
+		dest.writeLong(mStartTime);
+		dest.writeString(mSoundFile);
 	}
 	
 	private DMTaskItem(Parcel in) {
-		id = in.readLong();
-		title = in.readString();
-		maxTimeSec = in.readLong();
-		startTime = in.readLong();
-		soundFile = in.readString();
+		mId = in.readLong();
+		mTitle = in.readString();
+		mMaxTimeSec = in.readLong();
+		mStartTime = in.readLong();
+		mSoundFile = in.readString();
 		updateProcess();
 	}	
 	
@@ -68,57 +68,65 @@ public class DMTaskItem implements Parcelable {
 	
 	
 	public long getId() {
-		return id;
+		return mId;
 	}
 	
 	public String getTitle() {
-		return title;
+		return mTitle;
 	}
 	
 	public String getSoundFile(){
-		return soundFile;
+		return mSoundFile;
 	}
 	
 	public long getProgressInSec() {
 		updateProcess();
-		return (long) (currentTime - startTime) / 1000;
+		return (long) (mCurrentTime - mStartTime) / 1000;
 	}
 	
 	public boolean getCompleted() {
 		updateProcess();
-		return completedFlag;
+		return mCompletedFlag;
 	}
 	
 	public long getTriggerAtTime() {
-		return startTime + maxTimeSec * 1000;
+		return mStartTime + mMaxTimeSec * 1000;
 	}
 	
+	public long getStartTime() {
+		return mStartTime;
+	}
+	
+	public long getCurrentTime() {
+		return mCurrentTime;
+	}	
+	
 	public void startProcess() {
-		startTime = System.currentTimeMillis();
-		completedFlag = false;
+		mStartTime = System.currentTimeMillis();
+		mCompletedFlag = false;
 	}
 	
 	public void updateProcess() {
-		if (!completedFlag) {
-			currentTime = System.currentTimeMillis();
+		if (!mCompletedFlag) {
+			mCurrentTime = System.currentTimeMillis();
 			long triggerAtTime = getTriggerAtTime();
-			if (currentTime > triggerAtTime) {
-				currentTime = triggerAtTime;
-				completedFlag = true;
-				if (null != taskItemCompletedListener) {
-					taskItemCompletedListener.OnTaskItemCompletedEvent(this);
+			if (mCurrentTime > triggerAtTime) {
+				mCurrentTime = triggerAtTime;
+				mCompletedFlag = true;
+				if (null != mTaskItemCompletedListener) {
+					mTaskItemCompletedListener.OnTaskItemCompletedEvent(this);
 				}
 			}
 		}
 	}	
 	
 	public void resetProcess() {
-		startTime = currentTime = 0;
-		completedFlag = false;
+		mStartTime = mCurrentTime = 0;
+		mCompletedFlag = false;
 	}
 	
 	public boolean isCompleted() {
-		return completedFlag;
+		return mCompletedFlag;
 	}
 	
 }
