@@ -5,29 +5,27 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Toast;
 import android.widget.ListView;
-import android.content.ComponentName;
-import android.content.Intent;
-
-import com.romanpulov.symphonytimer.R;
+import android.widget.Toast;
 
 
 public class MainActivity extends FragmentActivity {
@@ -389,8 +387,10 @@ public class MainActivity extends FragmentActivity {
     		intent.setComponent(new ComponentName(this.getPackageName(), this.getClass().getName()));
     		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    		
     		getApplicationContext().startActivity(intent);   
-    		Log.d("MainActivity", "Activity was not visible, bringing to front");
+    		Log.d("MainActivity", "Activity was not visible, bringing to front");    		
     	}
+    	
+    	DBHelper.getInstance(this).insertTimerHistory(dmTaskItem);
 
     	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFile());
     	boolean preferencesVibrate = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_vibrate", false);

@@ -3,7 +3,6 @@ package com.romanpulov.symphonytimer;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 
 public class MediaPlayerHelper {
