@@ -192,4 +192,29 @@ public class DBHelper {
 		
 	}
 	
+	public void updateHistList(DMTimerHistList dmList) {
+		
+		dmList.clear();
+		DMTimerHistRec dmRec = null;
+		Cursor c = null;
+		
+		try {
+			c = db.query(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS, null, null, null, null, "start_time DESC");
+			
+			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
+				dmRec = new DMTimerHistRec();
+				dmRec.mId = c.getLong(0);
+				dmRec.mTimerId = c.getLong(1);
+				dmRec.mStartTime = c.getLong(2);
+				dmRec.mEndTime = c.getLong(3);
+				
+				dmList.add(dmRec);
+			}
+		} finally {
+			if (null != c && !c.isClosed()) {
+				c.close();
+			}
+		}
+	}
+	
 }

@@ -8,37 +8,45 @@
         android:minSdkVersion="7"
         android:targetSdkVersion="18" />
     <!-- Permissions -->
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.VIBRATE"/>
-	<uses-permission android:name = "android.permission.WRITE_EXTERNAL_STORAGE" />	    
-    <application        
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
         android:allowBackup="true"
         android:icon="@drawable/tuba"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >        
+        android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
-            android:theme="@style/Theme.Transparent"
-            android:label="@string/app_name"            
-            android:launchMode="singleTask" >			                        
+            android:name="com.romanpulov.symphonytimer.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Transparent" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddItemActivity"
-            android:label="@string/title_activity_add_item">
+            android:name="com.romanpulov.symphonytimer.AddItemActivity"
+            android:label="@string/title_activity_add_item" >
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
+            android:name="com.romanpulov.symphonytimer.SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
-        
+
         <!-- Broadcast receiver -->
-        <receiver android:name=".AlarmManagerBroadcastReceiver"></receiver>
-        <activity android:name="ImageSelectionActivity"></activity>        
+        <receiver android:name="com.romanpulov.symphonytimer.AlarmManagerBroadcastReceiver" >
+        </receiver>
+
+        <activity android:name="com.romanpulov.symphonytimer.ImageSelectionActivity" >
+        </activity>
+        <activity
+            android:name="com.romanpulov.symphonytimer.HistoryActivity"
+            android:label="@string/title_activity_history" >
+        </activity>
     </application>
 
 </manifest>
-
