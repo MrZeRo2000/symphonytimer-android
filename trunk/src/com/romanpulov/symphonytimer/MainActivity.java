@@ -140,6 +140,8 @@ public class MainActivity extends FragmentActivity {
         Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
         
         AssetsHelper.listAssets(this, "pre_inst_images");
+        
+        startHistoryActivity();
     }
     
     @Override
@@ -283,7 +285,13 @@ public class MainActivity extends FragmentActivity {
     	startItemIntent.putExtra(AddItemActivity.EDIT_REC_NAME, dmTimerRec);    	
     	startActivityForResult(startItemIntent, 
     			null == dmTimerRec.title ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
-    }    
+    }
+    
+    private void startHistoryActivity() {
+    	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
+    	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
+    	startActivity(startHistoryIntent);
+    }
     
     private void loadTimers() {
     	 DBHelper.getInstance(this).updateTimers(dmTimers);    	

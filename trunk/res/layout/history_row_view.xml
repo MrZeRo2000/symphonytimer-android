@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/history_row_view_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="right"
+    android:background="@drawable/main_list_shape"
+     >
+    
+    <LinearLayout 
+        android:id="@+id/history_row_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"       
+        android:layout_marginLeft="10dp"
+  		android:layout_marginTop="4dp"	 
+  		>       
+        <TextView
+        	android:id="@+id/history_text_view"
+        	android:layout_width="wrap_content"
+      		android:layout_height="wrap_content"
+      		android:textSize="18sp"
+      		android:textColor="#FFFFFF"
+      		android:text="history_text_view" />
+        <ImageView        
+         	android:id="@+id/history_image_view"
+         	android:contentDescription="@string/image_default_content_description"	                       
+         	android:layout_width="wrap_content"
+         	android:layout_height="fill_parent"
+         	android:layout_marginTop="4dp"    
+         	android:layout_marginBottom="4dp"
+         	android:layout_marginRight="10dp"        
+         	android:scaleType="fitCenter"
+         	android:adjustViewBounds="true"             
+        />        
+    </LinearLayout>      
+    
+	<TextView 
+    	android:id="@+id/history_time_view"
+    	android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="history_time_view"
+		android:textColor="#FFFFFF"  />
+
+</LinearLayout>

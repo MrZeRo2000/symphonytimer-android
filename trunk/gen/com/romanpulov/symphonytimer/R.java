@@ -36,36 +36,45 @@ public final class R {
         public static final int tuba=0x7f02000a;
     }
     public static final class id {
-        public static final int action_preferences=0x7f0a0012;
-        public static final int action_settings=0x7f0a0011;
-        public static final int add_image_button=0x7f0a000b;
+        public static final int action_preferences=0x7f0a0018;
+        public static final int action_settings=0x7f0a0017;
+        public static final int add_image_button=0x7f0a000c;
         public static final int cancel_button=0x7f0a0009;
         public static final int clear_image_file_button=0x7f0a0007;
         public static final int clear_sound_file_button=0x7f0a0005;
+        public static final int history_image_view=0x7f0a0011;
+        public static final int history_list_view=0x7f0a000a;
+        public static final int history_row_1=0x7f0a000f;
+        public static final int history_row_view_layout=0x7f0a000e;
+        public static final int history_text_view=0x7f0a0010;
+        public static final int history_time_view=0x7f0a0012;
         public static final int hours_edit_text=0x7f0a0001;
         public static final int image_file_image_button=0x7f0a0006;
-        public static final int image_image_view=0x7f0a000f;
-        public static final int main_layout=0x7f0a000a;
-        public static final int main_list_view=0x7f0a000c;
+        public static final int image_image_view=0x7f0a0015;
+        public static final int main_layout=0x7f0a000b;
+        public static final int main_list_view=0x7f0a000d;
         public static final int minutes_edit_text=0x7f0a0002;
         public static final int ok_button=0x7f0a0008;
-        public static final int progress_bar=0x7f0a0010;
-        public static final int progress_text_view=0x7f0a000e;
+        public static final int progress_bar=0x7f0a0016;
+        public static final int progress_text_view=0x7f0a0014;
         public static final int seconds_edit_text=0x7f0a0003;
         public static final int sound_file_button=0x7f0a0004;
         public static final int title_edit_text=0x7f0a0000;
-        public static final int title_text_view=0x7f0a000d;
+        public static final int title_text_view=0x7f0a0013;
     }
     public static final class layout {
         public static final int activity_add_item=0x7f030000;
-        public static final int activity_main=0x7f030001;
-        public static final int main_row_view=0x7f030002;
-        public static final int symphony_row_view=0x7f030003;
+        public static final int activity_history=0x7f030001;
+        public static final int activity_main=0x7f030002;
+        public static final int history_row_view=0x7f030003;
+        public static final int main_row_view=0x7f030004;
+        public static final int symphony_row_view=0x7f030005;
     }
     public static final class menu {
         public static final int add_item=0x7f090000;
-        public static final int image_selection=0x7f090001;
-        public static final int main=0x7f090002;
+        public static final int history=0x7f090001;
+        public static final int image_selection=0x7f090002;
+        public static final int main=0x7f090003;
     }
     public static final class raw {
         public static final int default_sound=0x7f050000;
@@ -101,6 +110,7 @@ public final class R {
         public static final int pref_vibrate=0x7f070018;
         public static final int question_are_you_sure=0x7f07001e;
         public static final int title_activity_add_item=0x7f070003;
+        public static final int title_activity_history=0x7f070020;
         public static final int title_activity_image_selection=0x7f07001f;
         public static final int title_activity_settings=0x7f070004;
     }
