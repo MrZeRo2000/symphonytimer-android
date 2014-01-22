@@ -133,7 +133,8 @@ public class DBHelper {
 	
 	
 	public long deleteTimer(long id) {
-		return db.delete(DBOpenHelper.TIMER_TABLE_NAME, "_id=" + id, null);
+		db.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1] + "=" + String.valueOf(id), null);
+		return db.delete(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS[0] + "=" + String.valueOf(id), null);
 	}
 
 	/* No longer needed

@@ -1,15 +1,16 @@
 package com.romanpulov.symphonytimer;
 
+import java.util.Date;
+
 import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -49,6 +50,7 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		final String tag = getClass().toString();
 		// TODO Auto-generated method stub
 		
 		View rowView;
@@ -67,12 +69,13 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		}
 		
 		DMTimerHistRec rec = mDMTimerHistList.get(position);
+		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.mTimerId);
 		
-		viewHolder.mTitle.setText(String.valueOf(rec.mTimerId));
-		
-//		RelativeLayout l = (RelativeLayout)rowView.findViewById(R.id.history_row_view_layout);
-//		l.setGravity(Gravity.RIGHT);
-				
+		viewHolder.mTitle.setText(dmTimerRec.title);		
+		viewHolder.mTime.setText(java.text.DateFormat.getDateTimeInstance().format(new Date(rec.mStartTime)));
+		viewHolder.mImage.setImageURI(
+				null != dmTimerRec.image_name ? Uri.parse(dmTimerRec.image_name) : null);
+		Log.d(tag, dmTimerRec.title + " " + dmTimerRec.image_name);
 		return rowView;
 	}
 

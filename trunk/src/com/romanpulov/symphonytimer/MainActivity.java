@@ -139,9 +139,8 @@ public class MainActivity extends FragmentActivity {
         
         Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
         
-        AssetsHelper.listAssets(this, "pre_inst_images");
+        AssetsHelper.listAssets(this, "pre_inst_images");      
         
-        startHistoryActivity();
     }
     
     @Override
@@ -221,8 +220,12 @@ public class MainActivity extends FragmentActivity {
     		Intent perferencesIntent = new Intent(this, SettingsActivity.class);
     		startActivity(perferencesIntent);
     		return true;
+    	case R.id.action_history:
+    		startHistoryActivity();
+    		return true;
     	default:
   			return super.onOptionsItemSelected(item);
+  			
     	}
     }
     
@@ -289,7 +292,8 @@ public class MainActivity extends FragmentActivity {
     
     private void startHistoryActivity() {
     	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
-    	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
+    	startHistoryIntent.putParcelableArrayListExtra(HistoryActivity.TIMERS_NAME, dmTimers);
+    	//startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
     	startActivity(startHistoryIntent);
     }
     

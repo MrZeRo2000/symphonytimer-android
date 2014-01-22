@@ -1,9 +1,10 @@
 package com.romanpulov.symphonytimer;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
 import android.app.Activity;
-import android.view.Menu;
-import android.widget.ArrayAdapter;
+import android.view.WindowManager;
 import android.widget.ListView;
 
 public class HistoryActivity extends Activity {
@@ -17,20 +18,19 @@ public class HistoryActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_history);
 		
-		DBHelper.getInstance(this).updateHistList(mDMimerHistList);
+		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 		
-		DMTimers dmTimers = getIntent().getExtras().getParcelable(HistoryActivity.TIMERS_NAME);
+		DBHelper.getInstance(this).updateHistList(mDMimerHistList);		
+			
+		ArrayList<DMTimerRec> timers = getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
+		DMTimers dmTimers = new DMTimers();
+		for (DMTimerRec timer : timers) {
+			dmTimers.add(timer);
+		}
 		
 		HistoryArrayAdapter adapter = new HistoryArrayAdapter(this, mDMimerHistList, dmTimers);
 		((ListView)findViewById(R.id.history_list_view)).setAdapter(adapter);		
 		    
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.history, menu);
-		return true;
 	}
 
 }
