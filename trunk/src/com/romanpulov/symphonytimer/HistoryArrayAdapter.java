@@ -75,6 +75,7 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		viewHolder.mTime.setText(java.text.DateFormat.getDateTimeInstance().format(new Date(rec.mStartTime)));
 		viewHolder.mImage.setImageURI(
 				null != dmTimerRec.image_name ? Uri.parse(dmTimerRec.image_name) : null);
+		
 		Log.d(tag, dmTimerRec.title + " " + dmTimerRec.image_name);
 		return rowView;
 	}

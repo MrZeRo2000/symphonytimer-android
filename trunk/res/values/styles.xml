@@ -28,5 +28,10 @@
     <style name="Theme.Dark" parent="android:Theme.Black" >
         
     </style>
+    
+    <style name="Theme.CompatTransparent" parent="Theme.AppCompat" >
+       <item name="android:windowBackground">@android:color/transparent</item> 
+    </style>
+    
 
 </resources>

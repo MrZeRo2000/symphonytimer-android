@@ -139,7 +139,8 @@ public class MainActivity extends FragmentActivity {
         
         Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
         
-        AssetsHelper.listAssets(this, "pre_inst_images");      
+        AssetsHelper.listAssets(this, "pre_inst_images");
+        startHistoryActivity();
         
     }
     

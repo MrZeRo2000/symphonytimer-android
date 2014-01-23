@@ -7,17 +7,23 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".HistoryActivity"  >
+    
+    <android.support.v4.view.ViewPager
+    	android:id="@+id/pager"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent">
+</android.support.v4.view.ViewPager>
 
-    <ListView
-        android:id="@+id/history_list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="8dp"            
-        android:divider="@android:color/transparent"        
-        android:cacheColorHint="@android:color/transparent"
-        android:dividerHeight="8dp"
-        android:listSelector="@android:color/transparent"
-        >
-	</ListView>        
+<!--     <ListView -->
+<!--         android:id="@+id/history_list_view" -->
+<!--         android:layout_width="fill_parent" -->
+<!--         android:layout_height="fill_parent" -->
+<!--         android:padding="8dp"             -->
+<!--         android:divider="@android:color/transparent"         -->
+<!--         android:cacheColorHint="@android:color/transparent" -->
+<!--         android:dividerHeight="8dp" -->
+<!--         android:listSelector="@android:color/transparent" -->
+<!--         > -->
+<!-- 	</ListView> -->
 
 </RelativeLayout>
