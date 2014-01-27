@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -28,7 +29,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity {
 	public static final int ADD_ITEM_RESULT_CODE = 1;
 	public static final int EDIT_ITEM_RESULT_CODE = 2;
 	
@@ -211,6 +212,9 @@ public class MainActivity extends FragmentActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    	//getMenuInflater().inflate(R.menu.main_activity_actions, menu);
+    	//return super.onCreateOptionsMenu(menu);
+
     }
     
     @Override

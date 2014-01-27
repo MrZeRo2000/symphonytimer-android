@@ -31,7 +31,10 @@
     
     <style name="Theme.CompatTransparent" parent="Theme.AppCompat" >
        <item name="android:windowBackground">@android:color/transparent</item> 
+    </style>    
+    
+    <style name="Theme.CompatTransparentWhite" parent="Theme.CompatTransparent" >
+       <item name ="android:textColor">@android:color/white</item>
     </style>
     
-
 </resources>
