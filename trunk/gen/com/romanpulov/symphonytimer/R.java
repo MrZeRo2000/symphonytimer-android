@@ -991,6 +991,7 @@ containing a value of this type.
         public static final int tuba=0x7f020061;
     }
     public static final class id {
+        public static final int action_add=0x7f07005c;
         public static final int action_bar=0x7f07001a;
         public static final int action_bar_activity_content=0x7f070015;
         public static final int action_bar_container=0x7f070019;
@@ -1147,6 +1148,7 @@ containing a value of this type.
         public static final int add_item=0x7f0e0000;
         public static final int image_selection=0x7f0e0001;
         public static final int main=0x7f0e0002;
+        public static final int main_activity_actions=0x7f0e0003;
     }
     public static final class raw {
         public static final int default_sound=0x7f060000;
@@ -1348,6 +1350,7 @@ containing a value of this type.
          */
         public static final int Theme_Base_Light=0x7f0d0079;
         public static final int Theme_CompatTransparent=0x7f0d0083;
+        public static final int Theme_CompatTransparentWhite=0x7f0d0084;
         public static final int Theme_Dark=0x7f0d0082;
         public static final int Theme_Transparent=0x7f0d0081;
         /**  Styles in here can be extended for customisation in your application. Each utilises

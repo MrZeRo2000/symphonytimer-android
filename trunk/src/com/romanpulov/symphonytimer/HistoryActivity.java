@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ListView;
 
@@ -23,6 +24,7 @@ public class HistoryActivity extends ActionBarActivity {
 	
 	private DMTimerHistList mDMimerHistList = new DMTimerHistList();
 	
+	private ActionBar mActionBar;
 	private ViewPager mViewPager;
 	private TabsPagerAdapter mAdapter;
 	
@@ -48,6 +50,28 @@ public class HistoryActivity extends ActionBarActivity {
 		
 	};
 	
+	private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+		@Override
+		public void onPageScrollStateChanged(int arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onPageSelected(int position) {
+			// TODO Auto-generated method stub
+			mActionBar.setSelectedNavigationItem(position);
+		}
+		
+	};
+	
 	private class TabsPagerAdapter extends FragmentPagerAdapter {
 		 
 	    public TabsPagerAdapter(FragmentManager fm) {
@@ -59,7 +83,7 @@ public class HistoryActivity extends ActionBarActivity {
 	 
 	        switch (index) {
 	        case 0:
-	            // Top Rated fragment activity
+	            // Top Rated fragment activity	        	
 	            return new HistoryListFragment();
 	        case 1:
 	            // Games fragment activity
@@ -85,22 +109,22 @@ public class HistoryActivity extends ActionBarActivity {
 		
 		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 		
-		ActionBar actionBar = this.getSupportActionBar();
+		mActionBar = this.getSupportActionBar();
+		mActionBar.setDisplayHomeAsUpEnabled(true);
 		
 		// Initilization
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
  
         mViewPager.setAdapter(mAdapter);
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        
+        mViewPager.setOnPageChangeListener(mPageChangeListener);
+        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);       
         
  
         // Adding Tabs
-        actionBar.addTab(actionBar.newTab().setText("Tab 1").setTabListener(mTabListener));
-        actionBar.addTab(actionBar.newTab().setText("Tab 2").setTabListener(mTabListener));
-        
+        mActionBar.addTab(mActionBar.newTab().setText("List").setTabListener(mTabListener));
+        mActionBar.addTab(mActionBar.newTab().setText("Top").setTabListener(mTabListener));       
         
 
 //
