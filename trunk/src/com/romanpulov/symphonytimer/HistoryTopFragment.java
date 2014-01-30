@@ -8,24 +8,27 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class HistoryListFragment extends Fragment {
+public class HistoryTopFragment extends Fragment{
 	
-	private DMTimerHistList mDMimerHistList = new DMTimerHistList();
+	private DMTimerHistTopList mDMTimerHistTopList = new DMTimerHistTopList();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		View rootView = inflater.inflate(R.layout.history_list_frag, container, false);
+		View rootView = inflater.inflate(R.layout.history_top_frag, container, false);
 		
-		DBHelper.getInstance(this.getActivity()).fillHistList(mDMimerHistList);		
+		DBHelper.getInstance(this.getActivity()).fillHistTopList(mDMTimerHistTopList);
+		mDMTimerHistTopList.calcMaxPerc();
 		
 		DMTimers dmTimers = ((HistoryActivity)this.getActivity()).getTimers();
 	
-		ArrayAdapter<?> adapter = new HistoryArrayAdapter(this.getActivity(), mDMimerHistList, dmTimers);
+		ArrayAdapter<?> adapter = new HistoryTopArrayAdapter(this.getActivity(), mDMTimerHistTopList, dmTimers);
 		
-		((ListView)rootView.findViewById(R.id.history_list_view)).setAdapter(adapter);
+		((ListView)rootView.findViewById(R.id.history_top_view)).setAdapter(adapter);
 		
         return rootView;
+
 	}
+
 }

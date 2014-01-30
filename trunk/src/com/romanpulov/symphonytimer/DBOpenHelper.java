@@ -26,6 +26,12 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     };
     public static final String MAX_ORDER_ID_COL = "max_order_id";
     
+    public static final String TIMER_HISTORY_TOP_QUERY =
+    		"SELECT timer_id, COUNT(timer_id) exec_cnt, COUNT(timer_id) * 100 / (SELECT COUNT(timer_id) FROM timer_history) exec_perc " +
+    		"FROM timer_history " +
+    		"GROUP BY timer_id " +
+    		"ORDER BY 2 DESC";
+    
     private static final String TIMER_TABLE_CREATE =
                 "CREATE TABLE " + TIMER_TABLE_NAME + " (" +
                 TIMER_TABLE_COLS[0] + " INTEGER PRIMARY KEY," +

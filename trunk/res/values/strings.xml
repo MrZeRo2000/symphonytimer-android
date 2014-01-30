@@ -34,6 +34,6 @@
     <string name="action_not_allowed">This operation is not allowed</string>
     <string name="question_are_you_sure">Are you sure?</string>
     <string name="title_activity_image_selection">ImageSelectionActivity</string>
-    <string name="title_activity_history">Symphony Timer > History</string>
+    <string name="title_activity_history">History</string>
 
 </resources>
