@@ -163,7 +163,7 @@ public class DBHelper {
 	}
 	*/
 	
-	public void updateTimers(DMTimers dmTimers) {
+	public void fillTimers(DMTimers dmTimers) {
 		// no need ...
 		openDB();
 		
@@ -193,7 +193,7 @@ public class DBHelper {
 		
 	}
 	
-	public void updateHistList(DMTimerHistList dmList) {
+	public void fillHistList(DMTimerHistList dmList) {
 		
 		dmList.clear();
 		DMTimerHistRec dmRec = null;
@@ -204,13 +204,36 @@ public class DBHelper {
 			
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistRec();
-				dmRec.mId = c.getLong(0);
-				dmRec.mTimerId = c.getLong(1);
-				dmRec.mStartTime = c.getLong(2);
-				dmRec.mEndTime = c.getLong(3);
+				dmRec.id = c.getLong(0);
+				dmRec.timerId = c.getLong(1);
+				dmRec.startTime = c.getLong(2);
+				dmRec.endTime = c.getLong(3);
 				
 				dmList.add(dmRec);
 			}
+		} finally {
+			if (null != c && !c.isClosed()) {
+				c.close();
+			}
+		}
+	}	
+	
+	public void fillHistTopList(DMTimerHistTopList dmList) {
+		
+		dmList.clear();
+		DMTimerHistTopRec dmRec = null;
+		Cursor c = null;
+		
+		try {
+			c = db.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
+			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
+				dmRec = new DMTimerHistTopRec();
+				dmRec.timerId = c.getLong(0);
+				dmRec.execCnt = c.getLong(1);
+				dmRec.execPerc = c.getLong(2);				
+				dmList.add(dmRec);
+			}
+			
 		} finally {
 			if (null != c && !c.isClosed()) {
 				c.close();

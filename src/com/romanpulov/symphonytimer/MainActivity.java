@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -141,7 +140,8 @@ public class MainActivity extends ActionBarActivity {
         Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
         
         AssetsHelper.listAssets(this, "pre_inst_images");
-        startHistoryActivity();
+        // the below is for testing only
+        //startHistoryActivity();
         
     }
     
@@ -303,7 +303,7 @@ public class MainActivity extends ActionBarActivity {
     }
     
     private void loadTimers() {
-    	 DBHelper.getInstance(this).updateTimers(dmTimers);    	
+    	 DBHelper.getInstance(this).fillTimers(dmTimers);    	
     }
     
     private void checkTimerSelection() {

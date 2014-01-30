@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer;
 
+
 import java.util.ArrayList;
 
 import android.os.Bundle;
@@ -11,22 +12,20 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ListView;
 
 public class HistoryActivity extends ActionBarActivity {
 	
 	public static String TIMERS_NAME = "timers";
 	
-	private DMTimerHistList mDMimerHistList = new DMTimerHistList();
-	
+	private DMTimers mDMTimers; 	
 	private ActionBar mActionBar;
 	private ViewPager mViewPager;
 	private TabsPagerAdapter mAdapter;
+	
+	public DMTimers getTimers() {
+		return mDMTimers;
+	}
 	
 	private ActionBar.TabListener mTabListener = new ActionBar.TabListener() {
 
@@ -87,7 +86,7 @@ public class HistoryActivity extends ActionBarActivity {
 	            return new HistoryListFragment();
 	        case 1:
 	            // Games fragment activity
-	        	return new HistoryListFragment();
+	        	return new HistoryTopFragment();
 	        }
 	 
 	        return null;
@@ -106,6 +105,12 @@ public class HistoryActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_history);
+		
+		ArrayList<DMTimerRec> timers = this.getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
+		mDMTimers = new DMTimers();
+		for (DMTimerRec timer : timers) {
+			mDMTimers.add(timer);
+		}
 		
 		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 		
@@ -126,7 +131,6 @@ public class HistoryActivity extends ActionBarActivity {
         mActionBar.addTab(mActionBar.newTab().setText("List").setTabListener(mTabListener));
         mActionBar.addTab(mActionBar.newTab().setText("Top").setTabListener(mTabListener));       
         
-
 //
 //		DBHelper.getInstance(this).updateHistList(mDMimerHistList);		
 //			
