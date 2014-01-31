@@ -123,25 +123,12 @@ public class HistoryActivity extends ActionBarActivity {
  
         mViewPager.setAdapter(mAdapter);
         mViewPager.setOnPageChangeListener(mPageChangeListener);
-        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setHomeButtonEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);       
         
- 
         // Adding Tabs
         mActionBar.addTab(mActionBar.newTab().setText("List").setTabListener(mTabListener));
-        mActionBar.addTab(mActionBar.newTab().setText("Top").setTabListener(mTabListener));       
-        
-//
-//		DBHelper.getInstance(this).updateHistList(mDMimerHistList);		
-//			
-//		ArrayList<DMTimerRec> timers = getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
-//		DMTimers dmTimers = new DMTimers();
-//		for (DMTimerRec timer : timers) {
-//			dmTimers.add(timer);
-//		}
-//		
-//		HistoryArrayAdapter adapter = new HistoryArrayAdapter(this, mDMimerHistList, dmTimers);
-//		((ListView)findViewById(R.id.history_list_view)).setAdapter(adapter);		
+        mActionBar.addTab(mActionBar.newTab().setText("Top").setTabListener(mTabListener));     
 		    
 	}
 
