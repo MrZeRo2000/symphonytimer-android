@@ -210,10 +210,10 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    	//getMenuInflater().inflate(R.menu.main_activity_actions, menu);
-    	//return super.onCreateOptionsMenu(menu);
+       // getMenuInflater().inflate(R.menu.main, menu);
+        //return true;
+    	getMenuInflater().inflate(R.menu.main_activity_actions, menu);
+    	return super.onCreateOptionsMenu(menu);
 
     }
     
@@ -221,6 +221,9 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	// TODO Auto-generated method stub
     	switch(item.getItemId()) {
+    	case R.id.action_add:
+    		startAddItemActivity(new DMTimerRec());
+    		return true;
     	case R.id.action_preferences:
     		Intent perferencesIntent = new Intent(this, SettingsActivity.class);
     		startActivity(perferencesIntent);
