@@ -5,8 +5,9 @@ import com.romanpulov.symphonytimer.R;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.app.Activity;
+import android.view.WindowManager;
 import android.content.Intent;
 import android.database.Cursor;
 import android.view.Menu;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 import android.widget.EditText;
 
 
-public class AddItemActivity extends Activity {
+public class AddItemActivity extends ActionBarActivity {
 	public static final String EDIT_REC_NAME = "rec";
 	
 	private static int SOUND_REQ_CODE = 1;
@@ -34,15 +35,19 @@ public class AddItemActivity extends Activity {
 
 		public AddItemInputException(String message) {
 			super(message);
-		}
-		
+		}		
 		
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_add_item);		
+		setContentView(R.layout.activity_add_item);
+		
+		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
 		updateEditRec();
 		//Toast.makeText(this, tr.title, Toast.LENGTH_SHORT).show();
