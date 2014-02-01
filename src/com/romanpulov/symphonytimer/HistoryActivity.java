@@ -7,89 +7,62 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 
-public class HistoryActivity extends ActionBarActivity {
+public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
+	
+	private static String HISTORY_NAVIGATION_INDEX;
 	
 	public static String TIMERS_NAME = "timers";
 	
 	private DMTimers mDMTimers; 	
 	private ActionBar mActionBar;
 	private ViewPager mViewPager;
-	private TabsPagerAdapter mAdapter;
+	private HistoryPagerAdapter mAdapter;
 	
 	public DMTimers getTimers() {
 		return mDMTimers;
 	}
 	
-	private ActionBar.TabListener mTabListener = new ActionBar.TabListener() {
-
-		@Override
-		public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onTabSelected(Tab tab, FragmentTransaction arg1) {
-			// TODO Auto-generated method stub
-			mViewPager.setCurrentItem(tab.getPosition());
-		}
-
-		@Override
-		public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	};
+	public interface HistoryFilterHandler {
+		public abstract void onHistoryFilterChange(int filterId);
+	}
 	
-	private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
-
-		@Override
-		public void onPageScrollStateChanged(int arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onPageScrolled(int arg0, float arg1, int arg2) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onPageSelected(int position) {
-			// TODO Auto-generated method stub
-			mActionBar.setSelectedNavigationItem(position);
-		}
+	private class HistoryPagerAdapter extends FragmentPagerAdapter {
 		
-	};
-	
-	private class TabsPagerAdapter extends FragmentPagerAdapter {
-		 
-	    public TabsPagerAdapter(FragmentManager fm) {
+		public HistoryListFragment mHistoryListFragment;
+		public HistoryTopFragment mHistoryTopFragment;
+		
+		public String[] mFragmentTags;
+		
+	    public HistoryPagerAdapter(FragmentManager fm) {
 	        super(fm);
+	        mFragmentTags = new String[getCount()];
 	    }
 	 
 	    @Override
 	    public Fragment getItem(int index) {
+	    	
+	    	HistoryFragment historyFragment = null;
 	 
 	        switch (index) {
 	        case 0:
-	            // Top Rated fragment activity	        	
-	            return new HistoryListFragment();
+	        	mHistoryListFragment = new HistoryListFragment(); 
+	        	historyFragment = mHistoryListFragment;
+	            break;
 	        case 1:
-	            // Games fragment activity
-	        	return new HistoryTopFragment();
+	        	mHistoryTopFragment = new HistoryTopFragment(); 
+	        	historyFragment = mHistoryTopFragment;
+	        	break;
 	        }
-	 
-	        return null;
+	        
+	        historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());	        
+	        return historyFragment;
 	    }
 	 
 	    @Override
@@ -97,16 +70,35 @@ public class HistoryActivity extends ActionBarActivity {
 	        // get item count - equal to number of tabs
 	        return 2;
 	    }
-	 
-	}
-	
+	    
+	    @Override
+	    public CharSequence getPageTitle(int position) {
+	    	// TODO Auto-generated method stub
+	    	switch (position) {
+	    	case 0:
+	    		return getResources().getString(R.string.tab_history_list);
+	    	case 1:
+	    		return getResources().getString(R.string.tab_history_top);
+	    	default:
+	    		return null;
+	    	}
+	    }
+	    
+	    @Override
+	    public Object instantiateItem(ViewGroup container, int position) {
+	    	// TODO Auto-generated method stub
+	    	HistoryFragment historyFragment = (HistoryFragment)super.instantiateItem(container, position); 
+	    	mFragmentTags[position] = historyFragment.getTag();
+	    	return historyFragment;
+	    }
+	}	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_history);
 		
-		ArrayList<DMTimerRec> timers = this.getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
+		final ArrayList<DMTimerRec> timers = this.getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
 		mDMTimers = new DMTimers();
 		for (DMTimerRec timer : timers) {
 			mDMTimers.add(timer);
@@ -115,21 +107,39 @@ public class HistoryActivity extends ActionBarActivity {
 		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 		
 		mActionBar = this.getSupportActionBar();
-		mActionBar.setDisplayHomeAsUpEnabled(true);
-		
-		// Initilization
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
- 
-        mViewPager.setAdapter(mAdapter);
-        mViewPager.setOnPageChangeListener(mPageChangeListener);
-        mActionBar.setHomeButtonEnabled(true);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);       
+		mActionBar.setHomeButtonEnabled(true);
+		mActionBar.setDisplayHomeAsUpEnabled(true);		
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         
-        // Adding Tabs
-        mActionBar.addTab(mActionBar.newTab().setText("List").setTabListener(mTabListener));
-        mActionBar.addTab(mActionBar.newTab().setText("Top").setTabListener(mTabListener));     
-		    
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.history_filter, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mActionBar.setListNavigationCallbacks(spinnerAdapter, this);  
+        //mActionBar.setSelectedNavigationItem(0);		
+        if (null != savedInstanceState) {
+        	mActionBar.setSelectedNavigationItem(savedInstanceState.getInt(HISTORY_NAVIGATION_INDEX));
+        }
+		
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mAdapter = new HistoryPagerAdapter(getSupportFragmentManager()); 
+        mViewPager.setAdapter(mAdapter);        		    
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub		
+		super.onSaveInstanceState(outState);
+		outState.putInt(HISTORY_NAVIGATION_INDEX, mActionBar.getSelectedNavigationIndex());
+	}
+	
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		// TODO Auto-generated method stub
+		//Fragment fr = getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":0");
+		for (int i = 0; i < mAdapter.getCount(); i++) {
+			HistoryFragment historyFragment = (HistoryFragment)getSupportFragmentManager().findFragmentByTag(mAdapter.mFragmentTags[i]);
+			historyFragment.setHistoryFilterId(itemPosition);
+		}
+		return false;
 	}
 
 }

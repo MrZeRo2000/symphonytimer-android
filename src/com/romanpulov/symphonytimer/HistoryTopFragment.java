@@ -1,14 +1,12 @@
 package com.romanpulov.symphonytimer;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class HistoryTopFragment extends Fragment{
+public class HistoryTopFragment extends HistoryFragment{
 	
 	private DMTimerHistTopList mDMTimerHistTopList = new DMTimerHistTopList();
 	
@@ -23,9 +21,9 @@ public class HistoryTopFragment extends Fragment{
 		
 		DMTimers dmTimers = ((HistoryActivity)this.getActivity()).getTimers();
 	
-		ArrayAdapter<?> adapter = new HistoryTopArrayAdapter(this.getActivity(), mDMTimerHistTopList, dmTimers);
+		mAdapter = new HistoryTopArrayAdapter(this.getActivity(), mDMTimerHistTopList, dmTimers);
 		
-		((ListView)rootView.findViewById(R.id.history_top_view)).setAdapter(adapter);
+		((ListView)rootView.findViewById(R.id.history_top_view)).setAdapter(mAdapter);
 		
         return rootView;
 

@@ -24,6 +24,11 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     	"start_time", 
     	"end_time" 
     };
+    public static final String[] TIMER_HISTORY_SELECTION_FILTERS = new String[] {
+    	"1=1",
+    	"1=0"
+    };
+    
     public static final String MAX_ORDER_ID_COL = "max_order_id";
     
     public static final String TIMER_HISTORY_TOP_QUERY =
