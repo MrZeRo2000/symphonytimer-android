@@ -193,14 +193,21 @@ public class DBHelper {
 		
 	}
 	
-	public void fillHistList(DMTimerHistList dmList) {
+	public void fillHistList(DMTimerHistList dmList, int filterId) {
 		
 		dmList.clear();
 		DMTimerHistRec dmRec = null;
 		Cursor c = null;
 		
 		try {
-			c = db.query(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS, null, null, null, null, "start_time DESC");
+			c = db.query(
+					DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
+					DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
+					DBOpenHelper.TIMER_HISTORY_SELECTION_FILTERS[filterId], 
+					null, 
+					null, 
+					null, 
+					"start_time DESC");
 			
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistRec();

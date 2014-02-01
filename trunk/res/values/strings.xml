@@ -35,5 +35,7 @@
     <string name="question_are_you_sure">Are you sure?</string>
     <string name="title_activity_image_selection">ImageSelectionActivity</string>
     <string name="title_activity_history">History</string>
+    <string name="tab_history_list">List</string>
+    <string name="tab_history_top">Top</string>
 
 </resources>
