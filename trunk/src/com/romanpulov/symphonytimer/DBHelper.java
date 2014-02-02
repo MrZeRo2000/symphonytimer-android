@@ -200,14 +200,24 @@ public class DBHelper {
 		Cursor c = null;
 		
 		try {
-			c = db.query(
-					DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
-					DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
-					DBOpenHelper.TIMER_HISTORY_SELECTION_FILTERS[filterId], 
-					null, 
-					null, 
-					null, 
-					"start_time DESC");
+			if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
+				c = db.query(
+						DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
+						DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
+						DBOpenHelper.TIMER_HISTORY_SELECTION_CRITERIA, 
+						new String[] {String.valueOf(System.currentTimeMillis()), DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId]}, 
+						null, 
+						null, 
+						"start_time DESC");
+			else
+				c = db.query(
+						DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
+						DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
+						null, 
+						null, 
+						null, 
+						null, 
+						"start_time DESC");
 			
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistRec();
@@ -225,22 +235,26 @@ public class DBHelper {
 		}
 	}	
 	
-	public void fillHistTopList(DMTimerHistTopList dmList) {
+	public void fillHistTopList(DMTimerHistTopList dmList, int filterId) {
 		
 		dmList.clear();
 		DMTimerHistTopRec dmRec = null;
 		Cursor c = null;
 		
 		try {
-			c = db.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
+			if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
+				c = db.rawQuery(
+						DBOpenHelper.TIMER_HISTORY_TOP_QUERY_FILTER, 
+						new String[] {String.valueOf(System.currentTimeMillis()), DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId]});
+			else
+				c = db.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistTopRec();
 				dmRec.timerId = c.getLong(0);
-				dmRec.execCnt = c.getLong(1);
-				dmRec.execPerc = c.getLong(2);				
+				dmRec.execCnt = c.getLong(1);								
 				dmList.add(dmRec);
-			}
-			
+			};
+
 		} finally {
 			if (null != c && !c.isClosed()) {
 				c.close();

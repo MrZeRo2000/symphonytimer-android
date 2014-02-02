@@ -9,7 +9,7 @@ import android.widget.ListView;
 
 public class HistoryListFragment extends HistoryFragment {
 	
-	private static String tag = "HistoryListFragment"; 
+	private final static String tag = "HistoryListFragment"; 
 	
 	private DMTimerHistList mDMimerHistList = new DMTimerHistList();
 	
