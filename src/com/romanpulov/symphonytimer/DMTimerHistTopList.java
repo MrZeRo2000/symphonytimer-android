@@ -8,15 +8,22 @@ public class DMTimerHistTopList extends ArrayList<DMTimerHistTopRec>{
 	
 	private long mMaxExecPerc;
 	
-	public void calcMaxPerc() {
+	public void calcPerc() {
+		
+		long sumCnt = 0;
+		
+		for (DMTimerHistTopRec rec : this) {
+			sumCnt += rec.execCnt;
+		}
 		
 		mMaxExecPerc = 0;
 		
-		for (DMTimerHistTopRec rec : this) {
+		for  (DMTimerHistTopRec rec : this) {
+			rec.execPerc = (long)(rec.execCnt * 100 / sumCnt);
 			if (rec.execPerc > mMaxExecPerc)
 				mMaxExecPerc = rec.execPerc;
 		}
-	}
+	}	
 	
 	public long getMaxExecPerc() {
 		return mMaxExecPerc;

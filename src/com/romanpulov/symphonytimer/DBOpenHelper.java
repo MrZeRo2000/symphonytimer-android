@@ -24,9 +24,11 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     	"start_time", 
     	"end_time" 
     };
-    public static final String[] TIMER_HISTORY_SELECTION_FILTERS = new String[] {
-    	"1=1",
-    	"1=0"
+    public static final String TIMER_HISTORY_SELECTION_CRITERIA = "start_time>? - ?";
+    public static final String[] TIMER_HISTORY_SELECTION_VALUES = new String[] {
+    	"2592000000", //"1000 * 60 * 60 * 24 * 30",
+    	"7776000000", //"1000 * 60 * 60 * 24 * 30 * 3",
+    	"31536000000" //1000 * 60 * 60 * 24 * 365",    	
     };
     
     public static final String MAX_ORDER_ID_COL = "max_order_id";
@@ -36,6 +38,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     		"FROM timer_history " +
     		"GROUP BY timer_id " +
     		"ORDER BY 2 DESC";
+    public static final String TIMER_HISTORY_TOP_QUERY_FILTER =
+    		"SELECT timer_id, COUNT(timer_id) exec_cnt " +
+    		"FROM timer_history " +
+    		"WHERE start_time>? - ?" +		
+    		"GROUP BY timer_id " +
+    		"ORDER BY 2 DESC";
+    
     
     private static final String TIMER_TABLE_CREATE =
                 "CREATE TABLE " + TIMER_TABLE_NAME + " (" +
