@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<PreferenceCategory
+	    android:title="@string/pref_cat_settings" 
+	    >    
+		<CheckBoxPreference
+		    android:key="pref_vibrate"
+		    android:title="@string/pref_vibrate"
+		    android:defaultValue="true" 
+		    />
+	</PreferenceCategory>
+	<PreferenceCategory
+	    android:title="@string/pref_cat_backup" 
+	    >
+    <Preference 
+        android:key="pref_backup"
+        android:title="@string/pref_local_backup"
+        android:selectable="true"
+        >
+        
+    </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>
