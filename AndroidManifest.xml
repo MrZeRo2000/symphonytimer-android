@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.romanpulov.symphonytimer"
     android:versionCode="1"
-    android:versionName="0.3" >
+    android:versionName="0.3.1" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -30,7 +30,7 @@
         </activity>
         <activity
             android:name="com.romanpulov.symphonytimer.AddItemActivity"
-            android:theme="@style/Theme.CompatTransparentWhite"  
+            android:theme="@style/Theme.AppCompat"  
             android:label="@string/title_activity_add_item"
             android:parentActivityName="com.romanpulov.symphonytimer.MainActivity" >
             <!-- Parent activity meta-data to support 4.0 and lower -->
