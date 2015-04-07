@@ -100,6 +100,8 @@ public class StorageManager {
 			xmlFileWriter.flush();
 			xmlFileWriter.close();
 			
+			Log.d(TAG, "XML generated");
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
