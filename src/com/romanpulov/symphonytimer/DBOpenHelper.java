@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBOpenHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 4;
-	private static final String DATABASE_NAME = "symphonytimerdb";
+	public static final String DATABASE_NAME = "symphonytimerdb";
     public static final String TIMER_TABLE_NAME = "timer";
     public static final String TIMER_HISTORY_TABLE_NAME = "timer_history";
     public static final String[] TIMER_TABLE_COLS = new String[] {
@@ -68,7 +68,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	DBOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-
+	
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TIMER_TABLE_CREATE);
@@ -88,6 +88,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + DBOpenHelper.TIMER_HISTORY_TABLE_NAME);
 			onCreate(db);
 		}		
-	}
+	}	
+	
 }
 

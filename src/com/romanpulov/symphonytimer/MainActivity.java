@@ -142,7 +142,8 @@ public class MainActivity extends ActionBarActivity {
         AssetsHelper.listAssets(this, "pre_inst_images");
         // the below is for testing only
         //startHistoryActivity();
-        
+        //Toast.makeText(this, DBHelper.getInstance(this).getDatabasePathName(), Toast.LENGTH_LONG).show();
+        Log.d("DBXMLHelper_getDBXML", DBXMLHelper.getInstance(this).getDBXML());
     }
     
     @Override

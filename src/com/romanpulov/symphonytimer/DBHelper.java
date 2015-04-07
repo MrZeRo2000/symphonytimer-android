@@ -1,5 +1,10 @@
 package com.romanpulov.symphonytimer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,10 +13,27 @@ import android.util.Log;
 
 public class DBHelper {
 	private static DBHelper dbHelperInstance = null;	
+	private Context context;
 	private SQLiteDatabase db;
 	private final DBOpenHelper dbOpenHelper;
 	
+	public static class RawRecItem {
+		
+		private Map<String, String> fields = new HashMap<String, String>();
+		
+		public Map<String, String> getFields () {
+			return fields;
+		}			
+		
+		public void setFieldNameValue(String fieldName, String fieldValue) {
+			fields.put(fieldName, fieldValue);
+		}
+		
+		
+	}	
+	
 	private DBHelper(Context context) {
+		this.context = context;
 		dbOpenHelper = new DBOpenHelper(context);
 		openDB();
 	}
@@ -31,9 +53,13 @@ public class DBHelper {
 	
 	public static DBHelper getInstance(Context context) {
 		if (null == dbHelperInstance) {
-			dbHelperInstance = new DBHelper(context);
+			dbHelperInstance = new DBHelper(context);			
 		}		
 		return dbHelperInstance;
+	}
+	
+	public String getDatabasePathName() {
+		return context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
 	}
 	
 	public void Init(){
@@ -260,6 +286,36 @@ public class DBHelper {
 				c.close();
 			}
 		}
+	}
+	
+	public List<RawRecItem> getRawTable(String tableName) {
+		List<RawRecItem> res = new ArrayList<RawRecItem>();
+		
+		Cursor c = null;
+		
+		try {
+			c = db.rawQuery("SELECT * FROM " + tableName, null);
+						
+			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+				
+				RawRecItem recItem = new RawRecItem();
+				
+				for (int columnIndex = 0; columnIndex < c.getColumnCount(); columnIndex ++ ) {					
+					recItem.setFieldNameValue(c.getColumnName(columnIndex), c.getString(columnIndex));										
+				}
+				
+				res.add(recItem);
+				
+			}			
+			
+		} finally {
+			
+			if (null != c && !c.isClosed()) {
+				c.close();
+			}			
+		}		
+		
+		return res;
 	}
 	
 }
