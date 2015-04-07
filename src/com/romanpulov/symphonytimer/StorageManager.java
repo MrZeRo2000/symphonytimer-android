@@ -102,6 +102,11 @@ public class StorageManager {
 			
 			Log.d(TAG, "XML generated");
 			
+			//for test only - parsing XML
+			FileInputStream xmlInputStream = new FileInputStream(destXmlFileName);
+			DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream);
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

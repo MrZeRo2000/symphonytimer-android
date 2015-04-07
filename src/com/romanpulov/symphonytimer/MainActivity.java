@@ -140,10 +140,12 @@ public class MainActivity extends ActionBarActivity {
         Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
         
         AssetsHelper.listAssets(this, "pre_inst_images");
+        
         // the below is for testing only
         //startHistoryActivity();
         //Toast.makeText(this, DBHelper.getInstance(this).getDatabasePathName(), Toast.LENGTH_LONG).show();
-        Log.d("DBXMLHelper_getDBXML", DBXMLHelper.getInstance(this).getDBXML());
+        
+
     }
     
     @Override
