@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -110,33 +112,28 @@ public class DBXMLHelper {
 		
 	}
 	
-	private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-	    String result = "";
-	    if (parser.next() == XmlPullParser.TEXT) {
-	        result = parser.getText();
-	        parser.nextTag();
-	    }
-	    return result;
+	private void logXMLDocument(InputStream inputStream) throws XmlPullParserException, IOException {
+		
+		XmlPullParser xmlParser = Xml.newPullParser();
+    	xmlParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+    	xmlParser.setInput(inputStream, null);
+
+    	//log everything in the xml
+    	Log.d("DBXMLHelper_parseDBXML", "Log all xml ===================================================");
+    	int eventType = xmlParser.getEventType();
+    	while (eventType != XmlPullParser.END_DOCUMENT) {
+    		
+    		Log.d("DBXMLHelper_parseDBXML", "Name = " + xmlParser.getName() + ", event = " + eventType + ", text = " + xmlParser.getText());
+    		
+    		xmlParser.next();
+    		eventType = xmlParser.getEventType();
+    	}
+		
 	}
 	
-	private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-	    if (parser.getEventType() != XmlPullParser.START_TAG) {
-	        throw new IllegalStateException();
-	    }
-	    int depth = 1;
-	    while (depth != 0) {
-	        switch (parser.next()) {
-	        case XmlPullParser.END_TAG:
-	            depth--;
-	            break;
-	        case XmlPullParser.START_TAG:
-	            depth++;
-	            break;
-	        }
-	    }
-	 }
-	
 	public void parseDBXML(InputStream inputStream) {
+		
+		Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>();
 		
         XmlPullParser xmlParser = Xml.newPullParser();
         
@@ -144,60 +141,13 @@ public class DBXMLHelper {
         	
         	xmlParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         	xmlParser.setInput(inputStream, null);
-
-        	/*
-        	//reading root
-        	xmlParser.nextTag();
-        	//check for correct tag
-        	xmlParser.require(XmlPullParser.START_TAG, null, DBOpenHelper.DATABASE_NAME);
-        	
-        	
-        	int eventType = xmlParser.getEventType();
-        	while (eventType != XmlPullParser.END_DOCUMENT) {
-        		
-        		if (DBOpenHelper.TIMER_TABLE_NAME.equalsIgnoreCase(xmlParser.getName())) {
-        		
-        			Log.d("DBXMLHelper_parseDBXML", "Name = " + xmlParser.getName());
-        			xmlParser.next();
-        			xmlParser.require(XmlPullParser.START_TAG, null, getTableItem(DBOpenHelper.TIMER_TABLE_NAME));
-        			Log.d("DBXMLHelper_parseDBXML", "Require table item passed" );
-        			
-        			while (xmlParser.next() != XmlPullParser.END_TAG) {
-        				
-        		        if (xmlParser.getEventType() != XmlPullParser.START_TAG) {
-        		            continue;
-        		        }
-        		        
-        		        String name = xmlParser.getName();        		        
-        		        
-        		        Log.d("DBXMLHelper_parseDBXML", "Inside name = " + name );
-        		        
-        		        
-        		        if (name.equals("title")) {
-        		        	
-        		        	xmlParser.require(XmlPullParser.START_TAG, null, "title");
-        		        	String title = readText(xmlParser);
-        		        	xmlParser.require(XmlPullParser.END_TAG, null, "title");
-        		        	
-        		        	Log.d("DBXMLHelper_parseDBXML", "Read title:" + title );
-        		        	
-        		        } else {
-        		            skip(xmlParser);
-        		        }
-        		        
-        		    } 
-        			
-        		}
-        		
-        		eventType = xmlParser.next();
-        	}
-        	*/
-        	
         	
         	String tableName = null;
         	String tableItem = null;
         	String fieldName = null;
         	String fieldValue = null;
+        	List<DBHelper.RawRecItem> tableDataRecList = null;
+        	DBHelper.RawRecItem tableDataRecItem = null;
         	int eventType = xmlParser.getEventType();
         	int a1_s = 0;        	
         	while ((eventType != XmlPullParser.END_DOCUMENT) && (10000 > a1_s)) {
@@ -211,6 +161,7 @@ public class DBXMLHelper {
                 	xmlParser.next();
                 	//check for correct tag
                 	xmlParser.require(XmlPullParser.START_TAG, null, DBOpenHelper.DATABASE_NAME);
+                	//move to read tables
                 	a1_s = 100;
                 	break;
                 	
@@ -225,6 +176,8 @@ public class DBXMLHelper {
         			tableName = xmlParser.getName();
         			//checking name
         			if ((DBOpenHelper.TIMER_TABLE_NAME.equals(tableName)) || (DBOpenHelper.TIMER_HISTORY_TABLE_NAME.equals(tableName))) {
+        				tableDataRecList = new ArrayList<DBHelper.RawRecItem>();
+        				tableData.put(tableName, tableDataRecList);
         				tableItem = getTableItem(tableName);
         				a1_s = 200;
 
@@ -249,7 +202,7 @@ public class DBXMLHelper {
         			Log.d("DBXMLHelper_parseDBXML", "case = 200, event = " + xmlParser.getEventType() + ", name = " + xmlParser.getName());
 
         			if ((XmlPullParser.START_TAG == xmlParser.getEventType()) && (tableItem.equals(xmlParser.getName()))) {
-        				//reading table item attributes
+        				//reading table item attributes        				        				
         				a1_s = 300;
         			} else {
         				if ((XmlPullParser.END_TAG == xmlParser.getEventType())) {
@@ -298,6 +251,10 @@ public class DBXMLHelper {
         			if (XmlPullParser.TEXT == xmlParser.getEventType()) {
         				//read text
         				fieldValue = xmlParser.getText();
+        				//
+        				Log.d("DBXMLHelper_dataDBXML", "tableName = " + tableName + ", fieldName = " + fieldName + ", fieldValue = " + fieldValue);
+        				tableDataRecItem = new DBHelper.RawRecItem();
+        				tableDataRecItem.setFieldNameValue(fieldName, fieldValue);
         				a1_s = 500;
         				
         			} else {
@@ -315,6 +272,7 @@ public class DBXMLHelper {
         			
         			if (XmlPullParser.END_TAG == xmlParser.getEventType()) {
         				//move to next attribute
+        				tableDataRecList.add(tableDataRecItem);
         				a1_s = 300;
         			} else {
         				//text closing tag not found
@@ -325,43 +283,21 @@ public class DBXMLHelper {
         			
         		}
         		
-        		
         	}
         	
         	Log.d("DBXMLHelper_parseDBXML", "Exiting with state =" + a1_s);
         	
-        	
-        	//log everything in the xml
-        	Log.d("DBXMLHelper_parseDBXML", "Log all xml ===================================================");
-        	eventType = xmlParser.getEventType();
-        	while (eventType != XmlPullParser.END_DOCUMENT) {
-        		
-        		Log.d("DBXMLHelper_parseDBXML", "Name = " + xmlParser.getName() + ", event = " + eventType + ", text = " + xmlParser.getText());
-        		
-        		xmlParser.next();
-        		eventType = xmlParser.getEventType();
-        	}
-
-        	
-        	/*
-        	
-        	while (xmlParser.next() != XmlPullParser.END_TAG) {
-        		
-        		if (xmlParser.getEventType() != XmlPullParser.START_TAG) {
-                    continue;
-                }        		
-        		
-        		String name = xmlParser.getName();
-        		Log.d("DBXMLHelper_parseDBXML", "Name = " + name);        		
-        		
-        	}
-        	*/
-        	
+        	//for test purposes
+        	logXMLDocument(inputStream);
         	
         } catch (XmlPullParserException e) {
         	
+        	e.printStackTrace();
+        	
         }
         catch (IOException e) {
+        	
+        	e.printStackTrace();
         	
         }
 	}
