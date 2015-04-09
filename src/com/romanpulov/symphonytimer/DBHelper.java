@@ -17,7 +17,7 @@ public class DBHelper {
 	private SQLiteDatabase db;
 	private final DBOpenHelper dbOpenHelper;
 	
-	public class RawRecItem {
+	public static class RawRecItem {
 		
 		private Map<String, String> fields = new HashMap<String, String>();
 		

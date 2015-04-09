@@ -227,7 +227,7 @@ public class DBXMLHelper {
 
         				//create new record item
         				Log.d("DBXMLHelper_tableData", "New tableDataRecItem");
-        				tableDataRecItem = DBHelper.getInstance(context).new RawRecItem();
+        				tableDataRecItem = /*DBHelper.getInstance(context).*/ new DBHelper.RawRecItem();
         				
         				//move to reading table item attributes        				        				
         				a1_s = 300;
