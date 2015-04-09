@@ -1,10 +1,17 @@
 package com.romanpulov.symphonytimer;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.os.Environment;
@@ -20,9 +27,30 @@ public class StorageManager {
 	private static StorageManager storageManagerInstance = null;
 	private Context context;
 	
+	private String sourceDBFileName;
+	private String localBackupFolderName; 
+	private String destDBFileName;
+	private String destXmlFileName;
+	
+	private void initLocalFileNames () {
+		
+		this.sourceDBFileName = getDatabasePath();
+		
+		StringBuilder destFolderStringBuilder = new StringBuilder(Environment.getExternalStorageDirectory().toString());	
+		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FOLDER_NAME);
+		this.localBackupFolderName = destFolderStringBuilder.toString();
+		
+		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FILE_NAME);
+		this.destDBFileName = destFolderStringBuilder.toString();
+		
+		destFolderStringBuilder.append(".xml");
+		this.destXmlFileName = destFolderStringBuilder.toString();	
+		
+	}
+	
 	private StorageManager(Context context) {
 		this.context = context;
-		
+		initLocalFileNames();
 	}
 	
 	public static StorageManager getInstance(Context context) {
@@ -38,22 +66,13 @@ public class StorageManager {
 		return context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
 	}
 	
-	public String CreateLocalBackup() {
+	public String createLocalBackup() {		
 		
-		final String sourceFileName = getDatabasePath();
-		StringBuilder destFolderStringBuilder = new StringBuilder(Environment.getExternalStorageDirectory().toString());	
-		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FOLDER_NAME);
-		final String backupFolderName = destFolderStringBuilder.toString();
-		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FILE_NAME);
-		final String destFileName = destFolderStringBuilder.toString();
-		destFolderStringBuilder.append(".xml");
-		final String destXmlFileName = destFolderStringBuilder.toString();
-		
-		Log.d(TAG, backupFolderName);
-		Log.d(TAG, destFileName);
+		Log.d(TAG, localBackupFolderName);
+		Log.d(TAG, destDBFileName);
 		
 		// create backup folder if not exists
-		File backupFolder = new File(backupFolderName);
+		File backupFolder = new File(localBackupFolderName);
 		if (!backupFolder.exists()) {
 			
 			Log.d(TAG, "Folder does not exist, creating one");
@@ -71,9 +90,9 @@ public class StorageManager {
 		
 			//copy source database to backup folder
 			Log.d(TAG, "Creating Input Stream");
-			FileInputStream inStream = new FileInputStream(sourceFileName);
+			FileInputStream inStream = new FileInputStream(sourceDBFileName);
 			Log.d(TAG, "Creating Output Stream");
-			FileOutputStream outStream = new FileOutputStream(destFileName);
+			FileOutputStream outStream = new FileOutputStream(destDBFileName);
 			try {
 				
 				Log.d(TAG, "Copying file");
@@ -103,17 +122,42 @@ public class StorageManager {
 			Log.d(TAG, "XML generated");
 			
 			//for test only - parsing XML
-			FileInputStream xmlInputStream = new FileInputStream(destXmlFileName);
-			DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream);
+			//FileInputStream xmlInputStream = new FileInputStream(destXmlFileName);
+			//DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream);
 			
 			
 		} catch (IOException e) {
+			
 			e.printStackTrace();
 			return null;
+			
 		}		
 
-		return destFileName;
+		return destDBFileName;
 		
 	}	
+	
+	public int restoreLocalXmlBackup() {
+		
+		int res = 0;
+		
+		try {
+			
+			InputStream xmlInputStream = new BufferedInputStream(new FileInputStream(destXmlFileName));
+			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>() ;
+			
+			//reading data
+			DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream, tableData);
+		
+		} catch (FileNotFoundException e) {
+			
+			res = 1;
+			e.printStackTrace();
+			
+		}
+		
+		return res;
+		
+	}
 
 }

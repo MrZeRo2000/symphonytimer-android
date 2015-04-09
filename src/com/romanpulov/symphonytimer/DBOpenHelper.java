@@ -1,5 +1,8 @@
 package com.romanpulov.symphonytimer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -45,6 +48,19 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     		"GROUP BY timer_id " +
     		"ORDER BY 2 DESC";
     
+    public static final String TIMER_BACKUP_GET_QUERY = 
+    		"SELECT _id, title, time_sec, order_id FROM " + TIMER_TABLE_NAME;
+    
+    public static final String TIMER_HISTORY_BACKUP_GET_QUERY = 
+    		"SELECT _id, timer_id, start_time, end_time FROM " + TIMER_HISTORY_TABLE_NAME;
+    
+    public static final Map<String, String> TABLE_BACKUP_QUERIES;
+    static {
+    	TABLE_BACKUP_QUERIES = new HashMap<String, String> ();
+    	TABLE_BACKUP_QUERIES.put(TIMER_TABLE_NAME, TIMER_BACKUP_GET_QUERY);
+    	TABLE_BACKUP_QUERIES.put(TIMER_HISTORY_TABLE_NAME, TIMER_HISTORY_BACKUP_GET_QUERY);
+    }
+
     
     private static final String TIMER_TABLE_CREATE =
                 "CREATE TABLE " + TIMER_TABLE_NAME + " (" +

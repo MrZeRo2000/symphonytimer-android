@@ -288,13 +288,14 @@ public class DBHelper {
 		}
 	}
 	
-	public List<RawRecItem> getRawTable(String tableName) {
+	public List<RawRecItem> getBackupTable(String tableName) {
+		
 		List<RawRecItem> res = new ArrayList<RawRecItem>();
 		
 		Cursor c = null;
 		
 		try {
-			c = db.rawQuery("SELECT * FROM " + tableName, null);
+			c = db.rawQuery(DBOpenHelper.TABLE_BACKUP_QUERIES.get(tableName), null);
 						
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
 				
@@ -316,6 +317,12 @@ public class DBHelper {
 		}		
 		
 		return res;
+	}
+
+	public void restoreBackupData (Map<String, List<DBHelper.RawRecItem>> tableData) {
+		
+		
+		
 	}
 	
 }

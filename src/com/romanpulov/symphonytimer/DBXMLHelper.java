@@ -41,7 +41,7 @@ public class DBXMLHelper {
 		
 		final String tableItem = getTableItem(tableName);
 		
-		List<DBHelper.RawRecItem> timers = DBHelper.getInstance(context).getRawTable(tableName);
+		List<DBHelper.RawRecItem> timers = DBHelper.getInstance(context).getBackupTable(tableName);
 		xmlSerializer.startTag("", tableName);
 		
 		for (DBHelper.RawRecItem timerRecItem: timers) {
@@ -112,6 +112,8 @@ public class DBXMLHelper {
 		
 	}
 	
+	// this one is for debugging purposes only
+	@SuppressWarnings("unused")
 	private void logXMLDocument(InputStream inputStream) throws XmlPullParserException, IOException {
 		
 		XmlPullParser xmlParser = Xml.newPullParser();
@@ -131,9 +133,12 @@ public class DBXMLHelper {
 		
 	}
 	
-	public void parseDBXML(InputStream inputStream) {
+	public int parseDBXML(InputStream inputStream, Map<String, List<DBHelper.RawRecItem>> tableData ) {
 		
-		Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>();
+//		= new HashMap<String, List<DBHelper.RawRecItem>>();
+		
+		int res = 0;
+		int a1_s = 0; 
 		
         XmlPullParser xmlParser = Xml.newPullParser();
         
@@ -142,14 +147,16 @@ public class DBXMLHelper {
         	xmlParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         	xmlParser.setInput(inputStream, null);
         	
+        	//
         	String tableName = null;
         	String tableItem = null;
         	String fieldName = null;
         	String fieldValue = null;
         	List<DBHelper.RawRecItem> tableDataRecList = null;
         	DBHelper.RawRecItem tableDataRecItem = null;
+        	
         	int eventType = xmlParser.getEventType();
-        	int a1_s = 0;        	
+        	      	
         	while ((eventType != XmlPullParser.END_DOCUMENT) && (10000 > a1_s)) {
         		
         		switch (a1_s) {
@@ -172,14 +179,28 @@ public class DBXMLHelper {
         			xmlParser.next();
         			Log.d("DBXMLHelper_parseDBXML", "case = 100, event = " + xmlParser.getEventType() + ", name = " + xmlParser.getName());
         			
-        			//getting table name
-        			tableName = xmlParser.getName();
-        			//checking name
-        			if ((DBOpenHelper.TIMER_TABLE_NAME.equals(tableName)) || (DBOpenHelper.TIMER_HISTORY_TABLE_NAME.equals(tableName))) {
-        				tableDataRecList = new ArrayList<DBHelper.RawRecItem>();
-        				tableData.put(tableName, tableDataRecList);
-        				tableItem = getTableItem(tableName);
-        				a1_s = 200;
+        			//looking for table name name
+        			if ((XmlPullParser.START_TAG == xmlParser.getEventType())) {
+            			//getting table name
+            			tableName = xmlParser.getName();
+            			
+            			if (null == tableName) {
+            				
+            				//table name not found
+            				a1_s = 10100;
+            				
+            			} else {
+            				
+            				//create data structure for table item
+	        				tableDataRecList = new ArrayList<DBHelper.RawRecItem>();
+	        				tableData.put(tableName, tableDataRecList);
+	        				tableItem = getTableItem(tableName);
+	        				
+	        				//move to reading table item	        				
+	        				a1_s = 200;
+	        				
+            			}
+            			
 
         			} else {
         				if ((XmlPullParser.END_TAG == xmlParser.getEventType()))  {
@@ -288,18 +309,24 @@ public class DBXMLHelper {
         	Log.d("DBXMLHelper_parseDBXML", "Exiting with state =" + a1_s);
         	
         	//for test purposes
-        	logXMLDocument(inputStream);
+        	//logXMLDocument(inputStream);
         	
         } catch (XmlPullParserException e) {
         	
         	e.printStackTrace();
+        	res = 20000;
         	
         }
         catch (IOException e) {
         	
         	e.printStackTrace();
+        	res = 30000;
         	
         }
+        
+        res = (a1_s > 10001) ? a1_s : 0;
+        
+        return res;
 	}
 
 }
