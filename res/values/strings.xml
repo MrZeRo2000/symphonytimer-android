@@ -26,7 +26,11 @@
     <string name="action_move_up">Move up</string>
     <string name="action_move_down">Move down</string>
     <string name="action_preferences">Preferences</string>
+    <string name="pref_cat_settings">Application Settings</string>
     <string name="pref_vibrate">Vibrate</string>
+    <string name="pref_cat_backup">Backup</string>
+    <string name="pref_local_backup">Local backup</string>
+    <string name="pref_local_restore">Local restore</string>
     <string name="error_saving_timer">Error saving timer: %s</string>
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>

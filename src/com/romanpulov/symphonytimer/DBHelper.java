@@ -17,7 +17,7 @@ public class DBHelper {
 	private SQLiteDatabase db;
 	private final DBOpenHelper dbOpenHelper;
 	
-	public static class RawRecItem {
+	public class RawRecItem {
 		
 		private Map<String, String> fields = new HashMap<String, String>();
 		
@@ -25,7 +25,7 @@ public class DBHelper {
 			return fields;
 		}			
 		
-		public void setFieldNameValue(String fieldName, String fieldValue) {
+		public void putFieldNameValue(String fieldName, String fieldValue) {
 			fields.put(fieldName, fieldValue);
 		}
 		
@@ -302,7 +302,7 @@ public class DBHelper {
 				RawRecItem recItem = new RawRecItem();
 				
 				for (int columnIndex = 0; columnIndex < c.getColumnCount(); columnIndex ++ ) {					
-					recItem.setFieldNameValue(c.getColumnName(columnIndex), c.getString(columnIndex));										
+					recItem.putFieldNameValue(c.getColumnName(columnIndex), c.getString(columnIndex));										
 				}
 				
 				res.add(recItem);
@@ -318,9 +318,58 @@ public class DBHelper {
 		
 		return res;
 	}
+	
+	private void loadBackupTimer(List<DBHelper.RawRecItem> recList) {
+		
+		for (RawRecItem recItem : recList) {
+
+			ContentValues cv = new ContentValues();
+			cv.put(DBOpenHelper.TIMER_TABLE_COLS[0], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[0]));
+			cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[1]));
+			cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[2]));
+			cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[5]));
+			db.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);						
+		}
+		
+	}
+	
+	private void loadBackupTimerHistory(List<DBHelper.RawRecItem> recList) {
+		
+		for (RawRecItem recItem : recList) {
+
+			ContentValues cv = new ContentValues();
+			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[0], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[0]));
+			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1]));
+			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2]));
+			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3]));
+			db.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);						
+		}
+		
+	}
 
 	public void restoreBackupData (Map<String, List<DBHelper.RawRecItem>> tableData) {
 		
+		//delete old data
+		db.delete(DBOpenHelper.TIMER_TABLE_NAME, null, null);
+		db.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, null);
+		
+		List<DBHelper.RawRecItem> tableItemData = null;
+		
+		//load timer
+		tableItemData = tableData.get(DBOpenHelper.TIMER_TABLE_NAME);
+		if (null != tableItemData) {
+			
+			loadBackupTimer(tableItemData);
+			
+		} 
+		
+		//load timer history
+		tableItemData = tableData.get(DBOpenHelper.TIMER_HISTORY_TABLE_NAME);
+		if (null != tableItemData) {
+			
+			loadBackupTimerHistory(tableItemData);
+			
+		} 
 		
 		
 	}

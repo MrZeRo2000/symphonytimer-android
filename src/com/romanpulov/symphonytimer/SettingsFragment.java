@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
@@ -22,16 +23,48 @@ public class SettingsFragment extends PreferenceListFragment implements
 		preferenceManager.setSharedPreferencesName(SHARED_PREFS_NAME);
 		addPreferencesFromResource(R.xml.preferences);
 		preferenceManager.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-		Preference button = (Preference)findPreference("pref_backup");
-		button.setOnPreferenceClickListener(this);
-		//button.setOnPreferenceChangeListener(onPreferenceChangeListener);
-		//Toast.makeText(getActivity(), button.getTitle(), Toast.LENGTH_LONG).show();
+		
+		//local backup
+		Preference button = (Preference)findPreference("pref_local_backup");
+		if (null != button) {
+			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					// TODO Auto-generated method stub
+					final String localBackupFileName = StorageManager.getInstance(getActivity()).createLocalBackup();
+					if (null != localBackupFileName) {
+						Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();
+					}
+					
+					return false;
+				}
+			});
+		}
+		
+		//local restore
+		button = (Preference)findPreference("pref_local_restore");
+		if (null != button) {
+			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
+				@Override
+				public boolean onPreferenceClick(Preference preference) {
+					// TODO Auto-generated method stub
+					int res = StorageManager.getInstance(getActivity()).restoreLocalXmlBackup();
+					
+					if (res != 0) {
+						Toast.makeText(getActivity(), "Error restoring from local backup: " + res, Toast.LENGTH_LONG).show();
+					}			
+					
+					return false;
+				}
+			});
+		}
+		
 	}
 	
 	
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub		
 		final String localBackupFileName = StorageManager.getInstance(getActivity()).createLocalBackup();
 		if (null != localBackupFileName) {
 			Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();

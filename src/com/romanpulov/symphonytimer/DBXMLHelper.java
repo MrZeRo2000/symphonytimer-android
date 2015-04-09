@@ -192,8 +192,9 @@ public class DBXMLHelper {
             			} else {
             				
             				//create data structure for table item
+            				Log.d("DBXMLHelper_tableData", "New tableDataRecList");            				
 	        				tableDataRecList = new ArrayList<DBHelper.RawRecItem>();
-	        				tableData.put(tableName, tableDataRecList);
+	        				//table item name
 	        				tableItem = getTableItem(tableName);
 	        				
 	        				//move to reading table item	        				
@@ -223,12 +224,24 @@ public class DBXMLHelper {
         			Log.d("DBXMLHelper_parseDBXML", "case = 200, event = " + xmlParser.getEventType() + ", name = " + xmlParser.getName());
 
         			if ((XmlPullParser.START_TAG == xmlParser.getEventType()) && (tableItem.equals(xmlParser.getName()))) {
-        				//reading table item attributes        				        				
+
+        				//create new record item
+        				Log.d("DBXMLHelper_tableData", "New tableDataRecItem");
+        				tableDataRecItem = DBHelper.getInstance(context).new RawRecItem();
+        				
+        				//move to reading table item attributes        				        				
         				a1_s = 300;
+        				
         			} else {
         				if ((XmlPullParser.END_TAG == xmlParser.getEventType())) {
-        					//move to read next table
+        					
+        					//put read data
+        					Log.d("DBXMLHelper_tableData", "Put tableDataRecList");
+        					tableData.put(tableName, tableDataRecList);
+        					
+        					//move to read next table        					
         					a1_s = 100;
+        					
         				} else {        				
 	        				//no table closing tag found where expected
 	        				a1_s = 10200;
@@ -245,12 +258,17 @@ public class DBXMLHelper {
         			
         			//attribute title
         			if (XmlPullParser.START_TAG == xmlParser.getEventType()) {
+        				
         				fieldName = xmlParser.getName();
         				//move to read text
         				a1_s = 400;
         			} else {
         				//start tag not found where expected
         				if (XmlPullParser.END_TAG == xmlParser.getEventType()) {
+        					
+        					//save record item
+        					Log.d("DBXMLHelper_tableData", "add tableDataRecItem");
+        					tableDataRecList.add(tableDataRecItem);
         					
         					//move to read next table item
         					a1_s = 200;
@@ -274,8 +292,8 @@ public class DBXMLHelper {
         				fieldValue = xmlParser.getText();
         				//
         				Log.d("DBXMLHelper_dataDBXML", "tableName = " + tableName + ", fieldName = " + fieldName + ", fieldValue = " + fieldValue);
-        				tableDataRecItem = new DBHelper.RawRecItem();
-        				tableDataRecItem.setFieldNameValue(fieldName, fieldValue);
+        				Log.d("DBXMLHelper_tableData", "putFieldNameValue");
+        				tableDataRecItem.putFieldNameValue(fieldName, fieldValue);
         				a1_s = 500;
         				
         			} else {
@@ -293,7 +311,7 @@ public class DBXMLHelper {
         			
         			if (XmlPullParser.END_TAG == xmlParser.getEventType()) {
         				//move to next attribute
-        				tableDataRecList.add(tableDataRecItem);
+        				
         				a1_s = 300;
         			} else {
         				//text closing tag not found

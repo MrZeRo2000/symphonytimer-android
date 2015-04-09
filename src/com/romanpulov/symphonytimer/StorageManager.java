@@ -147,7 +147,13 @@ public class StorageManager {
 			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>() ;
 			
 			//reading data
-			DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream, tableData);
+			res = DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream, tableData);
+			
+			if (0 == res) {
+				
+				DBHelper.getInstance(context).restoreBackupData(tableData);
+				
+			}
 		
 		} catch (FileNotFoundException e) {
 			
