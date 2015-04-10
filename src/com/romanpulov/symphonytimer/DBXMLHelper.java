@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,19 +18,21 @@ import android.util.Xml;
 
 public class DBXMLHelper {
 	
-	private static DBXMLHelper dbXMLHelperInstance = null;
+	//private static DBXMLHelper dbXMLHelperInstance = null;
 	private Context context;
 	
-	private DBXMLHelper(Context context) {
+	public DBXMLHelper(Context context) {
 		this.context = context;
 	}
 	
+	/*
 	public static DBXMLHelper getInstance(Context context) {
 		if (null == dbXMLHelperInstance) {
 			dbXMLHelperInstance = new DBXMLHelper(context);			
 		}		
 		return dbXMLHelperInstance;
 	}
+	*/
 	
 	private String getTableItem(String tableName) {
 		return tableName + "_item";

@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class StorageManager {
 			// generate xml
 			File xmlFile = new File(destXmlFileName);
 			FileWriter xmlFileWriter = new FileWriter(xmlFile);
-			DBXMLHelper.getInstance(context).writeDBXML(xmlFileWriter);
+			new DBXMLHelper(context).writeDBXML(xmlFileWriter);
 			xmlFileWriter.flush();
 			xmlFileWriter.close();
 			
@@ -147,12 +146,10 @@ public class StorageManager {
 			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>() ;
 			
 			//reading data
-			res = DBXMLHelper.getInstance(context).parseDBXML(xmlInputStream, tableData);
+			res = new DBXMLHelper(context).parseDBXML(xmlInputStream, tableData);
 			
-			if (0 == res) {
-				
-				DBHelper.getInstance(context).restoreBackupData(tableData);
-				
+			if (0 == res) {				
+				DBHelper.getInstance(context).restoreBackupData(tableData);				
 			}
 		
 		} catch (FileNotFoundException e) {

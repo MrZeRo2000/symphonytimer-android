@@ -179,6 +179,11 @@ public class MainActivity extends ActionBarActivity {
     	// TODO Auto-generated method stub
     	super.onResume();
     	activityVisible = true;
+    	
+    	if (DBHelper.getInstance(this).getDBDataChanged()) {
+    		loadTimers();
+    		DBHelper.getInstance(this).resetDBDataChanged();
+    	}
     	updateTimers();
     	Log.d("MainActivity", "OnResume");
     }
@@ -228,6 +233,10 @@ public class MainActivity extends ActionBarActivity {
     		startAddItemActivity(new DMTimerRec());
     		return true;
     	case R.id.action_preferences:
+        	if (0 != dmTasks.size()) {
+        		Toast.makeText(getApplicationContext(), this.getString(R.string.action_not_allowed), Toast.LENGTH_SHORT).show();
+        		return super.onOptionsItemSelected(item);
+        	}    		
     		Intent perferencesIntent = new Intent(this, SettingsActivity.class);
     		startActivity(perferencesIntent);
     		return true;
@@ -275,9 +284,11 @@ public class MainActivity extends ActionBarActivity {
     	switch (item.getItemId()) {
     		case (CONTEXT_MENU_EDIT):
     			editTimer(actionTimerRec);
-    			return true;
+    			return true;    			
     		case (CONTEXT_MENU_DELETE):
-    			AlertOkCancelDialog.newAlertOkCancelDialog(actionTimerRec, R.string.question_are_you_sure).show(getSupportFragmentManager(), null);
+    			AlertOkCancelDialog deleteDialog = AlertOkCancelDialog.newAlertOkCancelDialog(actionTimerRec, R.string.question_are_you_sure); 
+    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
+    			deleteDialog.show(getSupportFragmentManager(), null);
     			return true;
     		case (CONTEXT_MENU_MOVE_UP):
     			performMoveUpTimer(actionTimerRec);

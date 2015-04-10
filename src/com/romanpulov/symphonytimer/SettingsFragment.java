@@ -6,6 +6,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
 
 public class SettingsFragment extends PreferenceListFragment implements
@@ -24,8 +25,37 @@ public class SettingsFragment extends PreferenceListFragment implements
 		addPreferencesFromResource(R.xml.preferences);
 		preferenceManager.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 		
+		Preference button;
+		
+		//reset data
+		button = (Preference)findPreference("pref_reset_data");
+		if (null != button) {
+			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				
+				@Override
+				public boolean onPreferenceClick(Preference arg0) {
+					// TODO Auto-generated method stub
+					
+	    			AlertOkCancelDialog deleteDialog = AlertOkCancelDialog.newAlertOkCancelDialog(null, R.string.question_are_you_sure); 
+	    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
+	    			deleteDialog.show(getActivity().getSupportFragmentManager(), null);					
+					
+					return false;
+				};
+				
+			    public AlertOkCancelDialog.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialog.OnOkButtonClick() {
+					@Override
+					public void OnOkButtonClickEvent(DialogFragment dialog) {
+						// TODO Auto-generated method stub
+						DBHelper.getInstance(getActivity()).clearData();
+					}
+				};		
+
+			});
+		}
+		
 		//local backup
-		Preference button = (Preference)findPreference("pref_local_backup");
+		button = (Preference)findPreference("pref_local_backup");
 		if (null != button) {
 			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
 				@Override
@@ -51,7 +81,7 @@ public class SettingsFragment extends PreferenceListFragment implements
 					int res = StorageManager.getInstance(getActivity()).restoreLocalXmlBackup();
 					
 					if (res != 0) {
-						Toast.makeText(getActivity(), "Error restoring from local backup: " + res, Toast.LENGTH_LONG).show();
+						Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
 					}			
 					
 					return false;

@@ -16,6 +16,7 @@ public class DBHelper {
 	private Context context;
 	private SQLiteDatabase db;
 	private final DBOpenHelper dbOpenHelper;
+	private boolean dbDataChanged = false;
 	
 	public static class RawRecItem {
 		
@@ -28,7 +29,6 @@ public class DBHelper {
 		public void putFieldNameValue(String fieldName, String fieldValue) {
 			fields.put(fieldName, fieldValue);
 		}
-		
 		
 	}	
 	
@@ -56,6 +56,14 @@ public class DBHelper {
 			dbHelperInstance = new DBHelper(context);			
 		}		
 		return dbHelperInstance;
+	}
+	
+	public boolean getDBDataChanged() {
+		return this.dbDataChanged;
+	}
+	
+	public void resetDBDataChanged() {
+		this.dbDataChanged = false; 
 	}
 	
 	public String getDatabasePathName() {
@@ -346,12 +354,20 @@ public class DBHelper {
 		}
 		
 	}
+	
+	public void clearData() {
+
+		db.delete(DBOpenHelper.TIMER_TABLE_NAME, null, null);
+		db.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, null);
+		
+		dbDataChanged = true;
+
+	}
 
 	public void restoreBackupData (Map<String, List<DBHelper.RawRecItem>> tableData) {
 		
 		//delete old data
-		db.delete(DBOpenHelper.TIMER_TABLE_NAME, null, null);
-		db.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, null);
+		clearData();
 		
 		List<DBHelper.RawRecItem> tableItemData = null;
 		
@@ -370,7 +386,6 @@ public class DBHelper {
 			loadBackupTimerHistory(tableItemData);
 			
 		} 
-		
 		
 	}
 	

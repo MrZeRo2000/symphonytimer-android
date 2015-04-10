@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 
 public class AlertOkCancelDialog extends DialogFragment {
@@ -18,10 +19,13 @@ public class AlertOkCancelDialog extends DialogFragment {
 	
 	private OnOkButtonClick okButtonClick;
 	
-	public static AlertOkCancelDialog newAlertOkCancelDialog(DMTimerRec dmTimerRec, int message) {
+	public static AlertOkCancelDialog newAlertOkCancelDialog(Parcelable object, int message) {
 		AlertOkCancelDialog newDialog = new AlertOkCancelDialog() ;
 		Bundle data = new Bundle();
-		data.putParcelable(dmTimerRec.getClass().toString(), dmTimerRec);
+		//data.putParcelable(dmTimerRec.getClass().toString(), dmTimerRec);
+		if (null != object) {
+			data.putParcelable(object.getClass().toString(), object);
+		}
 		newDialog.setArguments(data);
 		newDialog.setMessage(message);
 		newDialog.setRetainInstance(false);
@@ -40,7 +44,6 @@ public class AlertOkCancelDialog extends DialogFragment {
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		setOkButtonClick(((MainActivity)activity).onDeleteOkButtonClick);
 	}
 	
 	@Override
