@@ -29,9 +29,10 @@
     <string name="pref_cat_settings">Application Settings</string>
     <string name="pref_vibrate">Vibrate</string>
     <string name="pref_reset_data">Reset data</string>
-    <string name="pref_cat_backup">Backup</string>
-    <string name="pref_local_backup">Local backup</string>
-    <string name="pref_local_restore">Local restore</string>
+    <string name="pref_cat_local_backup">Local backup</string>
+    <string name="pref_backup">Backup</string>
+    <string name="pref_restore">Restore</string>
+    <string name="pref_cat_dropbox_backup">DropBox backup</string>
     <string name="error_saving_timer">Error saving timer: %s</string>
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>
