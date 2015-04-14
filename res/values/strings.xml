@@ -30,14 +30,18 @@
     <string name="pref_vibrate">Vibrate</string>
     <string name="pref_reset_data">Reset data</string>
     <string name="pref_cat_local_backup">Local backup</string>
+    <string name="pref_cat_summary_local_backup">Backup to local SD card</string>    
     <string name="pref_backup">Backup</string>
+    <string name="pref_summary_backup">Backup current data to local SD card</string>    
     <string name="pref_restore">Restore</string>
+    <string name="pref_summary_restore">Restore current data from local SD card</string>
     <string name="pref_cat_dropbox_backup">DropBox backup</string>
     <string name="error_saving_timer">Error saving timer: %s</string>
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>
     <string name="error_playing_sound">Error playing sound : %s</string>
     <string name="error_load_local_backup">Error loading local backup, code = %s</string>
+    <string name="info_load_local_backup">Local backup has been restored successfully</string>
     <string name="action_not_allowed">This operation is not allowed</string>
     <string name="question_are_you_sure">Are you sure?</string>
     <string name="title_activity_image_selection">ImageSelectionActivity</string>

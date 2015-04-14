@@ -23,7 +23,7 @@ public class StorageManager {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
 	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdb";
 	
-	private static StorageManager storageManagerInstance = null;
+	//private static StorageManager storageManagerInstance = null;
 	private Context context;
 	
 	private String sourceDBFileName;
@@ -47,18 +47,9 @@ public class StorageManager {
 		
 	}
 	
-	private StorageManager(Context context) {
+	public StorageManager(Context context) {
 		this.context = context;
 		initLocalFileNames();
-	}
-	
-	public static StorageManager getInstance(Context context) {
-		
-		if (null == storageManagerInstance) {
-			storageManagerInstance = new StorageManager(context);
-		}
-		
-		return storageManagerInstance;
 	}
 	
 	private String getDatabasePath () {
@@ -132,7 +123,7 @@ public class StorageManager {
 			
 		}		
 
-		return destDBFileName;
+		return destXmlFileName;
 		
 	}	
 	

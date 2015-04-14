@@ -5,7 +5,5 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="lib" path="D:/Work/Android/dropbox-android-sdk-1.6.3/lib/dropbox-android-sdk-1.6.3.jar" sourcepath="D:/Work/Android/dropbox-android-sdk-1.6.3/dropbox-android-sdk-1.6.3.zip"/>
-	<classpathentry kind="lib" path="D:/Work/Android/dropbox-android-sdk-1.6.3/lib/json_simple-1.1.jar" sourcepath="D:/Work/Android/dropbox-android-sdk-1.6.3/dropbox-android-sdk-1.6.3.zip"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

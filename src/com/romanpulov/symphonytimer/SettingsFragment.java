@@ -43,7 +43,7 @@ public class SettingsFragment extends PreferenceListFragment implements
 					return false;
 				};
 				
-			    public AlertOkCancelDialog.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialog.OnOkButtonClick() {
+			    private AlertOkCancelDialog.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialog.OnOkButtonClick() {
 					@Override
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
 						// TODO Auto-generated method stub
@@ -61,31 +61,50 @@ public class SettingsFragment extends PreferenceListFragment implements
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					// TODO Auto-generated method stub
-					final String localBackupFileName = StorageManager.getInstance(getActivity()).createLocalBackup();
+					final String localBackupFileName = new StorageManager(getActivity()).createLocalBackup();
 					if (null != localBackupFileName) {
-						Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();
-					}
+						Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_SHORT).show();
+					}					
 					
 					return false;
-				}
+				};
+				
 			});
 		}
 		
 		//local restore
 		button = (Preference)findPreference("pref_local_restore");
 		if (null != button) {
-			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
+			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {		
+				
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					// TODO Auto-generated method stub
-					int res = StorageManager.getInstance(getActivity()).restoreLocalXmlBackup();
-					
-					if (res != 0) {
-						Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
-					}			
+
+	    			AlertOkCancelDialog deleteDialog = AlertOkCancelDialog.newAlertOkCancelDialog(null, R.string.question_are_you_sure); 
+	    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
+	    			deleteDialog.show(getActivity().getSupportFragmentManager(), null);					
 					
 					return false;
-				}
+				};
+				
+			    private AlertOkCancelDialog.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialog.OnOkButtonClick() {
+					@Override
+					public void OnOkButtonClickEvent(DialogFragment dialog) {
+						// TODO Auto-generated method stub
+						
+						int res = new StorageManager(getActivity()).restoreLocalXmlBackup();
+						
+						if (res != 0) {
+							Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
+						} else {
+							Toast.makeText(getActivity(), getResources().getString(R.string.info_load_local_backup), Toast.LENGTH_SHORT).show();							
+						}
+
+					}
+				};		
+				
+				
 			});
 		}
 		
@@ -95,7 +114,7 @@ public class SettingsFragment extends PreferenceListFragment implements
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
 		// TODO Auto-generated method stub		
-		final String localBackupFileName = StorageManager.getInstance(getActivity()).createLocalBackup();
+		final String localBackupFileName = new StorageManager(getActivity()).createLocalBackup();
 		if (null != localBackupFileName) {
 			Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();
 		}

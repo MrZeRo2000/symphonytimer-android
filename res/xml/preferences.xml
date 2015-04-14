@@ -16,36 +16,23 @@
         </Preference>           
 	</PreferenceCategory>
 	<PreferenceCategory
-	    android:title="@string/pref_cat_local_backup" 
+	    android:title="@string/pref_cat_local_backup"
+	    android:summary="@string/pref_cat_summary_local_backup"
 	    >
 	    <Preference 
 	        android:key="pref_local_backup"
 	        android:title="@string/pref_backup"
+	        android:summary="@string/pref_summary_backup"
 	        android:selectable="true"
 	        >        
 	    </Preference>
 	    <Preference 
 	        android:key="pref_local_restore"
 	        android:title="@string/pref_restore"
+	        android:summary="@string/pref_summary_restore"
 	        android:selectable="true"
 	        >        
 	    </Preference>    
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_cat_dropbox_backup"
-        >
-	    <Preference 
-	        android:key="pref_dropbox_backup"
-	        android:title="@string/pref_backup"
-	        android:selectable="true"
-	        >        
-	    </Preference>
-	    <Preference 
-	        android:key="pref_dropbox_restore"
-	        android:title="@string/pref_restore"
-	        android:selectable="true"
-	        >        
-	    </Preference>  
     </PreferenceCategory>
 
 </PreferenceScreen>
