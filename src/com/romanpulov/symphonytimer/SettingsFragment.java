@@ -61,7 +61,7 @@ public class SettingsFragment extends PreferenceListFragment implements
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					// TODO Auto-generated method stub
-					final String localBackupFileName = new StorageManager(getActivity()).createLocalBackup();
+					final String localBackupFileName = new StorageHelper(getActivity()).createLocalBackup();
 					if (null != localBackupFileName) {
 						Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_SHORT).show();
 					}					
@@ -93,7 +93,7 @@ public class SettingsFragment extends PreferenceListFragment implements
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
 						// TODO Auto-generated method stub
 						
-						int res = new StorageManager(getActivity()).restoreLocalXmlBackup();
+						int res = new StorageHelper(getActivity()).restoreLocalXmlBackup();
 						
 						if (res != 0) {
 							Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
@@ -114,7 +114,7 @@ public class SettingsFragment extends PreferenceListFragment implements
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
 		// TODO Auto-generated method stub		
-		final String localBackupFileName = new StorageManager(getActivity()).createLocalBackup();
+		final String localBackupFileName = new StorageHelper(getActivity()).createLocalBackup();
 		if (null != localBackupFileName) {
 			Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();
 		}
