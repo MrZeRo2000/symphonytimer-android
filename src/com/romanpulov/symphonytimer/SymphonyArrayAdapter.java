@@ -55,7 +55,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 
 		//display image
 		((ImageView)rowView.findViewById(R.id.image_image_view)).setImageURI(
-				null != dmTimerRec.image_name ? Uri.parse(dmTimerRec.image_name) : null);
+				null != dmTimerRec.image_name ? UriHelper.fileNameToUri(getContext(), dmTimerRec.image_name) : null);
 		
 		//calculate progress
 		long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);

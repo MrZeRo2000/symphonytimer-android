@@ -48,7 +48,7 @@ public class MediaPlayerHelper {
 		if (null == soundFile) {
 			mediaPlayer = MediaPlayer.create(context, R.raw.default_sound);
 		} else {
-			Uri uri = Uri.parse(soundFile);
+			Uri uri = UriHelper.fileNameToUri(context, soundFile);
 			mediaPlayer = new MediaPlayer();
 			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			try {

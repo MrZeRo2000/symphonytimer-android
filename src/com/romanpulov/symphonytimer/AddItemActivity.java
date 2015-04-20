@@ -4,12 +4,10 @@ import com.romanpulov.symphonytimer.R;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.content.Intent;
-import android.database.Cursor;
 import android.view.Menu;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -65,8 +63,8 @@ public class AddItemActivity extends ActionBarActivity {
 		
 		String soundFileTitle; 
 		if (null != editRec.sound_file) {
-			editSoundURI = Uri.parse(editRec.sound_file);
-			soundFileTitle = getSoundURITitle(editSoundURI);			
+			editSoundURI = UriHelper.fileNameToUri(getApplicationContext(), editRec.sound_file);
+			soundFileTitle = (null == editSoundURI) ? getString(R.string.default_sound) : UriHelper.getSoundTitleFromFileName(getApplicationContext(), editRec.sound_file); 
 		} else {
 			soundFileTitle = getString(R.string.default_sound);
 		}
@@ -74,28 +72,10 @@ public class AddItemActivity extends ActionBarActivity {
 		((Button)findViewById(R.id.sound_file_button)).setText(soundFileTitle);
 		
 		if (null != editRec.image_name) {
-			editImageURI = Uri.parse(editRec.image_name);		
+			//editImageURI = Uri.parse(editRec.image_name);
+			editImageURI = UriHelper.fileNameToUri(getApplicationContext(), editRec.image_name);
 			((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(editImageURI);
 		}
-	}
-	
-	private final String getSoundURITitle(Uri uri) {
-		String res = null;
-        Cursor mCursor = getContentResolver().query(
-        		uri,   // The content URI of the words table
-        	    new String[] {MediaStore.Audio.Media.TITLE},                        // The columns to return for each row
-        	    null,                    // Selection criteria
-        	    null,                     // Selection criteria
-        	    null);
-        if (null != mCursor)  {
-        	try {
-        		mCursor.moveToFirst();
-        		res = mCursor.getString(0);        		
-        	} finally {
-        		mCursor.close();
-        	}
-        }
-        return res;
 	}
 	
 	private final DMTimerRec getEditRec() throws AddItemInputException {
@@ -123,8 +103,8 @@ public class AddItemActivity extends ActionBarActivity {
 			throw new AddItemInputException(getResources().getString(R.string.error_time_zero));
 		}
 		
-		rec.sound_file = null != editSoundURI ? editSoundURI.toString() : null;
-		rec.image_name = null != editImageURI ? editImageURI.toString() : null;
+		rec.sound_file = null != editSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), editSoundURI) : null;
+		rec.image_name = null != editImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), editImageURI) : null;
 		
 		return rec;
 	}
@@ -174,19 +154,18 @@ public class AddItemActivity extends ActionBarActivity {
 	    if(resultCode == RESULT_OK){
 	        //the selected audio.   	    		    	
 	        editSoundURI = data.getData();
-	        ((Button)findViewById(R.id.sound_file_button)).setText(getSoundURITitle(editSoundURI));
+	        ((Button)findViewById(R.id.sound_file_button)).setText(UriHelper.getSoundTitleFromUri(getApplicationContext(), editSoundURI));	        
 	    }
 	  }
 	  
 	  if(requestCode == IMAGE_REQ_CODE){
 		    if(resultCode == RESULT_OK){
 		        //the selected image.
-		        editImageURI = data.getData();
+		    	editImageURI = data.getData();
 		        ImageButton ib = (ImageButton)findViewById(R.id.image_file_image_button);
-        		ib.setImageURI(editImageURI);
+        		ib.setImageURI(editImageURI);        		
 		    }
 	  }
-	
 
 	  super.onActivityResult(requestCode, resultCode, data);
 	}	
