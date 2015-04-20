@@ -4,7 +4,7 @@
         android:drawable="@android:color/transparent"
         android:state_pressed="true"
          />
-    <item
-        android:drawable="@drawable/main_list_shape"
-         />        
+<!--  android:drawable="@drawable/main_list_shape"-->      
+    <item        
+        android:drawable="@drawable/main_list_shape" />       
 </selector>
