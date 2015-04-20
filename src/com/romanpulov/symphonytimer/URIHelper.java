@@ -3,7 +3,6 @@ package com.romanpulov.symphonytimer;
 import java.io.File;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;

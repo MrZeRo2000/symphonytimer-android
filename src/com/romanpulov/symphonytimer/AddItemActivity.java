@@ -18,6 +18,9 @@ import android.widget.EditText;
 public class AddItemActivity extends ActionBarActivity {
 	public static final String EDIT_REC_NAME = "rec";
 	
+	private static final String EDIT_SOUND_URI = "EDIT_SOUND_URI";
+	private static final String EDIT_IMAGE_URI = "EDIT_IMAGE_URI";
+	
 	private static int SOUND_REQ_CODE = 1;
 	private static int IMAGE_REQ_CODE = 2;
 	
@@ -61,21 +64,29 @@ public class AddItemActivity extends ActionBarActivity {
 		((EditText)findViewById(R.id.minutes_edit_text)).setText(String.valueOf(minutes));
 		((EditText)findViewById(R.id.seconds_edit_text)).setText(String.valueOf(seconds));
 		
+		// update sound and image controls
+		updateSoundImageFromFile(editRec.sound_file, editRec.image_name);
+		
+	}
+	
+	private void updateSoundImageFromFile(String soundFile, String imageFile) {
+		
 		String soundFileTitle; 
-		if (null != editRec.sound_file) {
-			editSoundURI = UriHelper.fileNameToUri(getApplicationContext(), editRec.sound_file);
-			soundFileTitle = (null == editSoundURI) ? getString(R.string.default_sound) : UriHelper.getSoundTitleFromFileName(getApplicationContext(), editRec.sound_file); 
+		if (null != soundFile) {
+			editSoundURI = UriHelper.fileNameToUri(getApplicationContext(), soundFile);
+			soundFileTitle = (null == editSoundURI) ? getString(R.string.default_sound) : UriHelper.getSoundTitleFromFileName(getApplicationContext(), soundFile); 
 		} else {
 			soundFileTitle = getString(R.string.default_sound);
 		}
 		
 		((Button)findViewById(R.id.sound_file_button)).setText(soundFileTitle);
 		
-		if (null != editRec.image_name) {
+		if (null != imageFile) {
 			//editImageURI = Uri.parse(editRec.image_name);
-			editImageURI = UriHelper.fileNameToUri(getApplicationContext(), editRec.image_name);
+			editImageURI = UriHelper.fileNameToUri(getApplicationContext(), imageFile);
 			((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(editImageURI);
 		}
+		
 	}
 	
 	private final DMTimerRec getEditRec() throws AddItemInputException {
@@ -114,6 +125,28 @@ public class AddItemActivity extends ActionBarActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		//getMenuInflater().inflate(R.menu.add_item, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		if (null != editSoundURI) {
+			outState.putString(EDIT_SOUND_URI, UriHelper.uriMediaToFileName(getApplicationContext(), editSoundURI));
+		}
+		if (null != editImageURI) {
+			outState.putString(EDIT_IMAGE_URI, UriHelper.uriMediaToFileName(getApplicationContext(), editImageURI));
+		}
+
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onRestoreInstanceState(savedInstanceState);
+		final String soundFile = savedInstanceState.getString(EDIT_SOUND_URI);		
+		final String imageFile = savedInstanceState.getString(EDIT_IMAGE_URI);
+		
+		updateSoundImageFromFile(soundFile, imageFile);
 	}
 	
 	public void saveButtonClick(View v) {
