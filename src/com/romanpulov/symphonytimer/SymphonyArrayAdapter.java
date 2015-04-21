@@ -5,10 +5,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
@@ -23,6 +27,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	private final DMTimers values;
 	private DMTasks tasks;
 	private BgBitmapDrawable bgBitmapDrawable;
+	private int selectedPosition = -1;
 		
 	class BgBitmapDrawable {
 		
@@ -59,6 +64,10 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		this.tasks = tasks;
 	}
 	
+	public void setSelectedPosition(int position) {
+		this.selectedPosition = position;
+	}
+	
 	public void setTasks(DMTasks tasks) {
 		this.tasks = tasks;
 	}
@@ -86,6 +95,8 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		else 
 			rowView = convertView;
 		
+		rowView.setTag(position);
+		
 		//ViewTreeObserver vto = rowView.getViewTreeObserver();
 		//vto.addOnGlobalLayoutListener(this);		
 		
@@ -111,24 +122,53 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		
 		
 		final View rView = rowView;
-		ViewTreeObserver vto = rowView.getViewTreeObserver();		
+		final long rDisplayProgress = displayProgress;
+		final int rPosition = position;
+		ViewTreeObserver vto = rowView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			
 			@Override
 			public void onGlobalLayout() {
 				// TODO Auto-generated method stub
 				
+				//Log.d("SymphonyArrayAdapter", "onGlobalLayout");
+				
 				int rowWidth = rView.getWidth();
 				int rowHeight = rView.getHeight();
 				if ((rowWidth > 0) && (rowHeight > 0)) {
-					if (null == bgBitmapDrawable) {
-						bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
-					}	
-					rView.setBackground(bgBitmapDrawable.getDrawable());								
+					
+					if (0 == rDisplayProgress ) {
+						rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
+					} else {
+						if (rPosition == selectedPosition) {
+							Log.d("SymphonyArrayAdapter", "Set background to null");
+							rView.setBackgroundResource(R.drawable.main_list_shape_selected);
+						} else {							
+							if (null == bgBitmapDrawable) {
+								bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
+							}	
+							rView.setBackground(bgBitmapDrawable.getDrawable());
+						}
+					}
 				};				
 				
 			}
 		});
+		
+		rowView.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.d("SymphonyArrayAdapter", "ActionDown");
+					setSelectedPosition((Integer)rView.getTag());
+					rView.setBackgroundResource(R.drawable.main_list_shape_selected);
+				}
+				return false;
+			}
+		});
+		
 		
 		//update background
 		/*

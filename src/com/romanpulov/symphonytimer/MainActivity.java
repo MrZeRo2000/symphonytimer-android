@@ -17,9 +17,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnKeyListener;
+import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -121,17 +125,21 @@ public class MainActivity extends ActionBarActivity {
         layout.setBackgroundDrawable(wallpaperDrawable);
         */       
         
-		SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, dmTimers, dmTasks);
+		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, dmTimers, dmTasks);
 		getTimersListView().setAdapter(adapter);
 		getTimersListView().setOnItemClickListener(new OnItemClickListener() {
-
+			
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				// TODO Auto-generated method stub
-				performTimerAction((DMTimerRec)arg0.getItemAtPosition(arg2));
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+
+				//reset selected position upon click completion
+				adapter.setSelectedPosition(-1);
+				
+				//action
+				performTimerAction((DMTimerRec)parent.getItemAtPosition(position));
 			}			
-		});	
+		});
 		
         // Update List
         loadTimers();
