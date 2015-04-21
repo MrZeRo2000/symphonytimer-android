@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
@@ -14,11 +17,40 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
 
-class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
+class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	
 	private final Context context;
 	private final DMTimers values;
 	private DMTasks tasks;
+	private BgBitmapDrawable bgBitmapDrawable;
+		
+	class BgBitmapDrawable {
+		
+		private int width;
+		private int height;
+		
+		private Drawable drawable;
+		
+		public BgBitmapDrawable(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+		
+		private void createDrawable() {
+			Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home);
+			Bitmap sbg = Bitmap.createScaledBitmap(bg, width, height, false);
+			drawable = new StreamDrawable(sbg, 6, 0);	
+
+		}
+		
+		public Drawable getDrawable() {
+			if (null == drawable) {
+				createDrawable();
+			}
+			return drawable;
+		}
+		
+	}
 	
 	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
 		super(context, R.layout.symphony_row_view);
@@ -49,10 +81,13 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 		
 		if (convertView == null) {
 			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);			
+			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
 		}
 		else 
 			rowView = convertView;
+		
+		//ViewTreeObserver vto = rowView.getViewTreeObserver();
+		//vto.addOnGlobalLayoutListener(this);		
 		
 		TextView titleTextView = (TextView)rowView.findViewById(R.id.title_text_view);		
 		titleTextView.setText(dmTimerRec.title);
@@ -76,25 +111,24 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 		
 		
 		final View rView = rowView;
-		ViewTreeObserver vto = rowView.getViewTreeObserver();
+		ViewTreeObserver vto = rowView.getViewTreeObserver();		
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			
 			@Override
 			public void onGlobalLayout() {
 				// TODO Auto-generated method stub
 				
-				Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home);
 				int rowWidth = rView.getWidth();
 				int rowHeight = rView.getHeight();
 				if ((rowWidth > 0) && (rowHeight > 0)) {
-					Bitmap sbg = Bitmap.createScaledBitmap(bg, rowWidth, rowHeight, false);
-					StreamDrawable d = new StreamDrawable(sbg, 6, 0);	
-					rView.setBackground(d);
+					if (null == bgBitmapDrawable) {
+						bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
+					}	
+					rView.setBackground(bgBitmapDrawable.getDrawable());								
 				};				
 				
 			}
-		});		
-		
+		});
 		
 		//update background
 		/*
