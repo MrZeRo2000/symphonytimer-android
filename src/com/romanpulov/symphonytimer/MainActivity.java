@@ -520,6 +520,10 @@ public class MainActivity extends ActionBarActivity {
     			}  			
     		}
     	}
-    }    	
+    }
     
+    public void imageImageClick(View view) {
+    	//Toast.makeText(this, "imageImageClick", Toast.LENGTH_SHORT).show();
+    }
+   
 }

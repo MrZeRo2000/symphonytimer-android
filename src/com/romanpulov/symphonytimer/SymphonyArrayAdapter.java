@@ -2,9 +2,14 @@ package com.romanpulov.symphonytimer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -34,7 +39,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 	@Override
     public DMTimerRec getItem(int position) {
         return values.get(position);
-    }
+    }		
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -48,7 +53,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 		}
 		else 
 			rowView = convertView;
-			
+		
 		TextView titleTextView = (TextView)rowView.findViewById(R.id.title_text_view);		
 		titleTextView.setText(dmTimerRec.title);
 
@@ -69,10 +74,34 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 		progressBar.setMax((int)dmTimerRec.time_sec);
 		progressBar.setProgress((int)timerProgress);
 		
+		/*
+		final View rView = rowView;
+		ViewTreeObserver vto = rowView.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			
+			@Override
+			public void onGlobalLayout() {
+				// TODO Auto-generated method stub
+				
+				Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home);
+				int rowWidth = rView.getWidth();
+				int rowHeight = rView.getHeight();
+				if ((rowWidth > 0) && (rowHeight > 0)) {
+					Bitmap sbg = Bitmap.createScaledBitmap(bg, rowWidth, rowHeight, false);
+					StreamDrawable d = new StreamDrawable(sbg, 6, 0);	
+					rView.setBackground(d);
+				};				
+				
+			}
+		});		
+		*/
+		
 		//update background
+		
 		rowView.setBackgroundResource(
 				0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
 		);
+		
 		
 		return rowView;
 	}
