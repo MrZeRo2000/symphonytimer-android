@@ -74,7 +74,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 		progressBar.setMax((int)dmTimerRec.time_sec);
 		progressBar.setProgress((int)timerProgress);
 		
-		/*
+		
 		final View rView = rowView;
 		ViewTreeObserver vto = rowView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -94,14 +94,14 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec> {
 				
 			}
 		});		
-		*/
+		
 		
 		//update background
-		
+		/*
 		rowView.setBackgroundResource(
 				0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
 		);
-		
+		*/
 		
 		return rowView;
 	}
