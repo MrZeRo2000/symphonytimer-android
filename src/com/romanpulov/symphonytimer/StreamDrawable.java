@@ -47,7 +47,7 @@ class StreamDrawable extends Drawable {
 		super.onBoundsChange(bounds);
 		rect.set(margin, margin, bounds.width() - margin, bounds.height() - margin);
 
-		if (USE_VIGNETTE) {
+		if ((USE_VIGNETTE) && (rect.centerX() > 0)) {
 			RadialGradient vignette = new RadialGradient(
 					rect.centerX(), rect.centerY() * 1.0f / 0.7f, rect.centerX() * 1.3f,
 					new int[] { 0, 0, 0x7f000000 }, new float[] { 0.0f, 0.7f, 1.0f },

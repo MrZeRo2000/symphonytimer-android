@@ -133,9 +133,7 @@ public class MainActivity extends ActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 
-				//reset selected position upon click completion
-				adapter.setSelectedPosition(-1);
-				
+				Log.d("SymphonyArrayAdapter", "ItemClick");
 				//action
 				performTimerAction((DMTimerRec)parent.getItemAtPosition(position));
 			}			

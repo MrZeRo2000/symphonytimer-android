@@ -4,8 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
+import android.util.StateSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -27,7 +33,6 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	private final DMTimers values;
 	private DMTasks tasks;
 	private BgBitmapDrawable bgBitmapDrawable;
-	private int selectedPosition = -1;
 		
 	class BgBitmapDrawable {
 		
@@ -64,10 +69,6 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		this.tasks = tasks;
 	}
 	
-	public void setSelectedPosition(int position) {
-		this.selectedPosition = position;
-	}
-	
 	public void setTasks(DMTasks tasks) {
 		this.tasks = tasks;
 	}
@@ -88,9 +89,16 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		View rowView;
 		DMTimerRec dmTimerRec = values.get(position);
 		
+		//calculate progress
+		long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
+		long displayProgress = dmTimerRec.time_sec - timerProgress; 
+
+		
 		if (convertView == null) {
 			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
+			
+			
 		}
 		else 
 			rowView = convertView;
@@ -107,9 +115,6 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		((ImageView)rowView.findViewById(R.id.image_image_view)).setImageURI(
 				null != dmTimerRec.image_name ? UriHelper.fileNameToUri(getContext(), dmTimerRec.image_name) : null);
 		
-		//calculate progress
-		long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
-		long displayProgress = dmTimerRec.time_sec - timerProgress; 
 		
 		//display text
 		TextView progressTextView = (TextView)rowView.findViewById(R.id.progress_text_view);			
@@ -120,10 +125,75 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		progressBar.setMax((int)dmTimerRec.time_sec);
 		progressBar.setProgress((int)timerProgress);
 		
+		/*
+		final int rPosition = position;
+		rowView.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				int action = MotionEventCompat.getActionMasked(event);
+				
+				switch(action) {
+		        case (MotionEvent.ACTION_DOWN) :
+		            Log.d("SymphonyArrayAdapter","Action was DOWN");
+		            return true;
+		        case (MotionEvent.ACTION_MOVE) :
+		            Log.d("SymphonyArrayAdapter","Action was MOVE");
+		            return true;
+		        case (MotionEvent.ACTION_UP) :
+		            Log.d("SymphonyArrayAdapter","Action was UP");
+		        	ListView lv = (ListView)v.getParent();
+		        	lv.performItemClick(v, rPosition, rPosition);
+		            return true;
+		        case (MotionEvent.ACTION_CANCEL) :
+		            Log.d("SymphonyArrayAdapter","Action was CANCEL");
+		            return true;
+		        case (MotionEvent.ACTION_OUTSIDE) :
+		            Log.d("SymphonyArrayAdapter","Movement occurred outside bounds " +
+		                    "of current screen element");
+		            return true;      
+		        default : 
+		            return false;
+			}
+			}
+		});
+		*/
+		
+		
+		
+		/*
+		rowView.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					Log.d("SymphonyArrayAdapter", "ActionDown");
+					setSelectedPosition((Integer)rView.getTag());
+					rView.setBackgroundResource(R.drawable.main_list_shape_selected);
+					return false;
+				}
+				if (event.getAction() == MotionEvent.ACTION_MOVE) {
+					Log.d("SymphonyArrayAdapter", "ActionMove");
+					setSelectedPosition(-1);
+					//rView.setBackgroundResource(R.drawable.main_list_shape_selected);
+				}					
+				return true;
+			}
+		});
+		*/
+	
+		
+		//update background
+		/*
+		rowView.setBackgroundResource(
+				0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
+		);
+		*/
 		
 		final View rView = rowView;
 		final long rDisplayProgress = displayProgress;
-		final int rPosition = position;
 		ViewTreeObserver vto = rowView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			
@@ -140,42 +210,23 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 					if (0 == rDisplayProgress ) {
 						rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
 					} else {
-						if (rPosition == selectedPosition) {
-							Log.d("SymphonyArrayAdapter", "Set background to null");
-							rView.setBackgroundResource(R.drawable.main_list_shape_selected);
-						} else {							
-							if (null == bgBitmapDrawable) {
-								bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
-							}	
-							rView.setBackground(bgBitmapDrawable.getDrawable());
-						}
-					}
+						
+						if (null == bgBitmapDrawable) {
+							bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
+						}	
+						
+						StateListDrawable stateDrawable = new StateListDrawable(); 
+						stateDrawable.addState(new int[] { android.R.attr.state_pressed }, context.getResources().getDrawable(R.drawable.main_list_shape));
+						stateDrawable.addState(StateSet.WILD_CARD, bgBitmapDrawable.getDrawable());
+					
+						
+						rView.setBackground(stateDrawable);
+					}												
+
 				};				
 				
 			}
-		});
-		
-		rowView.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					Log.d("SymphonyArrayAdapter", "ActionDown");
-					setSelectedPosition((Integer)rView.getTag());
-					rView.setBackgroundResource(R.drawable.main_list_shape_selected);
-				}
-				return false;
-			}
-		});
-		
-		
-		//update background
-		/*
-		rowView.setBackgroundResource(
-				0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
-		);
-		*/
+		});		
 		
 		return rowView;
 	}
