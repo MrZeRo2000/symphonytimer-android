@@ -36,29 +36,103 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		
 	class BgBitmapDrawable {
 		
+		final static int BG_NORMAL = 0; 
+		final static int BG_FINAL = 1;
+		
 		private int width;
 		private int height;
 		
-		private Drawable drawable;
+		Drawable bgDrawable;
+		Drawable bgBrightDrawable;
+		Drawable bgFinalDrawable;
+		Drawable bgFinalBrightDrawable;
+		
+		
+		//private StateListDrawable drawable;
 		
 		public BgBitmapDrawable(int width, int height) {
+			Log.d("SymphonyArrayAdapter", "creating BgBitmapDrawable");
 			this.width = width;
 			this.height = height;
 		}
 		
-		private void createDrawable() {
+		private void prepareDrawable() {
+			
 			Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home);
-			Bitmap sbg = Bitmap.createScaledBitmap(bg, width, height, false);
-			drawable = new StreamDrawable(sbg, 6, 0);	
-
+			Bitmap brightBg = createBrightBitmap(bg, 100);
+			Bitmap scaledBg = Bitmap.createScaledBitmap(bg, width, height, false);
+			Bitmap scaledBrightBg = Bitmap.createScaledBitmap(brightBg, width, height, false);
+			
+			Bitmap finalBg = createBlueToRedBitmap(bg);
+			Bitmap finalBrightBg = createBrightBitmap(finalBg, 100);
+			Bitmap finalScaledBg = Bitmap.createScaledBitmap(finalBg, width, height, false);
+			Bitmap finalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, width, height, false);			
+			
+			bgDrawable = new StreamDrawable(scaledBg, 6, 0);
+			bgBrightDrawable = new StreamDrawable(scaledBrightBg, 6, 0);
+			bgFinalDrawable = new StreamDrawable(finalScaledBg, 6, 0);
+			bgFinalBrightDrawable = new StreamDrawable(finalScaledBrightBg, 6, 0);
+	
 		}
 		
-		public Drawable getDrawable() {
-			if (null == drawable) {
-				createDrawable();
+		
+		public Drawable getDrawable(int type) {
+			
+			if ((null == bgDrawable) || (null == bgBrightDrawable)) {
+				prepareDrawable();
 			}
+			
+			StateListDrawable drawable = new StateListDrawable(); 
+			drawable.addState(new int[] { android.R.attr.state_pressed }, (type == 0) ? bgBrightDrawable : bgFinalBrightDrawable);
+			drawable.addState(StateSet.WILD_CARD, (type == 0) ? bgDrawable : bgFinalDrawable);
+			
 			return drawable;
 		}
+		
+		private Bitmap createBrightBitmap(Bitmap src, int value) {
+			
+			int width = src.getWidth();
+			int height = src.getHeight();
+			
+			int[] pixels = new int[height * width];
+			src.getPixels(pixels, 0, width, 0, 0, width, height);
+			
+			for (int i = 0; i < height * width; i++) {
+				pixels[i] = Color.rgb(
+						(Color.red(pixels[i]) + value > 255 ? 255 : Color.red(pixels[i]) + value), 
+						(Color.green(pixels[i]) + value > 255 ? 255 : Color.green(pixels[i]) + value),
+						(Color.blue(pixels[i]) + value > 255 ? 255 : Color.blue(pixels[i]) + value)
+				);
+			}
+			
+			Bitmap res = Bitmap.createBitmap(width, height, src.getConfig());
+			res.setPixels(pixels, 0, width, 0, 0, width, height);
+			
+			return res;
+		}
+		
+		private Bitmap createBlueToRedBitmap(Bitmap src) {
+			
+			int width = src.getWidth();
+			int height = src.getHeight();
+			
+			int[] pixels = new int[height * width];
+			src.getPixels(pixels, 0, width, 0, 0, width, height);
+			
+			for (int i = 0; i < height * width; i++) {
+				pixels[i] = Color.rgb(
+						Color.blue(pixels[i]), 
+						Color.green(pixels[i]),
+						Color.red(pixels[i])
+				);
+			}
+			
+			Bitmap res = Bitmap.createBitmap(width, height, src.getConfig());
+			res.setPixels(pixels, 0, width, 0, 0, width, height);
+			
+			return res;
+		}
+		
 		
 	}
 	
@@ -91,19 +165,58 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		
 		//calculate progress
 		long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
-		long displayProgress = dmTimerRec.time_sec - timerProgress; 
-
+		final long displayProgress = dmTimerRec.time_sec - timerProgress; 
+		
 		
 		if (convertView == null) {
 			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
 			
+			Log.d("SymphonyArrayAdapter", "new view");
 			
+			if (null == bgBitmapDrawable) {
+				
+				Log.d("SymphonyArrayAdapter", "finding height");
+			
+				final View rView = rowView;			
+				ViewTreeObserver vto = rowView.getViewTreeObserver();
+				vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+					
+					@Override
+					public void onGlobalLayout() {
+						// TODO Auto-generated method stub
+						
+						int rowWidth = rView.getWidth();
+						int rowHeight = rView.getHeight();
+						if ((rowWidth > 0) && (rowHeight > 0)) {
+							
+							if (null == bgBitmapDrawable) {
+								bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
+							}
+							
+							
+							if (0 == displayProgress ) {
+								rView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL));
+								//rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
+							} else {
+								
+								rView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL));
+							}
+							
+	
+						};				
+						
+					}
+					
+				});	
+			
+			}
 		}
-		else 
+		else { 
 			rowView = convertView;
+			Log.d("SymphonyArrayAdapter", "existing view");
+		}
 		
-		rowView.setTag(position);
 		
 		//ViewTreeObserver vto = rowView.getViewTreeObserver();
 		//vto.addOnGlobalLayoutListener(this);		
@@ -170,7 +283,6 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 				// TODO Auto-generated method stub
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					Log.d("SymphonyArrayAdapter", "ActionDown");
-					setSelectedPosition((Integer)rView.getTag());
 					rView.setBackgroundResource(R.drawable.main_list_shape_selected);
 					return false;
 				}
@@ -192,41 +304,26 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		);
 		*/
 		
-		final View rView = rowView;
-		final long rDisplayProgress = displayProgress;
-		ViewTreeObserver vto = rowView.getViewTreeObserver();
-		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			
-			@Override
-			public void onGlobalLayout() {
-				// TODO Auto-generated method stub
+		
+		
+		if (null != bgBitmapDrawable) {
+			if (0 == displayProgress ) {
+				rowView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL));
+				//rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
+			} else {
 				
-				//Log.d("SymphonyArrayAdapter", "onGlobalLayout");
-				
-				int rowWidth = rView.getWidth();
-				int rowHeight = rView.getHeight();
-				if ((rowWidth > 0) && (rowHeight > 0)) {
-					
-					if (0 == rDisplayProgress ) {
-						rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
-					} else {
-						
-						if (null == bgBitmapDrawable) {
-							bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
-						}	
-						
-						StateListDrawable stateDrawable = new StateListDrawable(); 
-						stateDrawable.addState(new int[] { android.R.attr.state_pressed }, context.getResources().getDrawable(R.drawable.main_list_shape));
-						stateDrawable.addState(StateSet.WILD_CARD, bgBitmapDrawable.getDrawable());
-					
-						
-						rView.setBackground(stateDrawable);
-					}												
-
-				};				
-				
+				/*
+				StateListDrawable stateDrawable = new StateListDrawable(); 
+				stateDrawable.addState(new int[] { android.R.attr.state_pressed }, context.getResources().getDrawable(R.drawable.main_list_shape));
+				stateDrawable.addState(StateSet.WILD_CARD, bgBitmapDrawable.getDrawable());
+				*/
+				Log.d("SymphonyArrayAdapter", "setting normal");
+				rowView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL));
+				if (rowView.getBackground() == null) {
+					Log.d("SymphonyArrayAdapter", "background is null !!!");
+				}
 			}
-		});		
+		}
 		
 		return rowView;
 	}
