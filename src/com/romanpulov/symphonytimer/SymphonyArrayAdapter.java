@@ -5,25 +5,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.util.StateSet;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -33,60 +22,63 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	private final Context context;
 	private final DMTimers values;
 	private DMTasks tasks;
-	private BgBitmapDrawable bgBitmapDrawable;
+	private RoundedBitmapBackgroundBuilder backgroundBuilder;
 		
-	class BgBitmapDrawable {
+	class RoundedBitmapBackgroundBuilder {
 		
-		final static int BG_NORMAL = 0; 
-		final static int BG_FINAL = 1;
+		final public static int BG_NORMAL = 0; 
+		final public static int BG_FINAL = 1;
+		final private static int BRIGHTENING_FACTOR = 100;
 		
 		private int width;
 		private int height;
+		private float cornerRadius;
 		
-		private Drawable bgDrawable;
-		private Drawable bgBrightDrawable;
-		private Drawable bgFinalDrawable;
-		private Drawable bgFinalBrightDrawable;
+		private Boolean isBitmapPrepared = false;
 		
-		private Bitmap finalBg;
-		private Bitmap finalBrightBg;
+		private Bitmap scaledBg;
+		private Bitmap scaledBrightBg;
+		
 		private Bitmap finalScaledBg;
 		private Bitmap finalScaledBrightBg;
 		
 		
 		//private StateListDrawable drawable;
 		
-		public BgBitmapDrawable(int width, int height) {
+		public RoundedBitmapBackgroundBuilder(int width, int height, float cornerRadius) {
 			Log.d("SymphonyArrayAdapter", "creating BgBitmapDrawable");
 			this.width = width;
 			this.height = height;
+			this.cornerRadius = cornerRadius;
 		}
 		
-		private void prepareDrawable() {
+		private void prepareBitmaps() {
 			
 			Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home_sm);
-			Bitmap brightBg = createBrightBitmap(bg, 100);
-			Bitmap scaledBg = Bitmap.createScaledBitmap(bg, width, height, false);
-			Bitmap scaledBrightBg = Bitmap.createScaledBitmap(brightBg, width, height, false);
+			Bitmap brightBg = createBrightBitmap(bg, BRIGHTENING_FACTOR);
+			scaledBg = Bitmap.createScaledBitmap(bg, width, height, false);
+			scaledBrightBg = Bitmap.createScaledBitmap(brightBg, width, height, false);
 			
-			finalBg = createBlueToRedBitmap(bg);
-			finalBrightBg = createBrightBitmap(finalBg, 100);
+			Bitmap finalBg = createBlueToRedBitmap(bg);
+			Bitmap finalBrightBg = createBrightBitmap(finalBg, BRIGHTENING_FACTOR);
 			finalScaledBg = Bitmap.createScaledBitmap(finalBg, width, height, false);
 			finalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, width, height, false);			
 			
-			bgDrawable = new StreamDrawable(scaledBg, 6, 0);
-			bgBrightDrawable = new StreamDrawable(scaledBrightBg, 6, 0);
-			bgFinalDrawable = new StreamDrawable(finalScaledBg, 6, 0);
-			bgFinalBrightDrawable = new StreamDrawable(finalScaledBrightBg, 6, 0);
+			isBitmapPrepared = true;
 	
 		}
 		
 		
-		public Drawable getDrawable(int type) {
+		public Drawable buildDrawable(int type) {
 			
-			if ((null == bgDrawable) || (null == bgBrightDrawable)) {
-				prepareDrawable();
+			if (!isBitmapPrepared) {
+				prepareBitmaps();
 			}
+			
+			Drawable bgDrawable = new StreamDrawable(scaledBg, cornerRadius, 0);
+			Drawable bgBrightDrawable = new StreamDrawable(scaledBrightBg, cornerRadius, 0);
+			Drawable bgFinalDrawable = new StreamDrawable(finalScaledBg, cornerRadius, 0);
+			Drawable bgFinalBrightDrawable = new StreamDrawable(finalScaledBrightBg, cornerRadius, 0);
 			
 			StateListDrawable drawable = new StateListDrawable(); 
 			drawable.addState(new int[] { android.R.attr.state_pressed }, (type == 0) ? bgBrightDrawable : bgFinalBrightDrawable);
@@ -166,74 +158,32 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		View rowView;
 		final DMTimerRec dmTimerRec = values.get(position);
 		
 		//calculate progress
 		final long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
 		final long displayProgress = dmTimerRec.time_sec - timerProgress; 
 		
-		
-		if (null == bgBitmapDrawable) {
-			bgBitmapDrawable = new BgBitmapDrawable(1000, 500);
-		}					
-		
+		View rowView;
 		
 		if (convertView == null) {
 			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
-/*
-			if (null == bgBitmapDrawable) {
+
+			// create drawable source for background
+			if (null == backgroundBuilder) {
 				rowView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-				bgBitmapDrawable = new BgBitmapDrawable(parent.getMeasuredWidth(), rowView.getMeasuredHeight());
+				int measuredWidth = parent.getMeasuredWidth();
+				int measuredHeight =  rowView.getMeasuredHeight();
+				if ((measuredWidth > 0) && (measuredHeight > 0)) {
+					backgroundBuilder = new RoundedBitmapBackgroundBuilder(measuredWidth, measuredHeight, 6);
+				}
 			}
 						
-			
-			if (null == bgBitmapDrawable) {
-				
-				final View rView = rowView;			
-				ViewTreeObserver vto = rowView.getViewTreeObserver();
-				vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-					
-					@Override
-					public void onGlobalLayout() {
-						// TODO Auto-generated method stub
-						
-						int rowWidth = rView.getWidth();
-						int rowHeight = rView.getHeight();
-						if ((rowWidth > 0) && (rowHeight > 0)) {
-							
-							if (null == bgBitmapDrawable) {
-								bgBitmapDrawable = new BgBitmapDrawable(rowWidth, rowHeight);
-							}
-							
-							
-							if (0 == displayProgress ) {
-								rView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL));
-								//rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
-							} else {
-								
-								rView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL));
-							}
-							
-	
-						};				
-						
-					}
-					
-				});
-					
-			
-			}
-			*/
 		}
 		else { 
 			rowView = convertView;
 		}
-		
-		
-		//ViewTreeObserver vto = rowView.getViewTreeObserver();
-		//vto.addOnGlobalLayoutListener(this);		
 		
 		TextView titleTextView = (TextView)rowView.findViewById(R.id.title_text_view);		
 		titleTextView.setText(dmTimerRec.title);
@@ -252,86 +202,18 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		progressBar.setMax((int)dmTimerRec.time_sec);
 		progressBar.setProgress((int)timerProgress);
 		
-		/*
-		final int rPosition = position;
-		rowView.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				int action = MotionEventCompat.getActionMasked(event);
-				
-				switch(action) {
-		        case (MotionEvent.ACTION_DOWN) :
-		            Log.d("SymphonyArrayAdapter","Action was DOWN");
-		            return true;
-		        case (MotionEvent.ACTION_MOVE) :
-		            Log.d("SymphonyArrayAdapter","Action was MOVE");
-		            return true;
-		        case (MotionEvent.ACTION_UP) :
-		            Log.d("SymphonyArrayAdapter","Action was UP");
-		        	ListView lv = (ListView)v.getParent();
-		        	lv.performItemClick(v, rPosition, rPosition);
-		            return true;
-		        case (MotionEvent.ACTION_CANCEL) :
-		            Log.d("SymphonyArrayAdapter","Action was CANCEL");
-		            return true;
-		        case (MotionEvent.ACTION_OUTSIDE) :
-		            Log.d("SymphonyArrayAdapter","Movement occurred outside bounds " +
-		                    "of current screen element");
-		            return true;      
-		        default : 
-		            return false;
-			}
-			}
-		});
-		*/
-		
-		
-		
-		/*
-		rowView.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					Log.d("SymphonyArrayAdapter", "ActionDown");
-					rView.setBackgroundResource(R.drawable.main_list_shape_selected);
-					return false;
-				}
-				if (event.getAction() == MotionEvent.ACTION_MOVE) {
-					Log.d("SymphonyArrayAdapter", "ActionMove");
-					setSelectedPosition(-1);
-					//rView.setBackgroundResource(R.drawable.main_list_shape_selected);
-				}					
-				return true;
-			}
-		});
-		*/
-	
-		
-		//update background
+		//update background old style
 		/*
 		rowView.setBackgroundResource(
 				0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
 		);
 		*/
 		
-		Drawable backGround = (0 == displayProgress ) ? bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL) : bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL);
-		//Drawable backGround = context.getResources().getDrawable(R.drawable.sky_home_sm);
-		rowView.setBackground(backGround);
-		
-		/*
-		if (null != bgBitmapDrawable) {
-			if (0 == displayProgress ) {
-				rowView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL));
-			} else {				
-				rowView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL));
-			}
+		//update background
+		if (null != backgroundBuilder) {
+			Drawable backGround = (0 == displayProgress ) ? backgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL) : backgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+			rowView.setBackground(backGround);
 		}
-		*/
-		
 
 		return rowView;
 	}

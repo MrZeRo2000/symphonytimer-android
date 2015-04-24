@@ -25,6 +25,7 @@
 
 
 <!--   android:cacheColorHint="@android:color/transparent"-->
+<!--  android:scrollingCache="false"  -->
     <ListView
         android:id="@+id/main_list_view"
         android:layout_width="fill_parent"
@@ -33,8 +34,7 @@
         android:layout_alignParentTop="true"  
         android:padding="8dp"            
         android:divider="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent"
-        android:scrollingCache="false"
+        android:cacheColorHint="@android:color/transparent"        
         android:dividerHeight="8dp"    
     	android:listSelector="@drawable/main_list_selector"  	
     	>
