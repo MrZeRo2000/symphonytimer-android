@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
@@ -42,10 +43,15 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		private int width;
 		private int height;
 		
-		Drawable bgDrawable;
-		Drawable bgBrightDrawable;
-		Drawable bgFinalDrawable;
-		Drawable bgFinalBrightDrawable;
+		private Drawable bgDrawable;
+		private Drawable bgBrightDrawable;
+		private Drawable bgFinalDrawable;
+		private Drawable bgFinalBrightDrawable;
+		
+		private Bitmap finalBg;
+		private Bitmap finalBrightBg;
+		private Bitmap finalScaledBg;
+		private Bitmap finalScaledBrightBg;
 		
 		
 		//private StateListDrawable drawable;
@@ -58,15 +64,15 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		
 		private void prepareDrawable() {
 			
-			Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home);
+			Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home_sm);
 			Bitmap brightBg = createBrightBitmap(bg, 100);
 			Bitmap scaledBg = Bitmap.createScaledBitmap(bg, width, height, false);
 			Bitmap scaledBrightBg = Bitmap.createScaledBitmap(brightBg, width, height, false);
 			
-			Bitmap finalBg = createBlueToRedBitmap(bg);
-			Bitmap finalBrightBg = createBrightBitmap(finalBg, 100);
-			Bitmap finalScaledBg = Bitmap.createScaledBitmap(finalBg, width, height, false);
-			Bitmap finalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, width, height, false);			
+			finalBg = createBlueToRedBitmap(bg);
+			finalBrightBg = createBrightBitmap(finalBg, 100);
+			finalScaledBg = Bitmap.createScaledBitmap(finalBg, width, height, false);
+			finalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, width, height, false);			
 			
 			bgDrawable = new StreamDrawable(scaledBg, 6, 0);
 			bgBrightDrawable = new StreamDrawable(scaledBrightBg, 6, 0);
@@ -161,23 +167,30 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
 		View rowView;
-		DMTimerRec dmTimerRec = values.get(position);
+		final DMTimerRec dmTimerRec = values.get(position);
 		
 		//calculate progress
-		long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
+		final long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
 		final long displayProgress = dmTimerRec.time_sec - timerProgress; 
+		
+		
+		if (null == bgBitmapDrawable) {
+			bgBitmapDrawable = new BgBitmapDrawable(1000, 500);
+		}					
 		
 		
 		if (convertView == null) {
 			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
-			
-			Log.d("SymphonyArrayAdapter", "new view");
+/*
+			if (null == bgBitmapDrawable) {
+				rowView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+				bgBitmapDrawable = new BgBitmapDrawable(parent.getMeasuredWidth(), rowView.getMeasuredHeight());
+			}
+						
 			
 			if (null == bgBitmapDrawable) {
 				
-				Log.d("SymphonyArrayAdapter", "finding height");
-			
 				final View rView = rowView;			
 				ViewTreeObserver vto = rowView.getViewTreeObserver();
 				vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -208,13 +221,14 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 						
 					}
 					
-				});	
+				});
+					
 			
 			}
+			*/
 		}
 		else { 
 			rowView = convertView;
-			Log.d("SymphonyArrayAdapter", "existing view");
 		}
 		
 		
@@ -304,27 +318,21 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		);
 		*/
 		
+		Drawable backGround = (0 == displayProgress ) ? bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL) : bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL);
+		//Drawable backGround = context.getResources().getDrawable(R.drawable.sky_home_sm);
+		rowView.setBackground(backGround);
 		
-		
+		/*
 		if (null != bgBitmapDrawable) {
 			if (0 == displayProgress ) {
 				rowView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_FINAL));
-				//rView.setBackgroundResource(R.drawable.main_list_bg_final_selector);
-			} else {
-				
-				/*
-				StateListDrawable stateDrawable = new StateListDrawable(); 
-				stateDrawable.addState(new int[] { android.R.attr.state_pressed }, context.getResources().getDrawable(R.drawable.main_list_shape));
-				stateDrawable.addState(StateSet.WILD_CARD, bgBitmapDrawable.getDrawable());
-				*/
-				Log.d("SymphonyArrayAdapter", "setting normal");
+			} else {				
 				rowView.setBackground(bgBitmapDrawable.getDrawable(BgBitmapDrawable.BG_NORMAL));
-				if (rowView.getBackground() == null) {
-					Log.d("SymphonyArrayAdapter", "background is null !!!");
-				}
 			}
 		}
+		*/
 		
+
 		return rowView;
 	}
 }

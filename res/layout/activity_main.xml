@@ -23,6 +23,8 @@
 <!--         android:background="@drawable/main_add_button_selector"   -->
 <!--         /> -->
 
+
+<!--   android:cacheColorHint="@android:color/transparent"-->
     <ListView
         android:id="@+id/main_list_view"
         android:layout_width="fill_parent"
@@ -32,8 +34,10 @@
         android:padding="8dp"            
         android:divider="@android:color/transparent"
         android:cacheColorHint="@android:color/transparent"
+        android:scrollingCache="false"
         android:dividerHeight="8dp"    
-    	android:listSelector="@drawable/main_list_selector"  	>
+    	android:listSelector="@drawable/main_list_selector"  	
+    	>
 
     </ListView>
 

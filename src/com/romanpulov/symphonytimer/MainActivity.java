@@ -126,6 +126,7 @@ public class MainActivity extends ActionBarActivity {
         */       
         
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, dmTimers, dmTasks);
+		
 		getTimersListView().setAdapter(adapter);
 		getTimersListView().setOnItemClickListener(new OnItemClickListener() {
 			
@@ -133,7 +134,6 @@ public class MainActivity extends ActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 
-				Log.d("SymphonyArrayAdapter", "ItemClick");
 				//action
 				performTimerAction((DMTimerRec)parent.getItemAtPosition(position));
 			}			
