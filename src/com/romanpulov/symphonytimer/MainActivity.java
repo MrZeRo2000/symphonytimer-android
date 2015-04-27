@@ -146,7 +146,6 @@ public class MainActivity extends ActionBarActivity {
         // the below is for testing only
         //startHistoryActivity();
         //Toast.makeText(this, DBHelper.getInstance(this).getDatabasePathName(), Toast.LENGTH_LONG).show();
-        
 
     }
     
@@ -417,7 +416,8 @@ public class MainActivity extends ActionBarActivity {
     
     
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
-    	//Toast.makeText(getApplicationContext(), "Completed", Toast.LENGTH_SHORT).show();
+    	
+    	//bring activity to front
     	if (!activityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
     		intent.setComponent(new ComponentName(this.getPackageName(), this.getClass().getName()));
@@ -426,9 +426,16 @@ public class MainActivity extends ActionBarActivity {
     		Log.d("MainActivity", "Activity was not visible, bringing to front");    		
     	}
     	
+    	//prevent from sleeping while not turned off
+    	getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    	
+    	//save history
     	DBHelper.getInstance(this).insertTimerHistory(dmTaskItem);
 
+    	//play sound
     	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFile());
+    	
+    	//vibrate
     	boolean preferencesVibrate = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_vibrate", false);
     	if (preferencesVibrate)
     		VibratorHelper.getInstance(this).vibrate();
@@ -486,9 +493,6 @@ public class MainActivity extends ActionBarActivity {
     		}
     		updateTimers();
     		
-    		MediaPlayerHelper.getInstance(this).stop();
-    		VibratorHelper.getInstance(this).cancel();
-    		
     		dmTasks.remove(taskItem);
     		if (0 == dmTasks.size()) {		
     			//cancel  			
@@ -497,6 +501,16 @@ public class MainActivity extends ActionBarActivity {
     			scheduleExecutorTask.cancel(false);
     			scheduleExecutorTask = null;
     			*/
+
+    			//enable screen fading
+    			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    			
+    			//stop sound
+        		MediaPlayerHelper.getInstance(this).stop();
+        		//stop vibratin
+        		VibratorHelper.getInstance(this).cancel();
+
+    			
     			NotificationManager notificationManager = 
     					  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     			notificationManager.cancel(0);    			
