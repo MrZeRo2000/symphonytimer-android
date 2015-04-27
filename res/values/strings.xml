@@ -28,6 +28,8 @@
     <string name="action_preferences">Preferences</string>
     <string name="pref_cat_settings">Application Settings</string>
     <string name="pref_vibrate">Vibrate</string>
+    <string name="pref_bitmap_background">Bitmap background</string>
+    <string name="pref_bitmap_background_summary">Disable for minimum resource consumption</string>
     <string name="pref_reset_data">Reset data</string>
     <string name="pref_cat_local_backup">Local backup</string>
     <string name="pref_cat_summary_local_backup">Backup to local SD card</string>    

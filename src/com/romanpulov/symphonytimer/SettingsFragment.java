@@ -20,10 +20,17 @@ public class SettingsFragment extends PreferenceListFragment implements
 	public void onCreate(Bundle icicle) {
 	
 		super.onCreate(icicle);
+		
+		/*
 		PreferenceManager preferenceManager = getPreferenceManager();
-		preferenceManager.setSharedPreferencesName(SHARED_PREFS_NAME);
-		addPreferencesFromResource(R.xml.preferences);
+		preferenceManager.setSharedPreferencesName(SHARED_PREFS_NAME);		
 		preferenceManager.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+		*/
+		
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		sp.registerOnSharedPreferenceChangeListener(this);
+		
+		addPreferencesFromResource(R.xml.preferences);
 		
 		Preference button;
 		
