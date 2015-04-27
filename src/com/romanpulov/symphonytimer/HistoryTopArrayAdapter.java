@@ -43,16 +43,27 @@ public class HistoryTopArrayAdapter extends ArrayAdapter<DMTimerHistTopRec>{
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		
 		View rowView;
+		ViewHolder viewHolder;
 		
 		if (convertView == null) {
+			
+			//inflate view
 			LayoutInflater inflater = ((Activity)getContext()).getLayoutInflater();
-			rowView = inflater.inflate(R.layout.history_top_row_view, parent, false);			
+			rowView = inflater.inflate(R.layout.history_top_row_view, parent, false);
+			
+			//setup viewholder
+			viewHolder = new ViewHolder(rowView);
+			rowView.setTag(viewHolder);
+			
 		}
-		else 
+		else {
 			rowView = convertView;
+			viewHolder = (ViewHolder)rowView.getTag();
+		}
 		
-		ViewHolder viewHolder = (ViewHolder)rowView.getTag();
+		//create viewHolder(just in case)
 		if (null == viewHolder) {
 			viewHolder = new ViewHolder(rowView);
 			rowView.setTag(viewHolder);
