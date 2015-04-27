@@ -507,7 +507,7 @@ public class MainActivity extends ActionBarActivity {
     			
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
-        		//stop vibratin
+        		//stop vibrating
         		VibratorHelper.getInstance(this).cancel();
 
     			
