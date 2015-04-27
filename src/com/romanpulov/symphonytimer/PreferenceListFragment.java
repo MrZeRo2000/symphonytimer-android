@@ -32,6 +32,8 @@ public class PreferenceListFragment extends ListFragment{
     private static final int MSG_BIND_PREFERENCES = 0;
     
     private Handler mHandler;
+    private ListView mLV;
+    private int mXmlId;
     
 //    private Handler mHandler = new Handler() {
 //        @Override
@@ -65,10 +67,6 @@ public class PreferenceListFragment extends ListFragment{
         }    	
     }
     
-    
-    private ListView lv;
-    private int xmlId;
-     
     public PreferenceListFragment(){
 //        this.xmlId = R.xml.preferences;
     	mHandler = new PreferenceHandler(this);
@@ -77,28 +75,28 @@ public class PreferenceListFragment extends ListFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b){
         postBindPreferences();
-        return lv;
+        return mLV;
     }
      
     @Override
     public void onDestroyView(){
         super.onDestroyView();
-        ViewParent p = lv.getParent();
+        ViewParent p = mLV.getParent();
         if(p != null)
-            ((ViewGroup)p).removeView(lv);
+            ((ViewGroup)p).removeView(mLV);
     }
  
     @Override
     public void onCreate(Bundle b) {
         super.onCreate(b);
         if(b != null)
-            xmlId = b.getInt("xml");
+            mXmlId = b.getInt("xml");
         mPreferenceManager = onCreatePreferenceManager();        
-        lv = (ListView) LayoutInflater.from(getActivity()).inflate(R.layout.preference_list_content, null);
-        lv.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        addPreferencesFromResource(xmlId);
+        mLV = (ListView) LayoutInflater.from(getActivity()).inflate(R.layout.preference_list_content, null);
+        mLV.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        addPreferencesFromResource(mXmlId);
         postBindPreferences();
-        ((OnPreferenceAttachedListener)getActivity()).onPreferenceAttached(getPreferenceScreen(), xmlId);
+        ((OnPreferenceAttachedListener)getActivity()).onPreferenceAttached(getPreferenceScreen(), mXmlId);
     }
  
     @Override
@@ -116,7 +114,7 @@ public class PreferenceListFragment extends ListFragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        lv = null;
+        mLV = null;
         try{
             Method m = PreferenceManager.class.getDeclaredMethod("dispatchActivityDestroy");
             m.setAccessible(true);
@@ -128,7 +126,7 @@ public class PreferenceListFragment extends ListFragment{
  
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("xml", xmlId);
+        outState.putInt("xml", mXmlId);
         super.onSaveInstanceState(outState);
  
     }
@@ -159,7 +157,7 @@ public class PreferenceListFragment extends ListFragment{
     private void bindPreferences() {
         final PreferenceScreen preferenceScreen = getPreferenceScreen();
         if (preferenceScreen != null) {
-            preferenceScreen.bind(lv);
+            preferenceScreen.bind(mLV);
         }
     }
      

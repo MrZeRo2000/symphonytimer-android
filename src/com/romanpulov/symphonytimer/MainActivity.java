@@ -44,11 +44,11 @@ public class MainActivity extends ActionBarActivity {
 	private DMTasks dmTasks = new DMTasks();
 	private ScheduledThreadPoolExecutor scheduleExecutor = new ScheduledThreadPoolExecutor(2);
 	
-	private AlarmManagerBroadcastReceiver alarm;
+	private AlarmManagerBroadcastReceiver mAlarm;
 	
-	private ListView lv = null;
+	private ListView mLV = null;
 	
-	private final ScheduleHelper scheduleHelper = new ScheduleHelper();
+	private final ScheduleHelper mScheduleHelper = new ScheduleHelper();
 	
 	private Runnable taskRunnable = new Runnable () {
 		@Override
@@ -67,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
 		}
 	};
 	
-	private DMTaskItem.OnTaskItemCompleted taskItemCompleted = new DMTaskItem.OnTaskItemCompleted() {
+	private DMTaskItem.OnTaskItemCompleted mTaskItemCompleted = new DMTaskItem.OnTaskItemCompleted() {
 		@Override
 		public void OnTaskItemCompletedEvent(
 				DMTaskItem dmTaskItem) {
@@ -203,7 +203,7 @@ public class MainActivity extends ActionBarActivity {
     	super.onRestoreInstanceState(savedInstanceState);
     	ArrayList<DMTaskItem> restoredTasks  = savedInstanceState.getParcelableArrayList(dmTasks.getClass().toString());
     	for (DMTaskItem dmTaskItem : restoredTasks) {
-    		dmTaskItem.setTaskItemCompleted(taskItemCompleted);
+    		dmTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		dmTasks.add(dmTaskItem);
     	}
 		//dmTasks = (DMTasks)p;
@@ -211,7 +211,7 @@ public class MainActivity extends ActionBarActivity {
 		updateTimers();
 		//update scheduler
 		if (restoredTasks.size() > 0) {
-			scheduleHelper.startScheduler();
+			mScheduleHelper.startScheduler();
 		}	
 		Log.d("MainActivity", "OnRestoreInstanceState");
     }
@@ -310,7 +310,7 @@ public class MainActivity extends ActionBarActivity {
     	Intent startItemIntent = new Intent(this, AddItemActivity.class);    	
     	startItemIntent.putExtra(AddItemActivity.EDIT_REC_NAME, dmTimerRec);    	
     	startActivityForResult(startItemIntent, 
-    			null == dmTimerRec.title ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
+    			null == dmTimerRec.mTitle ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
     }
     
     private void startHistoryActivity() {
@@ -344,10 +344,10 @@ public class MainActivity extends ActionBarActivity {
     }
     
     private ListView getTimersListView () {
-    	if (null == lv) {
-    		lv = (ListView)findViewById(R.id.main_list_view);
+    	if (null == mLV) {
+    		mLV = (ListView)findViewById(R.id.main_list_view);
     	}
-    	return lv;
+    	return mLV;
     }    
     
     public void add_image_button_click(View v) {
@@ -368,7 +368,7 @@ public class MainActivity extends ActionBarActivity {
     
     private void performDeleteTimer(DMTimerRec dmTimerRec) {    	
 		try {
-			long retVal = DBHelper.getInstance(this).deleteTimer(dmTimerRec.id);
+			long retVal = DBHelper.getInstance(this).deleteTimer(dmTimerRec.mId);
 			if (retVal > 0) {
 				loadTimers();
 				updateTimers();  
@@ -380,7 +380,7 @@ public class MainActivity extends ActionBarActivity {
     
     private void performMoveUpTimer(DMTimerRec dmTimerRec) {
 		try {
-			boolean retVal = DBHelper.getInstance(this).moveTimerUp(dmTimerRec.order_id);
+			boolean retVal = DBHelper.getInstance(this).moveTimerUp(dmTimerRec.mOrderId);
 			if (retVal) {
 				loadTimers();
 				updateTimers();  
@@ -392,7 +392,7 @@ public class MainActivity extends ActionBarActivity {
     
     private void performMoveDownTimer(DMTimerRec dmTimerRec) {
 		try {
-			boolean retVal = DBHelper.getInstance(this).moveTimerDown(dmTimerRec.order_id);
+			boolean retVal = DBHelper.getInstance(this).moveTimerDown(dmTimerRec.mOrderId);
 			if (retVal) {
 				loadTimers();
 				updateTimers();  
@@ -459,11 +459,11 @@ public class MainActivity extends ActionBarActivity {
     
     private void performTimerAction(DMTimerRec dmTimerRec) {
     	
-    	DMTaskItem taskItem = dmTasks.getTaskItemById(dmTimerRec.id);
+    	DMTaskItem taskItem = dmTasks.getTaskItemById(dmTimerRec.mId);
     	
     	if (null == taskItem) {
     		DMTaskItem newTaskItem = dmTasks.addTaskItem(getApplicationContext(), dmTimerRec);//new DMTaskItem(dmTimerRec.id, dmTimerRec.time_sec);
-    		newTaskItem.setTaskItemCompleted(taskItemCompleted);
+    		newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		
     		
@@ -471,7 +471,7 @@ public class MainActivity extends ActionBarActivity {
     		
     		updateNotification();
     		
-    		scheduleHelper.startScheduler();  		
+    		mScheduleHelper.startScheduler();  		
     		
     		
     		/*
@@ -480,23 +480,23 @@ public class MainActivity extends ActionBarActivity {
     		}
     		*/
 
-    		if (null == alarm) {
-    			alarm = new AlarmManagerBroadcastReceiver();
+    		if (null == mAlarm) {
+    			mAlarm = new AlarmManagerBroadcastReceiver();
     		}
-    		alarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
+    		mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
     		
     		
     	} else {
     		//finalize
-    		if (null != alarm) {
-    			alarm.cancelAlarm(getApplicationContext(), taskItem.getId());
+    		if (null != mAlarm) {
+    			mAlarm.cancelAlarm(getApplicationContext(), taskItem.getId());
     		}
     		updateTimers();
     		
     		dmTasks.remove(taskItem);
     		if (0 == dmTasks.size()) {		
     			//cancel  			
-    			scheduleHelper.stopScheduler();
+    			mScheduleHelper.stopScheduler();
     			/*
     			scheduleExecutorTask.cancel(false);
     			scheduleExecutorTask = null;

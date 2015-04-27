@@ -11,7 +11,7 @@ import android.support.v4.app.DialogFragment;
 
 public class AlertOkCancelDialog extends DialogFragment {
 	private final static String STRING_MESSAGE = "MESSAGE";
-	private int message;	
+	private int mMessage;	
 	
 	public interface OnOkButtonClick {
 		public void OnOkButtonClickEvent(DialogFragment dialog);
@@ -33,7 +33,7 @@ public class AlertOkCancelDialog extends DialogFragment {
 	}
 	
 	public void setMessage(int message) {
-		this.message = message;
+		this.mMessage = message;
 	}
 	
 	public void setOkButtonClick(OnOkButtonClick okButtonClick) {
@@ -49,7 +49,7 @@ public class AlertOkCancelDialog extends DialogFragment {
 	@Override
 	public void onSaveInstanceState(Bundle data) {
 		// TODO Auto-generated method stub
-		data.putInt(AlertOkCancelDialog.STRING_MESSAGE, message);
+		data.putInt(AlertOkCancelDialog.STRING_MESSAGE, mMessage);
 		super.onSaveInstanceState(data);
 	}	
 	
@@ -57,11 +57,11 @@ public class AlertOkCancelDialog extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		if (null != savedInstanceState) {
-			message = savedInstanceState.getInt(AlertOkCancelDialog.STRING_MESSAGE);
+			mMessage = savedInstanceState.getInt(AlertOkCancelDialog.STRING_MESSAGE);
 		}
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
 		dialogBuilder
-		  .setMessage(message)
+		  .setMessage(mMessage)
 		  .setPositiveButton(R.string.caption_ok, 
 				  new OnClickListener() {					
 					@Override

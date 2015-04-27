@@ -61,7 +61,7 @@ public class DMTasks extends ArrayList<DMTaskItem> {
 	}
 		
 	public DMTaskItem addTaskItem(Context context, DMTimerRec dmTimerRec) {
-		DMTaskItem newTaskItem = new DMTaskItem(dmTimerRec.id, dmTimerRec.title, dmTimerRec.time_sec, dmTimerRec.sound_file);
+		DMTaskItem newTaskItem = new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile);
 		return newTaskItem;
 	}
 	

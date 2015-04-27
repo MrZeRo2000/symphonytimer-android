@@ -4,20 +4,20 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 
 public class SoundHelper {
-	private static SoundHelper soundHelperInstance = null;
 	
-	private SoundPool soundPool;
+	private static SoundHelper mSoundHelperInstance = null;	
+	private SoundPool mSoundPool;
 	
 	public static SoundHelper getInstance() {
-		if (null == soundHelperInstance) {
-			soundHelperInstance = new SoundHelper();
+		if (null == mSoundHelperInstance) {
+			mSoundHelperInstance = new SoundHelper();
 		}		
-		return soundHelperInstance;
+		return mSoundHelperInstance;
 	}	
 	
 	private void checkSoundPool() {
-		if (null == soundPool) {
-			soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+		if (null == mSoundPool) {
+			mSoundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
 		}
 	}
 	
@@ -28,7 +28,7 @@ public class SoundHelper {
 	public int loadTrack(String path) {
 		if (null != path) {
 			checkSoundPool();
-			return soundPool.load(path, 1);
+			return mSoundPool.load(path, 1);
 		} else {
 			return 0;
 		}
@@ -36,7 +36,7 @@ public class SoundHelper {
 	
 	public int playTrack(int trackId) {
 		if (0 != trackId) {
-			return soundPool.play(trackId, 1f, 1f, 1, -1, 1f);
+			return mSoundPool.play(trackId, 1f, 1f, 1, -1, 1f);
 		} else {
 			return 0;
 		}
@@ -44,12 +44,12 @@ public class SoundHelper {
 	
 	public void stopTrack(int trackId) {
 		if (0 != trackId) {
-			soundPool.stop(trackId);
+			mSoundPool.stop(trackId);
 		}
 	}
 	
 	public void release(){
-		soundPool.release();
-		soundPool = null;
+		mSoundPool.release();
+		mSoundPool = null;
 	}
 }

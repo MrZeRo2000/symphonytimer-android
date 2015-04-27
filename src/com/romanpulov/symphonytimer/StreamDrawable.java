@@ -23,33 +23,33 @@ import android.graphics.drawable.Drawable;
 class StreamDrawable extends Drawable {
 	private static final boolean USE_VIGNETTE = true;
 
-	private final float cornerRadius;
-	private final RectF rect = new RectF();
-	private final BitmapShader bitmapShader;
-	private final Paint paint;
-	private final int margin;
+	private final float mCornerRadius;
+	private final RectF mRect = new RectF();
+	private final BitmapShader mBitmapShader;
+	private final Paint mPaint;
+	private final int mMargin;
 
 	StreamDrawable(Bitmap bitmap, float cornerRadius, int margin) {
-		this.cornerRadius = cornerRadius;
+		this.mCornerRadius = cornerRadius;
 
-		bitmapShader = new BitmapShader(bitmap,
+		mBitmapShader = new BitmapShader(bitmap,
 				Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
 
-		paint = new Paint();
-		paint.setAntiAlias(true);
-		paint.setShader(bitmapShader);
+		mPaint = new Paint();
+		mPaint.setAntiAlias(true);
+		mPaint.setShader(mBitmapShader);
 
-		this.margin = margin;
+		this.mMargin = margin;
 	}
 
 	@Override
 	protected void onBoundsChange(Rect bounds) {
 		super.onBoundsChange(bounds);
-		rect.set(margin, margin, bounds.width() - margin, bounds.height() - margin);
+		mRect.set(mMargin, mMargin, bounds.width() - mMargin, bounds.height() - mMargin);
 
-		if ((USE_VIGNETTE) && (rect.centerX() > 0)) {
+		if ((USE_VIGNETTE) && (mRect.centerX() > 0)) {
 			RadialGradient vignette = new RadialGradient(
-					rect.centerX(), rect.centerY() * 1.0f / 0.7f, rect.centerX() * 1.3f,
+					mRect.centerX(), mRect.centerY() * 1.0f / 0.7f, mRect.centerX() * 1.3f,
 					new int[] { 0, 0, 0x7f000000 }, new float[] { 0.0f, 0.7f, 1.0f },
 					Shader.TileMode.CLAMP);
 
@@ -57,14 +57,14 @@ class StreamDrawable extends Drawable {
 			oval.setScale(1.0f, 0.7f);
 			vignette.setLocalMatrix(oval);
 
-			paint.setShader(
-					new ComposeShader(bitmapShader, vignette, PorterDuff.Mode.SRC_OVER));
+			mPaint.setShader(
+					new ComposeShader(mBitmapShader, vignette, PorterDuff.Mode.SRC_OVER));
 		}
 	}
 
 	@Override
 	public void draw(Canvas canvas) {
-		canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint);
+		canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
 	}
 
 	@Override
@@ -74,11 +74,11 @@ class StreamDrawable extends Drawable {
 
 	@Override
 	public void setAlpha(int alpha) {
-		paint.setAlpha(alpha);
+		mPaint.setAlpha(alpha);
 	}
 
 	@Override
 	public void setColorFilter(ColorFilter cf) {
-		paint.setColorFilter(cf);
+		mPaint.setColorFilter(cf);
 	}		
 }

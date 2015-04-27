@@ -79,14 +79,14 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		}
 		
 		DMTimerHistRec rec = mDMTimerHistList.get(position);
-		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.timerId);
+		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.mTimerId);
 		
-		viewHolder.mTitle.setText(dmTimerRec.title);		
-		viewHolder.mTime.setText(java.text.DateFormat.getDateTimeInstance().format(new Date(rec.startTime)));
+		viewHolder.mTitle.setText(dmTimerRec.mTitle);		
+		viewHolder.mTime.setText(java.text.DateFormat.getDateTimeInstance().format(new Date(rec.mStartTime)));
 		viewHolder.mImage.setImageURI(
-				null != dmTimerRec.image_name ? Uri.parse(dmTimerRec.image_name) : null);
+				null != dmTimerRec.mImageName ? Uri.parse(dmTimerRec.mImageName) : null);
 		
-		Log.d(tag, dmTimerRec.title + " " + dmTimerRec.image_name);
+		Log.d(tag, dmTimerRec.mTitle + " " + dmTimerRec.mImageName);
 		return rowView;
 	}
 

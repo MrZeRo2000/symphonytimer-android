@@ -12,11 +12,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class DBHelper {
-	private static DBHelper dbHelperInstance = null;	
-	private Context context;
-	private SQLiteDatabase db;
-	private final DBOpenHelper dbOpenHelper;
-	private boolean dbDataChanged = false;
+	private static DBHelper mDBHelperInstance = null;	
+	private Context mContext;
+	private SQLiteDatabase mDB;
+	private final DBOpenHelper mDBOpenHelper;
+	private boolean mDBDataChanged = false;
 	
 	public static class RawRecItem {
 		
@@ -33,41 +33,41 @@ public class DBHelper {
 	}	
 	
 	private DBHelper(Context context) {
-		this.context = context;
-		dbOpenHelper = new DBOpenHelper(context);
+		this.mContext = context;
+		mDBOpenHelper = new DBOpenHelper(context);
 		openDB();
 	}
 	
 	public void openDB() {
-		if (null == db) {
-			db = dbOpenHelper.getWritableDatabase();
+		if (null == mDB) {
+			mDB = mDBOpenHelper.getWritableDatabase();
 		}
 	}
 	
 	public void closeDB() {
-		if (null != db) {
-			db.close();
-			db = null;
+		if (null != mDB) {
+			mDB.close();
+			mDB = null;
 		}
 	}
 	
 	public static DBHelper getInstance(Context context) {
-		if (null == dbHelperInstance) {
-			dbHelperInstance = new DBHelper(context);			
+		if (null == mDBHelperInstance) {
+			mDBHelperInstance = new DBHelper(context);			
 		}		
-		return dbHelperInstance;
+		return mDBHelperInstance;
 	}
 	
 	public boolean getDBDataChanged() {
-		return this.dbDataChanged;
+		return this.mDBDataChanged;
 	}
 	
 	public void resetDBDataChanged() {
-		this.dbDataChanged = false; 
+		this.mDBDataChanged = false; 
 	}
 	
 	public String getDatabasePathName() {
-		return context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
+		return mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
 	}
 	
 	public void Init(){
@@ -76,21 +76,21 @@ public class DBHelper {
 	
 	public long insertTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.title);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.time_sec);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.sound_file);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.image_name);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.mTitle);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], getMaxOrderId() + 1);
-		return db.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);
+		return mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);
 	}
 	
 	public long updateTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.title);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.time_sec);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.sound_file);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.image_name);
-		return db.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.id, null);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.mTitle);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
+		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.mId, null);
 	}
 	
 	public long insertTimerHistory(DMTaskItem dmTaskItem) {
@@ -98,11 +98,11 @@ public class DBHelper {
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], dmTaskItem.getId());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], dmTaskItem.getStartTime());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], dmTaskItem.getCurrentTime());
-		return db.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
+		return mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
 	}
 	
 	private long getLongSQL(String sql) {
-		Cursor c = db.rawQuery(sql, null);
+		Cursor c = mDB.rawQuery(sql, null);
 		
 		try {
 			if (1 == c.getCount()) {
@@ -144,7 +144,7 @@ public class DBHelper {
 		String sql = sqlBuilder.toString();
 		Log.d("SQL", sql);		
 		
-		db.execSQL(sql);
+		mDB.execSQL(sql);
 	}	
 	
 	public boolean moveTimerUp(long orderId) {
@@ -167,8 +167,8 @@ public class DBHelper {
 	
 	
 	public long deleteTimer(long id) {
-		db.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1] + "=" + String.valueOf(id), null);
-		return db.delete(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS[0] + "=" + String.valueOf(id), null);
+		mDB.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1] + "=" + String.valueOf(id), null);
+		return mDB.delete(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS[0] + "=" + String.valueOf(id), null);
 	}
 
 	/* No longer needed
@@ -206,16 +206,16 @@ public class DBHelper {
 		Cursor c = null;		
 		
 		try {
-			c = db.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, null, null, null, null, "order_id");
+			c = mDB.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, null, null, null, null, "order_id");
 			
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmTimerRec = new DMTimerRec();
-				dmTimerRec.id = c.getLong(0);
-				dmTimerRec.title = c.getString(1);
-				dmTimerRec.time_sec = c.getLong(2);
-				dmTimerRec.sound_file = c.getString(3);
-				dmTimerRec.image_name = c.getString(4);
-				dmTimerRec.order_id = c.getLong(5);
+				dmTimerRec.mId = c.getLong(0);
+				dmTimerRec.mTitle = c.getString(1);
+				dmTimerRec.mTimeSec = c.getLong(2);
+				dmTimerRec.mSoundFile = c.getString(3);
+				dmTimerRec.mImageName = c.getString(4);
+				dmTimerRec.mOrderId = c.getLong(5);
 				
 				dmTimers.add(dmTimerRec);
 			}
@@ -235,7 +235,7 @@ public class DBHelper {
 		
 		try {
 			if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
-				c = db.query(
+				c = mDB.query(
 						DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
 						DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
 						DBOpenHelper.TIMER_HISTORY_SELECTION_CRITERIA, 
@@ -244,7 +244,7 @@ public class DBHelper {
 						null, 
 						"start_time DESC");
 			else
-				c = db.query(
+				c = mDB.query(
 						DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
 						DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
 						null, 
@@ -255,10 +255,10 @@ public class DBHelper {
 			
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistRec();
-				dmRec.id = c.getLong(0);
-				dmRec.timerId = c.getLong(1);
-				dmRec.startTime = c.getLong(2);
-				dmRec.endTime = c.getLong(3);
+				dmRec.mId = c.getLong(0);
+				dmRec.mTimerId = c.getLong(1);
+				dmRec.mStartTime = c.getLong(2);
+				dmRec.mEndTime = c.getLong(3);
 				
 				dmList.add(dmRec);
 			}
@@ -277,15 +277,15 @@ public class DBHelper {
 		
 		try {
 			if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
-				c = db.rawQuery(
+				c = mDB.rawQuery(
 						DBOpenHelper.TIMER_HISTORY_TOP_QUERY_FILTER, 
 						new String[] {String.valueOf(System.currentTimeMillis()), DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId]});
 			else
-				c = db.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
+				c = mDB.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistTopRec();
-				dmRec.timerId = c.getLong(0);
-				dmRec.execCnt = c.getLong(1);								
+				dmRec.mTimerId = c.getLong(0);
+				dmRec.mExecCnt = c.getLong(1);								
 				dmList.add(dmRec);
 			};
 
@@ -303,7 +303,7 @@ public class DBHelper {
 		Cursor c = null;
 		
 		try {
-			c = db.rawQuery(DBOpenHelper.TABLE_BACKUP_QUERIES.get(tableName), null);
+			c = mDB.rawQuery(DBOpenHelper.TABLE_BACKUP_QUERIES.get(tableName), null);
 						
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
 				
@@ -336,7 +336,7 @@ public class DBHelper {
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[5]));
-			db.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);						
+			mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);						
 		}
 		
 	}
@@ -350,17 +350,17 @@ public class DBHelper {
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3]));
-			db.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);						
+			mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);						
 		}
 		
 	}
 	
 	public void clearData() {
 
-		db.delete(DBOpenHelper.TIMER_TABLE_NAME, null, null);
-		db.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, null);
+		mDB.delete(DBOpenHelper.TIMER_TABLE_NAME, null, null);
+		mDB.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, null);
 		
-		dbDataChanged = true;
+		mDBDataChanged = true;
 
 	}
 

@@ -70,16 +70,16 @@ public class HistoryTopArrayAdapter extends ArrayAdapter<DMTimerHistTopRec>{
 		}
 		
 		DMTimerHistTopRec rec = mDMTimerHistTopList.get(position);
-		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.timerId);
+		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.mTimerId);
 		
 		StringBuilder sb = new StringBuilder();
 		sb
-		  .append(dmTimerRec.title)
+		  .append(dmTimerRec.mTitle)
 		  .append(" (")
-		  .append(String.valueOf(rec.execCnt))
+		  .append(String.valueOf(rec.mExecCnt))
 		  .append(")");		
 		viewHolder.mTitle.setText(sb.toString());
-		viewHolder.mProgress.setProgress((int)(rec.execPerc * viewHolder.mProgress.getMax() / mDMTimerHistTopList.getMaxExecPerc()));
+		viewHolder.mProgress.setProgress((int)(rec.mExecPerc * viewHolder.mProgress.getMax() / mDMTimerHistTopList.getMaxExecPerc()));
 
 		return rowView;
 	}

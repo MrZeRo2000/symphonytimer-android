@@ -26,9 +26,9 @@ public class AddItemActivity extends ActionBarActivity {
 	
 	private DMTimerRec editRec;
 	
-	private long editId;
-	private Uri editSoundURI;
-	private Uri editImageURI;
+	private long mEditId;
+	private Uri mEditSoundURI;
+	private Uri mEditImageURI;
 	
 	private class AddItemInputException extends Exception {
 		
@@ -55,17 +55,17 @@ public class AddItemActivity extends ActionBarActivity {
 	}
 	
 	private final void updateEditRec(){
-		editId = editRec.id;
-		((EditText)findViewById(R.id.title_edit_text)).setText(editRec.title);
-		long hours =  (long) editRec.time_sec / 3600;
-		long minutes = (long) editRec.time_sec % 3600 / 60;
-		long seconds = (long) editRec.time_sec % 60;
+		mEditId = editRec.mId;
+		((EditText)findViewById(R.id.title_edit_text)).setText(editRec.mTitle);
+		long hours =  (long) editRec.mTimeSec / 3600;
+		long minutes = (long) editRec.mTimeSec % 3600 / 60;
+		long seconds = (long) editRec.mTimeSec % 60;
 		((EditText)findViewById(R.id.hours_edit_text)).setText(String.valueOf(hours));
 		((EditText)findViewById(R.id.minutes_edit_text)).setText(String.valueOf(minutes));
 		((EditText)findViewById(R.id.seconds_edit_text)).setText(String.valueOf(seconds));
 		
 		// update sound and image controls
-		updateSoundImageFromFile(editRec.sound_file, editRec.image_name);
+		updateSoundImageFromFile(editRec.mSoundFile, editRec.mImageName);
 		
 	}
 	
@@ -73,8 +73,8 @@ public class AddItemActivity extends ActionBarActivity {
 		
 		String soundFileTitle; 
 		if (null != soundFile) {
-			editSoundURI = UriHelper.fileNameToUri(getApplicationContext(), soundFile);
-			soundFileTitle = (null == editSoundURI) ? getString(R.string.default_sound) : UriHelper.getSoundTitleFromFileName(getApplicationContext(), soundFile); 
+			mEditSoundURI = UriHelper.fileNameToUri(getApplicationContext(), soundFile);
+			soundFileTitle = (null == mEditSoundURI) ? getString(R.string.default_sound) : UriHelper.getSoundTitleFromFileName(getApplicationContext(), soundFile); 
 		} else {
 			soundFileTitle = getString(R.string.default_sound);
 		}
@@ -83,22 +83,22 @@ public class AddItemActivity extends ActionBarActivity {
 		
 		if (null != imageFile) {
 			//editImageURI = Uri.parse(editRec.image_name);
-			editImageURI = UriHelper.fileNameToUri(getApplicationContext(), imageFile);
-			((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(editImageURI);
+			mEditImageURI = UriHelper.fileNameToUri(getApplicationContext(), imageFile);
+			((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(mEditImageURI);
 		}
 		
 	}
 	
 	private final DMTimerRec getEditRec() throws AddItemInputException {
 		DMTimerRec rec = new DMTimerRec();
-		rec.id = editId;
-		rec.title = ((EditText)findViewById(R.id.title_edit_text)).getText().toString().trim();
+		rec.mId = mEditId;
+		rec.mTitle = ((EditText)findViewById(R.id.title_edit_text)).getText().toString().trim();
 		
-		if (null == rec.title) {
+		if (null == rec.mTitle) {
 			throw new AddItemInputException(getResources().getString(R.string.error_title_not_assigned));
 		}
 		
-		if (0 == rec.title.length()) {
+		if (0 == rec.mTitle.length()) {
 			throw new AddItemInputException(getResources().getString(R.string.error_title_not_assigned));
 		}
 		
@@ -108,14 +108,14 @@ public class AddItemActivity extends ActionBarActivity {
 		long hours = Long.valueOf(hoursString);
 		long minutes = Long.valueOf(minutesString); 
 		long seconds = Long.valueOf(secondsString);
-		rec.time_sec = hours * 3600 + minutes * 60 + seconds;
+		rec.mTimeSec = hours * 3600 + minutes * 60 + seconds;
 		
-		if (0 == rec.time_sec) {
+		if (0 == rec.mTimeSec) {
 			throw new AddItemInputException(getResources().getString(R.string.error_time_zero));
 		}
 		
-		rec.sound_file = null != editSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), editSoundURI) : null;
-		rec.image_name = null != editImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), editImageURI) : null;
+		rec.mSoundFile = null != mEditSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI) : null;
+		rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
 		
 		return rec;
 	}
@@ -130,11 +130,11 @@ public class AddItemActivity extends ActionBarActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
-		if (null != editSoundURI) {
-			outState.putString(EDIT_SOUND_URI, UriHelper.uriMediaToFileName(getApplicationContext(), editSoundURI));
+		if (null != mEditSoundURI) {
+			outState.putString(EDIT_SOUND_URI, UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI));
 		}
-		if (null != editImageURI) {
-			outState.putString(EDIT_IMAGE_URI, UriHelper.uriMediaToFileName(getApplicationContext(), editImageURI));
+		if (null != mEditImageURI) {
+			outState.putString(EDIT_IMAGE_URI, UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI));
 		}
 
 	}
@@ -162,12 +162,12 @@ public class AddItemActivity extends ActionBarActivity {
 	}
 	
 	public void onClearSoundFileButtonClick(View v){
-		editSoundURI = null;
+		mEditSoundURI = null;
 		((Button)findViewById(R.id.sound_file_button)).setText(R.string.default_sound);		
 	}
 	
 	public void onClearImageFileButtonClick(View v){
-		editImageURI = null;
+		mEditImageURI = null;
 		((ImageButton)findViewById(R.id.image_file_image_button)).setImageResource(R.drawable.btn_check_off);
 	}	
 	
@@ -186,17 +186,17 @@ public class AddItemActivity extends ActionBarActivity {
 
 	    if(resultCode == RESULT_OK){
 	        //the selected audio.   	    		    	
-	        editSoundURI = data.getData();
-	        ((Button)findViewById(R.id.sound_file_button)).setText(UriHelper.getSoundTitleFromUri(getApplicationContext(), editSoundURI));	        
+	        mEditSoundURI = data.getData();
+	        ((Button)findViewById(R.id.sound_file_button)).setText(UriHelper.getSoundTitleFromUri(getApplicationContext(), mEditSoundURI));	        
 	    }
 	  }
 	  
 	  if(requestCode == IMAGE_REQ_CODE){
 		    if(resultCode == RESULT_OK){
 		        //the selected image.
-		    	editImageURI = data.getData();
+		    	mEditImageURI = data.getData();
 		        ImageButton ib = (ImageButton)findViewById(R.id.image_file_image_button);
-        		ib.setImageURI(editImageURI);        		
+        		ib.setImageURI(mEditImageURI);        		
 		    }
 	  }
 

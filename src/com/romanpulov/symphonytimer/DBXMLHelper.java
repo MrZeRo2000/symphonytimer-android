@@ -19,10 +19,10 @@ import android.util.Xml;
 public class DBXMLHelper {
 	
 	//private static DBXMLHelper dbXMLHelperInstance = null;
-	private Context context;
+	private Context mContext;
 	
 	public DBXMLHelper(Context context) {
-		this.context = context;
+		this.mContext = context;
 	}
 	
 	/*
@@ -42,7 +42,7 @@ public class DBXMLHelper {
 		
 		final String tableItem = getTableItem(tableName);
 		
-		List<DBHelper.RawRecItem> timers = DBHelper.getInstance(context).getBackupTable(tableName);
+		List<DBHelper.RawRecItem> timers = DBHelper.getInstance(mContext).getBackupTable(tableName);
 		xmlSerializer.startTag("", tableName);
 		
 		for (DBHelper.RawRecItem timerRecItem: timers) {

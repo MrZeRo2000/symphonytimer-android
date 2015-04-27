@@ -14,52 +14,52 @@ public class RoundedBitmapBackgroundBuilder {
 	final public static int BG_FINAL = 1;
 	final private static int BRIGHTENING_FACTOR = 100;
 	
-	private Context context;
-	private int width;
-	private int height;
-	private float cornerRadius;
+	private Context mContext;
+	private int mWidth;
+	private int mHeight;
+	private float mCornerRadius;
 	
-	private Boolean isBitmapPrepared = false;
+	private Boolean mIsBitmapPrepared = false;
 	
-	private Bitmap scaledBg;
-	private Bitmap scaledBrightBg;
+	private Bitmap mScaledBg;
+	private Bitmap mScaledBrightBg;
 	
-	private Bitmap finalScaledBg;
-	private Bitmap finalScaledBrightBg;
+	private Bitmap mFinalScaledBg;
+	private Bitmap mFinalScaledBrightBg;
 	
 	public RoundedBitmapBackgroundBuilder(Context context, int width, int height, float cornerRadius) {
-		this.context = context;
-		this.width = width;
-		this.height = height;
-		this.cornerRadius = cornerRadius;
+		this.mContext = context;
+		this.mWidth = width;
+		this.mHeight = height;
+		this.mCornerRadius = cornerRadius;
 	}
 	
 	private void prepareBitmaps() {
 		
-		Bitmap bg = BitmapFactory.decodeResource(context.getResources(), R.drawable.sky_home_sm);
+		Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky_home_sm);
 		Bitmap brightBg = createBrightBitmap(bg, BRIGHTENING_FACTOR);
-		scaledBg = Bitmap.createScaledBitmap(bg, width, height, false);
-		scaledBrightBg = Bitmap.createScaledBitmap(brightBg, width, height, false);
+		mScaledBg = Bitmap.createScaledBitmap(bg, mWidth, mHeight, false);
+		mScaledBrightBg = Bitmap.createScaledBitmap(brightBg, mWidth, mHeight, false);
 		
 		Bitmap finalBg = createBlueToRedBitmap(bg);
 		Bitmap finalBrightBg = createBrightBitmap(finalBg, BRIGHTENING_FACTOR);
-		finalScaledBg = Bitmap.createScaledBitmap(finalBg, width, height, false);
-		finalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, width, height, false);			
+		mFinalScaledBg = Bitmap.createScaledBitmap(finalBg, mWidth, mHeight, false);
+		mFinalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, mWidth, mHeight, false);			
 		
-		isBitmapPrepared = true;
+		mIsBitmapPrepared = true;
 
 	}
 	
 	public Drawable buildDrawable(int type) {
 		
-		if (!isBitmapPrepared) {
+		if (!mIsBitmapPrepared) {
 			prepareBitmaps();
 		}
 		
-		Drawable bgDrawable = new StreamDrawable(scaledBg, cornerRadius, 0);
-		Drawable bgBrightDrawable = new StreamDrawable(scaledBrightBg, cornerRadius, 0);
-		Drawable bgFinalDrawable = new StreamDrawable(finalScaledBg, cornerRadius, 0);
-		Drawable bgFinalBrightDrawable = new StreamDrawable(finalScaledBrightBg, cornerRadius, 0);
+		Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+		Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
+		Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
+		Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
 		
 		StateListDrawable drawable = new StateListDrawable(); 
 		drawable.addState(new int[] { android.R.attr.state_pressed }, (type == 0) ? bgBrightDrawable : bgFinalBrightDrawable);

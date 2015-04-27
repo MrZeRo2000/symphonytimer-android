@@ -8,7 +8,7 @@ public class DMTimers extends ArrayList<DMTimerRec>{
 	
 	public DMTimerRec getItemById(long id) {
 		for (DMTimerRec timerRec : this) {
-			if (timerRec.id == id) {
+			if (timerRec.mId == id) {
 				return timerRec;
 			}
 		}

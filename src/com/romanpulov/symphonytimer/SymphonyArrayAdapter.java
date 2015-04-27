@@ -14,58 +14,58 @@ import android.widget.ImageView;
 
 class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	
-	private final Context context;
-	private final DMTimers values;
-	private DMTasks tasks;
-	private RoundedBitmapBackgroundBuilder backgroundBuilder;
+	private final Context mContext;
+	private final DMTimers mValues;
+	private DMTasks mTasks;
+	private RoundedBitmapBackgroundBuilder mBackgroundBuilder;
 	
 	static class ViewHolder {
-		TextView titleTextView;
-		ImageView imageView;
-		TextView progressTextView;
-		ProgressBar progressBar;
+		TextView mTitleTextView;
+		ImageView mImageView;
+		TextView mProgressTextView;
+		ProgressBar mProgressBar;
 		
 		public ViewHolder(View view) {
-			this.titleTextView = (TextView)view.findViewById(R.id.title_text_view);
-			this.imageView = (ImageView)view.findViewById(R.id.image_image_view);
-			this.progressTextView = (TextView)view.findViewById(R.id.progress_text_view);
-			this.progressBar = (ProgressBar)view.findViewById(R.id.progress_bar);			
+			this.mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
+			this.mImageView = (ImageView)view.findViewById(R.id.image_image_view);
+			this.mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
+			this.mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);			
 		}
 				
 	}
 	
 	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
 		super(context, R.layout.symphony_row_view);
-		this.context = context;
-		this.values = values;
-		this.tasks = tasks;
+		this.mContext = context;
+		this.mValues = values;
+		this.mTasks = tasks;
 	}
 	
 	public void setTasks(DMTasks tasks) {
-		this.tasks = tasks;
+		this.mTasks = tasks;
 	}
 	
 	@Override
     public int getCount() {
-        return values.size();
+        return mValues.size();
     }
 	
 	@Override
     public DMTimerRec getItem(int position) {
-        return values.get(position);
+        return mValues.get(position);
     }		
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		final DMTimerRec dmTimerRec = values.get(position);
+		final DMTimerRec dmTimerRec = mValues.get(position);
 		
 		//calculate progress
-		final long timerProgress = tasks.getTaskItemProgress(dmTimerRec.id);
-		final long displayProgress = dmTimerRec.time_sec - timerProgress;
+		final long timerProgress = mTasks.getTaskItemProgress(dmTimerRec.mId);
+		final long displayProgress = dmTimerRec.mTimeSec - timerProgress;
 		
 		//background drawer
-		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_bitmap_background", false);
+		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
 		
 		View rowView;
 		ViewHolder viewHolder;
@@ -73,7 +73,7 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		if (convertView == null) {
 			
 			//inflate from layout
-			LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+			LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
 			
 			//setup holder
@@ -98,33 +98,33 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		if (isBitmapBackground) {
 			
 			// create drawable source for background
-			if (null == backgroundBuilder) {
+			if (null == mBackgroundBuilder) {
 				rowView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
 				int measuredWidth = parent.getMeasuredWidth();
 				int measuredHeight =  rowView.getMeasuredHeight();
 				if ((measuredWidth > 0) && (measuredHeight > 0)) {
-					backgroundBuilder = new RoundedBitmapBackgroundBuilder(context, measuredWidth, measuredHeight, 6);
+					mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, measuredWidth, measuredHeight, 6);
 				}
 			}
 		}
 				
-		viewHolder.titleTextView.setText(dmTimerRec.title);
+		viewHolder.mTitleTextView.setText(dmTimerRec.mTitle);
 
 		//display image
-		viewHolder.imageView.setImageURI(
-				null != dmTimerRec.image_name ? UriHelper.fileNameToUri(getContext(), dmTimerRec.image_name) : null);
+		viewHolder.mImageView.setImageURI(
+				null != dmTimerRec.mImageName ? UriHelper.fileNameToUri(getContext(), dmTimerRec.mImageName) : null);
 		
 		//display text
-		viewHolder.progressTextView.setText(String.format("%02d:%02d:%02d", (long) displayProgress / 3600, (long) displayProgress % 3600 / 60, displayProgress % 60));
+		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", (long) displayProgress / 3600, (long) displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display progress bar
-		viewHolder.progressBar.setMax((int)dmTimerRec.time_sec);
-		viewHolder.progressBar.setProgress((int)timerProgress);
+		viewHolder.mProgressBar.setMax((int)dmTimerRec.mTimeSec);
+		viewHolder.mProgressBar.setProgress((int)timerProgress);
 		
 		if (isBitmapBackground) {
 			//update bitmap background
-			if (null != backgroundBuilder) {
-				Drawable backGround = (0 == displayProgress ) ? backgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL) : backgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+			if (null != mBackgroundBuilder) {
+				Drawable backGround = (0 == displayProgress ) ? mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL) : mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
 				rowView.setBackground(backGround);
 			}
 		} else {

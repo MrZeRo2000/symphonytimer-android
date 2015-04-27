@@ -5,28 +5,28 @@ import android.os.Vibrator;
 
 public class VibratorHelper {
 	
-	private static long[] pattern = {0, 500, 500, 500, 500, 300, 300, 300, 300};
+	private static long[] mPattern = {0, 500, 500, 500, 500, 300, 300, 300, 300};
 	
-	private static VibratorHelper vibratorHelperInstance = null;
-	private Vibrator vibrator;
+	private static VibratorHelper mVibratorHelperInstance = null;
+	private Vibrator mVibrator;
 	
 	private VibratorHelper(Context context){		
-		vibrator =  (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE); 
+		mVibrator =  (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE); 
 	}
 	
 	public static VibratorHelper getInstance(Context context) {
-		if (null == vibratorHelperInstance) {
-			vibratorHelperInstance = new VibratorHelper(context);
+		if (null == mVibratorHelperInstance) {
+			mVibratorHelperInstance = new VibratorHelper(context);
 		}		
-		return vibratorHelperInstance;
+		return mVibratorHelperInstance;
 	}
 	
 	public void vibrate() {
-		vibrator.vibrate(pattern, 0);
+		mVibrator.vibrate(mPattern, 0);
 	}
 	
 	public void cancel() {
-		vibrator.cancel();
+		mVibrator.cancel();
 	}
 	
 }

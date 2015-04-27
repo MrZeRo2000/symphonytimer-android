@@ -13,15 +13,15 @@ public class DMTimerHistTopList extends ArrayList<DMTimerHistTopRec>{
 		long sumCnt = 0;
 		
 		for (DMTimerHistTopRec rec : this) {
-			sumCnt += rec.execCnt;
+			sumCnt += rec.mExecCnt;
 		}
 		
 		mMaxExecPerc = 0;
 		
 		for  (DMTimerHistTopRec rec : this) {
-			rec.execPerc = (long)(rec.execCnt * 100 / sumCnt);
-			if (rec.execPerc > mMaxExecPerc)
-				mMaxExecPerc = rec.execPerc;
+			rec.mExecPerc = (long)(rec.mExecCnt * 100 / sumCnt);
+			if (rec.mExecPerc > mMaxExecPerc)
+				mMaxExecPerc = rec.mExecPerc;
 		}
 	}	
 	

@@ -6,39 +6,39 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 
 public class MediaPlayerHelper {
-	private static MediaPlayerHelper mediaPlayerHelperInstance = null;
-	private Context context;
-	private MediaPlayer mediaPlayer;
-	private int originalVolume;
-	private AudioManager audioManager;
+	private static MediaPlayerHelper mMediaPlayerHelperInstance = null;
+	private Context mContext;
+	private MediaPlayer mMediaPlayer;
+	private int mOriginalVolume;
+	private AudioManager mAudioManager;
 	
 	private MediaPlayerHelper(Context context){
-		this.context = context;
+		this.mContext = context;
 	}
 	
 	public static MediaPlayerHelper getInstance(Context context) {
-		if (null == mediaPlayerHelperInstance) {
-			mediaPlayerHelperInstance = new MediaPlayerHelper(context);
-			mediaPlayerHelperInstance.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		if (null == mMediaPlayerHelperInstance) {
+			mMediaPlayerHelperInstance = new MediaPlayerHelper(context);
+			mMediaPlayerHelperInstance.mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		}		
-		return mediaPlayerHelperInstance;
+		return mMediaPlayerHelperInstance;
 	}	
 	
 	public void stop() {
-		if (null != mediaPlayer) {
-			if (mediaPlayer.isPlaying()) {
-				mediaPlayer.stop();				
+		if (null != mMediaPlayer) {
+			if (mMediaPlayer.isPlaying()) {
+				mMediaPlayer.stop();				
 			}
-			mediaPlayer.reset();
-			mediaPlayer = null;
-			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0);
+			mMediaPlayer.reset();
+			mMediaPlayer = null;
+			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mOriginalVolume, 0);
 		}
 	}
 	
 	public void release() {
-		if (null != mediaPlayer) {
-			mediaPlayer.release();
-			mediaPlayer = null;
+		if (null != mMediaPlayer) {
+			mMediaPlayer.release();
+			mMediaPlayer = null;
 		}
 	}
 
@@ -46,24 +46,24 @@ public class MediaPlayerHelper {
 		// TODO Auto-generated method stub
 		stop();
 		if (null == soundFile) {
-			mediaPlayer = MediaPlayer.create(context, R.raw.default_sound);
+			mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
 		} else {
-			Uri uri = UriHelper.fileNameToUri(context, soundFile);
-			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			Uri uri = UriHelper.fileNameToUri(mContext, soundFile);
+			mMediaPlayer = new MediaPlayer();
+			mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			try {
-				mediaPlayer.setDataSource(context, uri);
-				mediaPlayer.prepare();
+				mMediaPlayer.setDataSource(mContext, uri);
+				mMediaPlayer.prepare();
 			} catch (Exception e) {
 				startSoundFile(null);
 			}
 		}
 		
-		originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+		mOriginalVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 		
-		mediaPlayer.setLooping(true);
-		mediaPlayer.start();
+		mMediaPlayer.setLooping(true);
+		mMediaPlayer.start();
 	}	
 	
 }

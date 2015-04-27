@@ -4,12 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class DMTimerRec implements Parcelable{
-	public long id;
-	public String title;
-	public long time_sec;
-	public String sound_file;
-	public String image_name;
-	public long order_id;
+	public long mId;
+	public String mTitle;
+	public long mTimeSec;
+	public String mSoundFile;
+	public String mImageName;
+	public long mOrderId;
 	
 	@Override
 	public int describeContents() {
@@ -20,21 +20,21 @@ public class DMTimerRec implements Parcelable{
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		// TODO Auto-generated method stub
-		dest.writeLong(id);
-		dest.writeString(title);
-		dest.writeLong(time_sec);
-		dest.writeString(sound_file);
-		dest.writeString(image_name);
-		dest.writeLong(order_id);
+		dest.writeLong(mId);
+		dest.writeString(mTitle);
+		dest.writeLong(mTimeSec);
+		dest.writeString(mSoundFile);
+		dest.writeString(mImageName);
+		dest.writeLong(mOrderId);
 	}
 	
 	private DMTimerRec(Parcel in) {
-		id = in.readLong();
-		title = in.readString();
-		time_sec = in.readLong();
-		sound_file = in.readString();
-		image_name = in.readString();
-		order_id = in.readLong();
+		mId = in.readLong();
+		mTitle = in.readString();
+		mTimeSec = in.readLong();
+		mSoundFile = in.readString();
+		mImageName = in.readString();
+		mOrderId = in.readLong();
 	}
 	
 	public DMTimerRec() {

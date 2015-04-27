@@ -24,45 +24,45 @@ public class StorageHelper {
 	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdb";
 	
 	//private static StorageManager storageManagerInstance = null;
-	private Context context;
+	private Context mContext;
 	
-	private String sourceDBFileName;
-	private String localBackupFolderName; 
-	private String destDBFileName;
-	private String destXmlFileName;
+	private String mSourceDBFileName;
+	private String mLocalBackupFolderName; 
+	private String mDestDBFileName;
+	private String mDestXmlFileName;
 	
 	private void initLocalFileNames () {
 		
-		this.sourceDBFileName = getDatabasePath();
+		this.mSourceDBFileName = getDatabasePath();
 		
 		StringBuilder destFolderStringBuilder = new StringBuilder(Environment.getExternalStorageDirectory().toString());	
 		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FOLDER_NAME);
-		this.localBackupFolderName = destFolderStringBuilder.toString();
+		this.mLocalBackupFolderName = destFolderStringBuilder.toString();
 		
 		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FILE_NAME);
-		this.destDBFileName = destFolderStringBuilder.toString();
+		this.mDestDBFileName = destFolderStringBuilder.toString();
 		
 		destFolderStringBuilder.append(".xml");
-		this.destXmlFileName = destFolderStringBuilder.toString();	
+		this.mDestXmlFileName = destFolderStringBuilder.toString();	
 		
 	}
 	
 	public StorageHelper(Context context) {
-		this.context = context;
+		this.mContext = context;
 		initLocalFileNames();
 	}
 	
 	private String getDatabasePath () {
-		return context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
+		return mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
 	}
 	
 	public String createLocalBackup() {		
 		
-		Log.d(TAG, localBackupFolderName);
-		Log.d(TAG, destDBFileName);
+		Log.d(TAG, mLocalBackupFolderName);
+		Log.d(TAG, mDestDBFileName);
 		
 		// create backup folder if not exists
-		File backupFolder = new File(localBackupFolderName);
+		File backupFolder = new File(mLocalBackupFolderName);
 		if (!backupFolder.exists()) {
 			
 			Log.d(TAG, "Folder does not exist, creating one");
@@ -80,9 +80,9 @@ public class StorageHelper {
 		
 			//copy source database to backup folder
 			Log.d(TAG, "Creating Input Stream");
-			FileInputStream inStream = new FileInputStream(sourceDBFileName);
+			FileInputStream inStream = new FileInputStream(mSourceDBFileName);
 			Log.d(TAG, "Creating Output Stream");
-			FileOutputStream outStream = new FileOutputStream(destDBFileName);
+			FileOutputStream outStream = new FileOutputStream(mDestDBFileName);
 			try {
 				
 				Log.d(TAG, "Copying file");
@@ -103,9 +103,9 @@ public class StorageHelper {
 			Log.d(TAG, "File copied");
 			
 			// generate xml
-			File xmlFile = new File(destXmlFileName);
+			File xmlFile = new File(mDestXmlFileName);
 			FileWriter xmlFileWriter = new FileWriter(xmlFile);
-			new DBXMLHelper(context).writeDBXML(xmlFileWriter);
+			new DBXMLHelper(mContext).writeDBXML(xmlFileWriter);
 			xmlFileWriter.flush();
 			xmlFileWriter.close();
 			
@@ -123,7 +123,7 @@ public class StorageHelper {
 			
 		}		
 
-		return destXmlFileName;
+		return mDestXmlFileName;
 		
 	}	
 	
@@ -133,14 +133,14 @@ public class StorageHelper {
 		
 		try {
 			
-			InputStream xmlInputStream = new BufferedInputStream(new FileInputStream(destXmlFileName));
+			InputStream xmlInputStream = new BufferedInputStream(new FileInputStream(mDestXmlFileName));
 			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>() ;
 			
 			//reading data
-			res = new DBXMLHelper(context).parseDBXML(xmlInputStream, tableData);
+			res = new DBXMLHelper(mContext).parseDBXML(xmlInputStream, tableData);
 			
 			if (0 == res) {				
-				DBHelper.getInstance(context).restoreBackupData(tableData);				
+				DBHelper.getInstance(mContext).restoreBackupData(tableData);				
 			}
 		
 		} catch (FileNotFoundException e) {
