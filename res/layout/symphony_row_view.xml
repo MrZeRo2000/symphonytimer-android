@@ -67,7 +67,7 @@
         android:layout_margin="2dp"
         android:max="100"
         android:progress="20" />
-    <Button
+    <com.romanpulov.symphonytimer.controls.ProgressCircle
         android:id="@+id/testcontrol1"
         android:layout_width="50dp" 
         android:layout_height="50dp"
