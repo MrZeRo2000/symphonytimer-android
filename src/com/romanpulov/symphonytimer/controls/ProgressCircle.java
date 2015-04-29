@@ -21,6 +21,7 @@ public class ProgressCircle extends View {
 	private int mMin;
 	private int mMax;
 	private int mProgress;
+	private String mDisplayProgress;
 	
 	private Paint mTextPaint;
 	private Paint mArcPaint;
@@ -55,12 +56,25 @@ public class ProgressCircle extends View {
 	
 	}
 	
+	private String getDisplayProgress() {
+		
+		if (mMax == mProgress) {
+			return "100";
+		} else if (mMin == mProgress) {
+			return "";
+		} else	{
+			return String.format("%02d%%", mProgress * 100 / (mMax - mMin));
+		} 
+		
+	}
+	
 	private void initProgressCircle() {
 		
 		//defaults
 		mMin = 0;
 		mMax = 100;
 		mProgress = 50;
+		mDisplayProgress = getDisplayProgress();
 		
 		//paint
 		mTextPaint = new Paint();
@@ -111,6 +125,7 @@ public class ProgressCircle extends View {
 			mProgress = mMax;
 		} else
 			mProgress = progress;
+		mDisplayProgress = getDisplayProgress();
 		invalidate();
 	}
 	
@@ -123,7 +138,7 @@ public class ProgressCircle extends View {
 		int width = getWidth();
 		int height = getHeight();
 		
-		canvas.drawText("00%", (width - mTextBounds.width()) / 2, height - (height - mTextBounds.height()) / 2, mTextPaint);		
+		canvas.drawText(mDisplayProgress, (width - mTextBounds.width()) / 2, height - (height - mTextBounds.height()) / 2, mTextPaint);		
 		canvas.drawRect(0, 0, width, height, mTextPaint);
 
 		if (width > height) {
@@ -141,7 +156,22 @@ public class ProgressCircle extends View {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		// TODO Auto-generated method stub
-		setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);		
+		//setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+		
+		int size = 0;
+        int width = getMeasuredWidth();
+        int height = getMeasuredHeight();
+        int widthWithoutPadding = width - getPaddingLeft() - getPaddingRight();
+        int heigthWithoutPadding = height - getPaddingTop() - getPaddingBottom();
+        
+        if (widthWithoutPadding > heigthWithoutPadding) {
+            size = heigthWithoutPadding;
+        } else {
+            size = widthWithoutPadding;
+        }
+        
+        setMeasuredDimension(size + getPaddingLeft() + getPaddingRight(), size + getPaddingTop() + getPaddingBottom());		
 	}
 
 }

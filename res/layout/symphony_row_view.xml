@@ -12,6 +12,18 @@
         android:layout_height="0dip"
         android:layout_weight="1"
         >
+	    <com.romanpulov.symphonytimer.controls.ProgressCircle
+	        android:id="@+id/progress_circle"
+	        app:min="0"
+	        app:max="100"
+	        app:progress="35"
+	        android:layout_marginLeft="4dp"
+	        android:layout_marginTop="0dp"
+	        android:layout_marginRight="4dp"
+	        android:layout_width="48dp" 
+	        android:layout_height="48dp"
+	        android:layout_gravity="center_vertical"
+	         />    
         <LinearLayout 
 	        android:orientation="vertical"
 	        android:layout_width="wrap_content" 
@@ -58,7 +70,6 @@
             />
         </LinearLayout>        
     </LinearLayout>
-        
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@android:style/Widget.ProgressBar.Horizontal"        
@@ -67,18 +78,5 @@
         android:layout_margin="2dp"
         android:max="100"
         android:progress="20" />
-    <com.romanpulov.symphonytimer.controls.ProgressCircle
-        android:id="@+id/testcontrol1"
-        app:min="0"
-        app:max="100"
-        app:progress="35"
-        android:layout_width="50dp" 
-        android:layout_height="150dp"
-        />
-    <Button
-        android:id="@+id/testcontrol2"
-        android:layout_width="50dp" 
-        android:layout_height="50dp"
-        />
     
 </LinearLayout>
