@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@drawable/main_list_bg_selector"
-    >
+    xmlns:app="http://schemas.android.com/apk/res/com.romanpulov.symphonytimer">
         
     <LinearLayout
         android:orientation="horizontal"
@@ -69,8 +69,11 @@
         android:progress="20" />
     <com.romanpulov.symphonytimer.controls.ProgressCircle
         android:id="@+id/testcontrol1"
+        app:min="0"
+        app:max="100"
+        app:progress="35"
         android:layout_width="50dp" 
-        android:layout_height="50dp"
+        android:layout_height="150dp"
         />
     <Button
         android:id="@+id/testcontrol2"
