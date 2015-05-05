@@ -1,5 +1,7 @@
 package com.romanpulov.symphonytimer.controls;
 
+import java.util.Locale;
+
 import com.romanpulov.symphonytimer.R;
 
 import android.content.Context;
@@ -22,8 +24,11 @@ public class ProgressCircle extends View {
 	private int mMin;
 	private int mMax;
 	private int mProgress;
+	private boolean mAutoHide;
+	
 	private String mDisplayProgress;
 	
+	private int mPrevProgress;
 	private Paint mTextPaint;
 	private Paint mArcPaint;
 	private Rect mTextBounds;
@@ -48,11 +53,14 @@ public class ProgressCircle extends View {
         int min =  a.getInteger(R.styleable.ProgressCircle_min, mMin);        
         int max = a.getInteger(R.styleable.ProgressCircle_max, mMax);
         int progress = a.getInteger(R.styleable.ProgressCircle_progress, mProgress);
+        boolean autohide = a.getBoolean(R.styleable.ProgressCircle_autohide, mAutoHide);
         
         if ((max >= min) && (progress >= min) && (progress <= max)) {
         	mMin = min;
         	mMax = max;
         	mProgress = progress;
+        	mAutoHide = autohide;
+        	mPrevProgress = mProgress;
         }
 
         a.recycle();
@@ -77,6 +85,8 @@ public class ProgressCircle extends View {
 		mMin = 0;
 		mMax = 100;
 		mProgress = 50;
+		mPrevProgress = mProgress;
+		mAutoHide = false;
 		mDisplayProgress = getDisplayProgress();
 		
 		//paint
@@ -88,7 +98,6 @@ public class ProgressCircle extends View {
         mTextPaint.setTextAlign(Align.LEFT);
         mTextBounds = new Rect();
         mTextPaint.getTextBounds("000", 0, 3, mTextBounds);
-        mTextPaint.setStrokeWidth(2);
         
         mArcPaint = new Paint();
         mArcPaint.setAntiAlias(true);
@@ -123,6 +132,8 @@ public class ProgressCircle extends View {
 	}
 	
 	public void setProgress(int progress) {
+		
+		// change progress
 		if (progress < mMin) {
 			mProgress = mMin;
 		} else if (progress > mMax) {
@@ -130,7 +141,17 @@ public class ProgressCircle extends View {
 		} else
 			mProgress = progress;
 		mDisplayProgress = getDisplayProgress();
+		
+		//redraw control
 		invalidate();
+		
+		//autohide support
+		if (mAutoHide) {
+			if (((mPrevProgress == mMin) && (mProgress != mMin)) || ((mPrevProgress != mMin) && (mProgress == mMin))) {
+				requestLayout();
+			}
+			mPrevProgress = mProgress;
+		}
 	}
 	
 	
@@ -142,8 +163,10 @@ public class ProgressCircle extends View {
 		int width = getWidth();
 		int height = getHeight();
 		
-		canvas.drawText(mDisplayProgress, (width - mTextBounds.width()) / 2, height - (height - mTextBounds.height()) / 2, mTextPaint);		
-		canvas.drawRect(0, 0, width, height, mTextPaint);
+		canvas.drawText(mDisplayProgress, (width - mTextBounds.width()) / 2, height - (height - mTextBounds.height()) / 2, mTextPaint);
+
+		//draw border for testing purposes
+		//canvas.drawRect(0, 0, width, height, mTextPaint);
 
 		if (width > height) {
 			mArcRect.set((width - height) / 2 + ARC_MARGIN , ARC_MARGIN, (width - height) / 2 + height - ARC_MARGIN, height - ARC_MARGIN);
@@ -199,10 +222,14 @@ public class ProgressCircle extends View {
         	size = mMostSize;
         }
         
-        //size = 67;
+        //autohide support
+        if (mAutoHide) {
+	        if (mProgress == mMin) {
+	        	size = 0;
+	        }
+        }
         
-        Log.d("ProgressCircle", "widthMeasureSpec=" + widthMeasureSpec + ", heightMeasureSpec=" + heightMeasureSpec + ", width=" + widthWithoutPadding + ", height=" + heigthWithoutPadding + ", size=" + size);
-        
+        //Log.d("ProgressCircle", "widthMeasureSpec=" + widthMeasureSpec + ", heightMeasureSpec=" + heightMeasureSpec + ", width=" + widthWithoutPadding + ", height=" + heigthWithoutPadding + ", size=" + size);
         setMeasuredDimension(size + getPaddingLeft() + getPaddingRight(), size + getPaddingTop() + getPaddingBottom());		
 	}
 
