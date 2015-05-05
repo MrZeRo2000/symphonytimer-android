@@ -11,6 +11,7 @@ import android.graphics.Paint.Align;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class ProgressCircle extends View {
@@ -27,6 +28,8 @@ public class ProgressCircle extends View {
 	private Paint mArcPaint;
 	private Rect mTextBounds;
 	private RectF mArcRect;
+	
+	private int mMostSize = 0;
 	
 	// constructor from code
 	public ProgressCircle(Context context) {
@@ -85,6 +88,7 @@ public class ProgressCircle extends View {
         mTextPaint.setTextAlign(Align.LEFT);
         mTextBounds = new Rect();
         mTextPaint.getTextBounds("000", 0, 3, mTextBounds);
+        mTextPaint.setStrokeWidth(2);
         
         mArcPaint = new Paint();
         mArcPaint.setAntiAlias(true);
@@ -159,17 +163,45 @@ public class ProgressCircle extends View {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);		
 		//setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
 		
+        final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+        final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+
 		int size = 0;
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
         int widthWithoutPadding = width - getPaddingLeft() - getPaddingRight();
         int heigthWithoutPadding = height - getPaddingTop() - getPaddingBottom();
         
+        /*
         if (widthWithoutPadding > heigthWithoutPadding) {
             size = heigthWithoutPadding;
         } else {
             size = widthWithoutPadding;
         }
+        */
+        
+        if ((MeasureSpec.EXACTLY ==  heightSpecMode) || (MeasureSpec.EXACTLY == widthSpecMode)) {
+        	if ((0 == widthWithoutPadding) || (0 == heigthWithoutPadding)) {
+        		size = Math.max(widthWithoutPadding, heigthWithoutPadding);
+        	} else {
+        		size = Math.max(widthWithoutPadding, heigthWithoutPadding);
+        	}
+        	
+        	if (size > 0 ) {
+        		mMostSize = size;
+        	}
+        	
+        } else {
+        	size = 0;
+        }
+        
+        if (widthSpecMode == MeasureSpec.AT_MOST) {
+        	size = mMostSize;
+        }
+        
+        //size = 67;
+        
+        Log.d("ProgressCircle", "widthMeasureSpec=" + widthMeasureSpec + ", heightMeasureSpec=" + heightMeasureSpec + ", width=" + widthWithoutPadding + ", height=" + heigthWithoutPadding + ", size=" + size);
         
         setMeasuredDimension(size + getPaddingLeft() + getPaddingRight(), size + getPaddingTop() + getPaddingBottom());		
 	}
