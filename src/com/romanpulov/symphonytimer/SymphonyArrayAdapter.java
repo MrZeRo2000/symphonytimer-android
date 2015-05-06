@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
 
@@ -25,14 +24,12 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		TextView mTitleTextView;
 		ImageView mImageView;
 		TextView mProgressTextView;
-		ProgressBar mProgressBar;
 		ProgressCircle mProgressCircle;
 		
 		public ViewHolder(View view) {
 			this.mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
 			this.mImageView = (ImageView)view.findViewById(R.id.image_image_view);
 			this.mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
-			this.mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);
 			this.mProgressCircle = (ProgressCircle)view.findViewById(R.id.progress_circle);
 		}
 				
@@ -120,10 +117,6 @@ class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 		
 		//display text
 		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", (long) displayProgress / 3600, (long) displayProgress % 3600 / 60, displayProgress % 60));
-		
-		//display progress bar
-		viewHolder.mProgressBar.setMax((int)dmTimerRec.mTimeSec);
-		viewHolder.mProgressBar.setProgress((int)timerProgress);
 		
 		//display circle bar
 		viewHolder.mProgressCircle.setMax((int)dmTimerRec.mTimeSec);
