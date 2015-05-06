@@ -36,13 +36,13 @@ public class RoundedBitmapBackgroundBuilder {
 	
 	private void prepareBitmaps() {
 		
-		Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky_home_sm);
-		Bitmap brightBg = createBrightBitmap(bg, BRIGHTENING_FACTOR);
+		final Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky_home_sm);
+		final Bitmap brightBg = createBrightBitmap(bg, BRIGHTENING_FACTOR);
 		mScaledBg = Bitmap.createScaledBitmap(bg, mWidth, mHeight, false);
 		mScaledBrightBg = Bitmap.createScaledBitmap(brightBg, mWidth, mHeight, false);
 		
-		Bitmap finalBg = createBlueToRedBitmap(bg);
-		Bitmap finalBrightBg = createBrightBitmap(finalBg, BRIGHTENING_FACTOR);
+		final Bitmap finalBg = createBlueToRedBitmap(bg);
+		final Bitmap finalBrightBg = createBrightBitmap(finalBg, BRIGHTENING_FACTOR);
 		mFinalScaledBg = Bitmap.createScaledBitmap(finalBg, mWidth, mHeight, false);
 		mFinalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, mWidth, mHeight, false);			
 		
@@ -56,12 +56,12 @@ public class RoundedBitmapBackgroundBuilder {
 			prepareBitmaps();
 		}
 		
-		Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-		Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
-		Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
-		Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
+		final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+		final Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
+		final Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
+		final Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
 		
-		StateListDrawable drawable = new StateListDrawable(); 
+		final StateListDrawable drawable = new StateListDrawable(); 
 		drawable.addState(new int[] { android.R.attr.state_pressed }, (type == 0) ? bgBrightDrawable : bgFinalBrightDrawable);
 		drawable.addState(StateSet.WILD_CARD, (type == 0) ? bgDrawable : bgFinalDrawable);
 		
@@ -70,10 +70,10 @@ public class RoundedBitmapBackgroundBuilder {
 	
 	private Bitmap createBrightBitmap(Bitmap src, int value) {
 		
-		int width = src.getWidth();
-		int height = src.getHeight();
+		final int width = src.getWidth();
+		final int height = src.getHeight();
 		
-		int[] pixels = new int[height * width];
+		final int[] pixels = new int[height * width];
 		src.getPixels(pixels, 0, width, 0, 0, width, height);
 		
 		for (int i = 0; i < height * width; i++) {
@@ -84,7 +84,7 @@ public class RoundedBitmapBackgroundBuilder {
 			);
 		}
 		
-		Bitmap res = Bitmap.createBitmap(width, height, src.getConfig());
+		final Bitmap res = Bitmap.createBitmap(width, height, src.getConfig());
 		res.setPixels(pixels, 0, width, 0, 0, width, height);
 		
 		return res;
@@ -92,10 +92,10 @@ public class RoundedBitmapBackgroundBuilder {
 	
 	private Bitmap createBlueToRedBitmap(Bitmap src) {
 		
-		int width = src.getWidth();
-		int height = src.getHeight();
+		final int width = src.getWidth();
+		final int height = src.getHeight();
 		
-		int[] pixels = new int[height * width];
+		final int[] pixels = new int[height * width];
 		src.getPixels(pixels, 0, width, 0, 0, width, height);
 		
 		for (int i = 0; i < height * width; i++) {
@@ -106,7 +106,7 @@ public class RoundedBitmapBackgroundBuilder {
 			);
 		}
 		
-		Bitmap res = Bitmap.createBitmap(width, height, src.getConfig());
+		final Bitmap res = Bitmap.createBitmap(width, height, src.getConfig());
 		res.setPixels(pixels, 0, width, 0, 0, width, height);
 		
 		return res;
