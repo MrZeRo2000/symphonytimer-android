@@ -462,7 +462,7 @@ public class MainActivity extends ActionBarActivity {
     	DMTaskItem taskItem = dmTasks.getTaskItemById(dmTimerRec.mId);
     	
     	if (null == taskItem) {
-    		DMTaskItem newTaskItem = dmTasks.addTaskItem(getApplicationContext(), dmTimerRec);//new DMTaskItem(dmTimerRec.id, dmTimerRec.time_sec);
+    		DMTaskItem newTaskItem = dmTasks.addTaskItem(dmTimerRec);//new DMTaskItem(dmTimerRec.id, dmTimerRec.time_sec);
     		newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		

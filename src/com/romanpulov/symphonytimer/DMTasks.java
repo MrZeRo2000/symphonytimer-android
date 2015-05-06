@@ -2,8 +2,6 @@ package com.romanpulov.symphonytimer;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-
 public class DMTasks extends ArrayList<DMTaskItem> {
 
 	private static final long serialVersionUID = -7435677773769357006L;
@@ -60,7 +58,7 @@ public class DMTasks extends ArrayList<DMTaskItem> {
 		}
 	}
 		
-	public DMTaskItem addTaskItem(Context context, DMTimerRec dmTimerRec) {
+	public DMTaskItem addTaskItem(DMTimerRec dmTimerRec) {
 		DMTaskItem newTaskItem = new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile);
 		return newTaskItem;
 	}
