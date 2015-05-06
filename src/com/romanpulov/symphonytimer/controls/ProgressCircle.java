@@ -13,7 +13,6 @@ import android.graphics.Paint.Align;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class ProgressCircle extends View {
@@ -25,6 +24,8 @@ public class ProgressCircle extends View {
 	private int mMax;
 	private int mProgress;
 	private boolean mAutoHide;
+	private int mProgressColor;
+	private int mProgressRestColor;
 	
 	private String mDisplayProgress;
 	
@@ -62,7 +63,17 @@ public class ProgressCircle extends View {
         	mAutoHide = autohide;
         	mPrevProgress = mProgress;
         }
+        
+        setTextColor(a.getColor(R.styleable.ProgressCircle_textColor, Color.WHITE));
+        
+        mProgressColor = a.getColor(R.styleable.ProgressCircle_progressColor, mProgressColor);
+        mProgressRestColor = a.getColor(R.styleable.ProgressCircle_progressRestColor, mProgressRestColor);
 
+        int textSize = a.getDimensionPixelOffset(R.styleable.ProgressCircle_textSize, 0);
+        if (textSize > 0) {
+            setTextSize(textSize);
+        }
+        
         a.recycle();
 	
 	}
@@ -74,7 +85,7 @@ public class ProgressCircle extends View {
 		} else if (mMin == mProgress) {
 			return "";
 		} else	{
-			return String.format("%02d%%", mProgress * 100 / (mMax - mMin));
+			return String.format(Locale.getDefault(), "%02d%%", mProgress * 100 / (mMax - mMin));
 		} 
 		
 	}
@@ -87,9 +98,11 @@ public class ProgressCircle extends View {
 		mProgress = 50;
 		mPrevProgress = mProgress;
 		mAutoHide = false;
+		mProgressColor = Color.RED;
+		mProgressRestColor = Color.WHITE;
 		mDisplayProgress = getDisplayProgress();
 		
-		//paint
+		//text paint
 		mTextPaint = new Paint();
 		mTextPaint.setAntiAlias(true);
         mTextPaint.setTextSize(12 * getResources().getDisplayMetrics().density);
@@ -99,11 +112,11 @@ public class ProgressCircle extends View {
         mTextBounds = new Rect();
         mTextPaint.getTextBounds("000", 0, 3, mTextBounds);
         
+        //arc paint
         mArcPaint = new Paint();
         mArcPaint.setAntiAlias(true);
         mArcPaint.setStrokeWidth(ARC_THICKNESS);
         mArcPaint.setStyle(Paint.Style.STROKE);
-        mArcPaint.setColor(Color.RED);
         
         mArcRect = new RectF();
 	}
@@ -154,14 +167,26 @@ public class ProgressCircle extends View {
 		}
 	}
 	
+    public void setTextSize(int size) {
+        // This text size has been pre-scaled by the getDimensionPixelOffset method
+        mTextPaint.setTextSize(size);
+        //would be required if control size gets dependent from test font 
+        //requestLayout();
+        invalidate();
+    }	
+    
+    public void setTextColor(int color) {
+        mTextPaint.setColor(color);
+        invalidate();
+    }    
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
 		
-		int width = getWidth();
-		int height = getHeight();
+		final int width = getWidth();
+		final int height = getHeight();
 		
 		canvas.drawText(mDisplayProgress, (width - mTextBounds.width()) / 2, height - (height - mTextBounds.height()) / 2, mTextPaint);
 
@@ -175,50 +200,64 @@ public class ProgressCircle extends View {
 		}
 		
 		if (mMax > mMin) {
-			canvas.drawArc(mArcRect, 90, (mProgress - mMin) * 360 / (mMax - mMin), false, mArcPaint);
+			// calculate progress angle
+			final float progressAngle = (mProgress - mMin) * 360 / (mMax - mMin);
+			
+			//draw progress
+			mArcPaint.setColor(mProgressColor);
+			canvas.drawArc(mArcRect, 90, progressAngle, false, mArcPaint);
+			
+			//draw rest
+			if (mProgress > mMin) {
+				mArcPaint.setColor(mProgressRestColor);
+				canvas.drawArc(mArcRect, 90 + progressAngle, 360 - progressAngle, false, mArcPaint);
+			}
 		}
 			 
 	}
 	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		// TODO Auto-generated method stub
+
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);		
-		//setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
-		
+
+		//vars used for calculation
         final int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
         final int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-
+        final int width = getMeasuredWidth();
+        final int height = getMeasuredHeight();
+        final int widthWithoutPadding = width - getPaddingLeft() - getPaddingRight();
+        final int heigthWithoutPadding = height - getPaddingTop() - getPaddingBottom();
+        
+        //this is the main metric to be calculated
 		int size = 0;
-        int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
-        int widthWithoutPadding = width - getPaddingLeft() - getPaddingRight();
-        int heigthWithoutPadding = height - getPaddingTop() - getPaddingBottom();
-        
-        /*
-        if (widthWithoutPadding > heigthWithoutPadding) {
-            size = heigthWithoutPadding;
-        } else {
-            size = widthWithoutPadding;
-        }
-        */
-        
+
+		/*
+		  as there is no internal restriction to the control size, 
+		  trying to get this information from the container
+		*/ 
         if ((MeasureSpec.EXACTLY ==  heightSpecMode) || (MeasureSpec.EXACTLY == widthSpecMode)) {
+        	
         	if ((0 == widthWithoutPadding) || (0 == heigthWithoutPadding)) {
         		size = Math.max(widthWithoutPadding, heigthWithoutPadding);
         	} else {
-        		size = Math.max(widthWithoutPadding, heigthWithoutPadding);
+        		size = Math.min(widthWithoutPadding, heigthWithoutPadding);
         	}
+        	
+        	//get size if specified exactly
+        	//size = Math.max(widthWithoutPadding, heigthWithoutPadding);
         	
         	if (size > 0 ) {
         		mMostSize = size;
         	}
         	
         } else {
+        	//unable to get to know the size, return 0
         	size = 0;
         }
         
-        if (widthSpecMode == MeasureSpec.AT_MOST) {
+        // return most size if it was calculated during previous EXACTLY measure request
+        if ((widthSpecMode == MeasureSpec.AT_MOST) || (heightSpecMode == MeasureSpec.AT_MOST)) {
         	size = mMostSize;
         }
         
