@@ -494,6 +494,15 @@ public class MainActivity extends ActionBarActivity {
     		updateTimers();
     		
     		dmTasks.remove(taskItem);
+    		
+    		// stop notifications if completed task items
+    		if (null == dmTasks.getFirstTaskItemCompleted()) {
+    			//stop sound
+        		MediaPlayerHelper.getInstance(this).stop();
+        		//stop vibrating
+        		VibratorHelper.getInstance(this).cancel();    			
+    		}
+    		
     		if (0 == dmTasks.size()) {		
     			//cancel  			
     			mScheduleHelper.stopScheduler();
@@ -504,12 +513,6 @@ public class MainActivity extends ActionBarActivity {
 
     			//enable screen fading
     			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    			
-    			//stop sound
-        		MediaPlayerHelper.getInstance(this).stop();
-        		//stop vibrating
-        		VibratorHelper.getInstance(this).cancel();
-
     			
     			NotificationManager notificationManager = 
     					  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
