@@ -495,29 +495,31 @@ public class MainActivity extends ActionBarActivity {
     		
     		dmTasks.remove(taskItem);
     		
-    		// stop notifications if completed task items
+    		// inactive timer or no timers
     		if (null == dmTasks.getFirstTaskItemCompleted()) {
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
         		//stop vibrating
-        		VibratorHelper.getInstance(this).cancel();    			
+        		VibratorHelper.getInstance(this).cancel();
+    			//enable screen fading
+    			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        		
     		}
     		
+    		// no timers
     		if (0 == dmTasks.size()) {		
-    			//cancel  			
+    			//cancel scheduler  			
     			mScheduleHelper.stopScheduler();
     			/*
     			scheduleExecutorTask.cancel(false);
     			scheduleExecutorTask = null;
     			*/
-
-    			//enable screen fading
-    			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     			
+    			// cancel notifications
     			NotificationManager notificationManager = 
     					  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     			notificationManager.cancel(0);    			
     		} else {
+    			// update notification if any active timers still exist
     			updateNotification();
     		}
     	}
