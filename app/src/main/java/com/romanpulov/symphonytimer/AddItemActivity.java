@@ -4,6 +4,7 @@ import com.romanpulov.symphonytimer.R;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -46,8 +47,12 @@ public class AddItemActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_add_item);
 		
 		this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
-		
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setIcon(R.drawable.tuba);
+
 		
 		editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
 		updateEditRec();

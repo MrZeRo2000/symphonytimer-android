@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -98,19 +99,24 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-  
+
         setContentView(R.layout.activity_main);
         
         this.getWindow().addFlags(
-        		WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-        		WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-        		//WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-        		WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                        //WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                        WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 		
         // Register context menu
         registerForContextMenu(getTimersListView());
         
         activityVisible = true;
+
+        //setup actionbar icon
+        ActionBar actionBar= this.getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setIcon(R.drawable.tuba);
         
         /*
         // Set background wallpaper

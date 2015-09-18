@@ -15,8 +15,9 @@ public class SettingsActivity extends ActionBarActivity implements OnPreferenceA
         
         ActionBar actionBar = this.getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setIcon(R.drawable.tuba);
+
         //addPreferencesFromResource(R.xml.preferences);
     }
 
