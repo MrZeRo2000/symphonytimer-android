@@ -183,7 +183,6 @@ public class MainActivity extends ActionBarActivity {
     
     @Override
     protected void onResume() {
-    	// TODO Auto-generated method stub
     	super.onResume();
     	activityVisible = true;
     	
@@ -192,34 +191,33 @@ public class MainActivity extends ActionBarActivity {
     		DBHelper.getInstance(this).resetDBDataChanged();
     	}
     	updateTimers();
-    	Log.d("MainActivity", "OnResume");
     }
     
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-    	// TODO Auto-generated method stub
     	super.onSaveInstanceState(outState);
-    	outState.putParcelableArrayList(dmTasks.getClass().toString(), dmTasks);
-    	Log.d("MainActivity", "OnSaveInstanceState");
+        outState.putParcelable(dmTasks.getClass().toString(), dmTasks);
     }
     
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    	// TODO Auto-generated method stub
     	super.onRestoreInstanceState(savedInstanceState);
-    	ArrayList<DMTaskItem> restoredTasks  = savedInstanceState.getParcelableArrayList(dmTasks.getClass().toString());
-    	for (DMTaskItem dmTaskItem : restoredTasks) {
-    		dmTaskItem.setTaskItemCompleted(mTaskItemCompleted);
-    		dmTasks.add(dmTaskItem);
-    	}
-		//dmTasks = (DMTasks)p;
-		dmTasks.updateProcess();		
+
+        //restore tasks
+        dmTasks = savedInstanceState.getParcelable(dmTasks.getClass().toString());
+
+        //restore code references
+        ((SymphonyArrayAdapter)getTimersListView().getAdapter()).setTasks(dmTasks);
+        dmTasks.setTasksCompleted(mTaskItemCompleted);
+
+        //update UI
+		dmTasks.updateProcess();
 		updateTimers();
+
 		//update scheduler
-		if (restoredTasks.size() > 0) {
-			mScheduleHelper.startScheduler();
-		}	
-		Log.d("MainActivity", "OnRestoreInstanceState");
+		if (dmTasks.size() > 0) {
+            mScheduleHelper.startScheduler();
+        }
     }
     
     @Override
@@ -227,7 +225,7 @@ public class MainActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
        // getMenuInflater().inflate(R.menu.main, menu);
         //return true;
-    	getMenuInflater().inflate(R.menu.main_activity_actions, menu);
+        getMenuInflater().inflate(R.menu.main_activity_actions, menu);
     	return super.onCreateOptionsMenu(menu);
 
     }
@@ -262,8 +260,8 @@ public class MainActivity extends ActionBarActivity {
     	// TODO Auto-generated method stub
     	menu.add(Menu.NONE, CONTEXT_MENU_EDIT, Menu.NONE, R.string.action_edit);
     	menu.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.NONE, R.string.action_delete);
-    	menu.add(Menu.NONE, CONTEXT_MENU_MOVE_UP, Menu.NONE, R.string.action_move_up);
-    	menu.add(Menu.NONE, CONTEXT_MENU_MOVE_DOWN, Menu.NONE, R.string.action_move_down);
+        menu.add(Menu.NONE, CONTEXT_MENU_MOVE_UP, Menu.NONE, R.string.action_move_up);
+        menu.add(Menu.NONE, CONTEXT_MENU_MOVE_DOWN, Menu.NONE, R.string.action_move_down);
     	super.onCreateContextMenu(menu, v, menuInfo);
     }
     
@@ -323,7 +321,7 @@ public class MainActivity extends ActionBarActivity {
     	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
     	//startHistoryIntent.putParcelableArrayListExtra(HistoryActivity.TIMERS_NAME, dmTimers);
     	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
-    	startActivity(startHistoryIntent);
+        startActivity(startHistoryIntent);
     }
 
     @Override

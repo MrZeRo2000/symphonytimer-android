@@ -44,6 +44,7 @@ public class DMTimers implements Parcelable {
         dataItems = new ArrayList<>();
     }
 
+    @SuppressWarnings("unchecked")
     private DMTimers(Parcel in) {
         dataItems = in.readArrayList(DMTimerRec.class.getClassLoader());
     }

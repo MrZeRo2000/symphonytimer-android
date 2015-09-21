@@ -1,13 +1,32 @@
 package com.romanpulov.symphonytimer;
 
-import java.util.ArrayList;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class DMTasks extends ArrayList<DMTaskItem> {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class DMTasks implements Parcelable {
 
 	private static final long serialVersionUID = -7435677773769357006L;
 
+    private List<DMTaskItem> dataItems;
+
+    public boolean add(DMTaskItem item) {
+        return dataItems.add(item);
+    }
+
+    public boolean remove(DMTaskItem item) {
+        return dataItems.remove(item);
+    }
+
+    public int size() {
+        return dataItems.size();
+    }
+
 	public DMTaskItem getTaskItemById(long id) {
-		for (DMTaskItem taskItem : this) {
+		for (DMTaskItem taskItem : dataItems) {
 			if (id == taskItem.getId()) {
 				return taskItem;
 			}
@@ -25,18 +44,8 @@ public class DMTasks extends ArrayList<DMTaskItem> {
 		}
 	}
 	
-	public boolean getTaskItemCompleted(long id) {
-		DMTaskItem taskItem = getTaskItemById(id);
-		
-		if(null != taskItem) {
-			return taskItem.getCompleted();		
-		} else {
-			return false;
-		}		
-	}
-	
 	public DMTaskItem getFirstTaskItemCompleted() {
-		for (DMTaskItem taskItem : this) {
+		for (DMTaskItem taskItem : dataItems) {
 			if (taskItem.getCompleted()) {
 				return taskItem;
 			}
@@ -44,34 +53,58 @@ public class DMTasks extends ArrayList<DMTaskItem> {
 		return null;
 	}
 	
-	public long getNearestTriggerAtTime() {
-		long res = this.get(0).getTriggerAtTime();
-		for (DMTaskItem dmTaskItem : this) {
-			res = java.lang.Math.min(res, dmTaskItem.getTriggerAtTime());			
-		}
-		return res;
-	}
-	
 	public void updateProcess() {
-		for (DMTaskItem dmTaskItem : this) {
+		for (DMTaskItem dmTaskItem : dataItems) {
 			dmTaskItem.updateProcess();
 		}
 	}
 		
 	public DMTaskItem addTaskItem(DMTimerRec dmTimerRec) {
-		DMTaskItem newTaskItem = new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile);
-		return newTaskItem;
+		return new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile);
 	}
 	
 	public String getTaskTitles() {
 		StringBuilder sb = new StringBuilder();
 		String delimiter = "";
-		for (DMTaskItem taskItem : this) {
+		for (DMTaskItem taskItem : dataItems) {
 			sb.append(delimiter);
 			sb.append(taskItem.getTitle());
 			delimiter = ",";
 		}
 		return sb.toString();
 	}
-	
+
+    public void setTasksCompleted(DMTaskItem.OnTaskItemCompleted taskItemCompletedListener) {
+        for (DMTaskItem item : dataItems) {
+            item.setTaskItemCompleted(taskItemCompletedListener);
+        }
+    }
+
+    public DMTasks() {
+        dataItems = new ArrayList<>();
+    }
+
+    @SuppressWarnings("unchecked")
+    private DMTasks(Parcel in) {
+        dataItems = in.readArrayList(DMTaskItem.class.getClassLoader());
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(dataItems);
+    }
+
+    public static final Parcelable.Creator<DMTasks> CREATOR = new Parcelable.Creator<DMTasks>() {
+        public DMTasks createFromParcel(Parcel in) {
+            return new DMTasks(in);
+        }
+
+        public DMTasks[] newArray(int size) {
+            return new DMTasks[size];
+        }
+    };
+
 }
