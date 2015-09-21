@@ -20,17 +20,16 @@ public class DBHelper {
 	
 	public static class RawRecItem {
 		
-		private Map<String, String> fields = new HashMap<String, String>();
+		private Map<String, String> fields = new HashMap<>();
 		
 		public Map<String, String> getFields () {
-			return fields;
+            return fields;
 		}			
 		
 		public void putFieldNameValue(String fieldName, String fieldValue) {
 			fields.put(fieldName, fieldValue);
 		}
-		
-	}	
+	}
 	
 	private DBHelper(Context context) {
 		this.mContext = context;
@@ -59,45 +58,47 @@ public class DBHelper {
 	}
 	
 	public boolean getDBDataChanged() {
-		return this.mDBDataChanged;
+        return this.mDBDataChanged;
 	}
 	
 	public void resetDBDataChanged() {
-		this.mDBDataChanged = false; 
+        this.mDBDataChanged = false;
 	}
 	
 	public String getDatabasePathName() {
 		return mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
 	}
 	
-	public void Init(){
-		
-	}
-	
 	public long insertTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
+
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.mTitle);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], getMaxOrderId() + 1);
+
 		return mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);
 	}
 	
 	public long updateTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
+
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.mTitle);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
+
 		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.mId, null);
 	}
 	
 	public long insertTimerHistory(DMTaskItem dmTaskItem) {
 		ContentValues cv = new ContentValues();
+
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], dmTaskItem.getId());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], dmTaskItem.getStartTime());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], dmTaskItem.getCurrentTime());
+
 		return mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
 	}
 	
@@ -134,7 +135,6 @@ public class DBHelper {
 	}
 	
 	private void exchangeOrderId(long orderId_1, long orderId_2) {
-		
 		StringBuilder sqlBuilder = new StringBuilder();
 		sqlBuilder.append("UPDATE ").append(DBOpenHelper.TIMER_TABLE_NAME).append(" SET order_id = ");
 		sqlBuilder.append("CASE WHEN order_id = ").append(orderId_1).append(" THEN ").append(orderId_2).append(" ");
@@ -224,11 +224,9 @@ public class DBHelper {
 				c.close();
 			}
 		}	
-		
 	}
 	
 	public void fillHistList(List<DMTimerHistRec> dmList, int filterId) {
-		
 		dmList.clear();
 		DMTimerHistRec dmRec = null;
 		Cursor c = null;
@@ -270,7 +268,6 @@ public class DBHelper {
 	}	
 	
 	public void fillHistTopList(DMTimerHistTopList dmList, int filterId) {
-		
 		dmList.clear();
 		DMTimerHistTopRec dmRec = null;
 		Cursor c = null;
@@ -282,6 +279,7 @@ public class DBHelper {
 						new String[] {String.valueOf(System.currentTimeMillis()), DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId]});
 			else
 				c = mDB.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
+
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
 				dmRec = new DMTimerHistTopRec();
 				dmRec.mTimerId = c.getLong(0);
@@ -297,96 +295,78 @@ public class DBHelper {
 	}
 	
 	public List<RawRecItem> getBackupTable(String tableName) {
-		
-		List<RawRecItem> res = new ArrayList<RawRecItem>();
-		
+		List<RawRecItem> res = new ArrayList<>();
 		Cursor c = null;
 		
 		try {
 			c = mDB.rawQuery(DBOpenHelper.TABLE_BACKUP_QUERIES.get(tableName), null);
 						
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-				
 				RawRecItem recItem = new RawRecItem();
 				
 				for (int columnIndex = 0; columnIndex < c.getColumnCount(); columnIndex ++ ) {					
 					recItem.putFieldNameValue(c.getColumnName(columnIndex), c.getString(columnIndex));										
 				}
-				
+
 				res.add(recItem);
-				
-			}			
-			
+			}
 		} finally {
 			
 			if (null != c && !c.isClosed()) {
 				c.close();
 			}			
 		}		
-		
 		return res;
 	}
 	
 	private void loadBackupTimer(List<DBHelper.RawRecItem> recList) {
 		
 		for (RawRecItem recItem : recList) {
-
 			ContentValues cv = new ContentValues();
+
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[0], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[0]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[5]));
+
 			mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);						
 		}
-		
 	}
 	
 	private void loadBackupTimerHistory(List<DBHelper.RawRecItem> recList) {
-		
 		for (RawRecItem recItem : recList) {
-
 			ContentValues cv = new ContentValues();
+
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[0], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[0]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3]));
+
 			mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);						
 		}
-		
 	}
 	
 	public void clearData() {
-
 		mDB.delete(DBOpenHelper.TIMER_TABLE_NAME, null, null);
 		mDB.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, null);
 		
 		mDBDataChanged = true;
-
 	}
 
 	public void restoreBackupData (Map<String, List<DBHelper.RawRecItem>> tableData) {
-		
 		//delete old data
 		clearData();
 		
-		List<DBHelper.RawRecItem> tableItemData = null;
-		
 		//load timer
-		tableItemData = tableData.get(DBOpenHelper.TIMER_TABLE_NAME);
+        List<DBHelper.RawRecItem> tableItemData = tableData.get(DBOpenHelper.TIMER_TABLE_NAME);
 		if (null != tableItemData) {
-			
 			loadBackupTimer(tableItemData);
-			
-		} 
+		}
 		
 		//load timer history
 		tableItemData = tableData.get(DBOpenHelper.TIMER_HISTORY_TABLE_NAME);
 		if (null != tableItemData) {
-			
 			loadBackupTimerHistory(tableItemData);
-			
-		} 
-		
+		}
 	}
-	
 }

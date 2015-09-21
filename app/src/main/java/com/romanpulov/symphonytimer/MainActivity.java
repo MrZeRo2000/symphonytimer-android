@@ -72,8 +72,7 @@ public class MainActivity extends ActionBarActivity {
 		@Override
 		public void OnTaskItemCompletedEvent(
 				DMTaskItem dmTaskItem) {
-			// TODO Auto-generated method stub
-			performTaskCompleted(dmTaskItem);    				
+			performTaskCompleted(dmTaskItem);
 		}
 	};
 	
