@@ -37,7 +37,7 @@ public class HistoryTopFragment extends HistoryFragment{
 		
 		super.setHistoryFilterId(historyFilterId);
 		DBHelper.getInstance(this.getActivity()).fillHistTopList(mDMTimerHistTopList, historyFilterId);
-		mDMTimerHistTopList.calcPerc();
+		mDMTimerHistTopList.calcPercent();
 		
 		if (null != mAdapter) {
 			Log.d(tag, "adapter notifyDataSetChanged");

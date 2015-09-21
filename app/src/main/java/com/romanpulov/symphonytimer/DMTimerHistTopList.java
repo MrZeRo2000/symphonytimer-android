@@ -1,32 +1,46 @@
 package com.romanpulov.symphonytimer;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class DMTimerHistTopList extends ArrayList<DMTimerHistTopRec>{
+public class DMTimerHistTopList{
 		
 	private static final long serialVersionUID = 4191447399203845533L;
-	
-	private long mMaxExecPerc;
-	
-	public void calcPerc() {
-		
+
+    private List<DMTimerHistTopRec> dataItems = new ArrayList<DMTimerHistTopRec>();
+	private long mMaxExecPercent;
+
+    public void clear() {
+        dataItems.clear();;
+    }
+
+    public boolean add(DMTimerHistTopRec rec) {
+        return dataItems.add(rec);
+    }
+
+    public int size() {
+        return dataItems.size();
+    }
+
+    public DMTimerHistTopRec get(int location) {
+        return dataItems.get(location);
+    }
+
+	public void calcPercent() {
 		long sumCnt = 0;
-		
-		for (DMTimerHistTopRec rec : this) {
+		for (DMTimerHistTopRec rec : dataItems) {
 			sumCnt += rec.mExecCnt;
 		}
 		
-		mMaxExecPerc = 0;
-		
-		for  (DMTimerHistTopRec rec : this) {
+		mMaxExecPercent = 0;
+		for  (DMTimerHistTopRec rec : dataItems) {
 			rec.mExecPerc = (long)(rec.mExecCnt * 100 / sumCnt);
-			if (rec.mExecPerc > mMaxExecPerc)
-				mMaxExecPerc = rec.mExecPerc;
+			if (rec.mExecPerc > mMaxExecPercent)
+				mMaxExecPercent = rec.mExecPerc;
 		}
 	}	
 	
 	public long getMaxExecPerc() {
-		return mMaxExecPerc;
+        return mMaxExecPercent;
 	}
-
 }
