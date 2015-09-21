@@ -321,11 +321,21 @@ public class MainActivity extends ActionBarActivity {
     
     private void startHistoryActivity() {
     	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
-    	startHistoryIntent.putParcelableArrayListExtra(HistoryActivity.TIMERS_NAME, dmTimers);
-    	//startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
+    	//startHistoryIntent.putParcelableArrayListExtra(HistoryActivity.TIMERS_NAME, dmTimers);
+    	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
     	startActivity(startHistoryIntent);
     }
-    
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
     private void loadTimers() {
     	 DBHelper.getInstance(this).fillTimers(dmTimers);    	
     }

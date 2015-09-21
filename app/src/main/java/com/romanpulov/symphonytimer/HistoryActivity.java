@@ -99,11 +99,15 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
+        /*
         final ArrayList<DMTimerRec> timers = this.getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
         mDMTimers = new DMTimers();
         for (DMTimerRec timer : timers) {
             mDMTimers.add(timer);
         }
+        */
+
+        mDMTimers = this.getIntent().getExtras().getParcelable(HistoryActivity.TIMERS_NAME);
 
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 

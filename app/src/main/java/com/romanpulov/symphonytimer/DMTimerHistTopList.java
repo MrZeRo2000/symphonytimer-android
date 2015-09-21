@@ -7,7 +7,7 @@ public class DMTimerHistTopList{
 		
 	private static final long serialVersionUID = 4191447399203845533L;
 
-    private List<DMTimerHistTopRec> dataItems = new ArrayList<DMTimerHistTopRec>();
+    private List<DMTimerHistTopRec> dataItems = new ArrayList<>();
 	private long mMaxExecPercent;
 
     public void clear() {
