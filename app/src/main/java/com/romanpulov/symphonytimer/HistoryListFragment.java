@@ -7,11 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HistoryListFragment extends HistoryFragment {
 	
 	private final static String tag = "HistoryListFragment"; 
 	
-	private DMTimerHistList mDMimerHistList = new DMTimerHistList();
+	private List<DMTimerHistRec> mDMimerHistList = new ArrayList<DMTimerHistRec>();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

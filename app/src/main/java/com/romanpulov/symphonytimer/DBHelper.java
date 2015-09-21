@@ -227,7 +227,7 @@ public class DBHelper {
 		
 	}
 	
-	public void fillHistList(DMTimerHistList dmList, int filterId) {
+	public void fillHistList(List<DMTimerHistRec> dmList, int filterId) {
 		
 		dmList.clear();
 		DMTimerHistRec dmRec = null;

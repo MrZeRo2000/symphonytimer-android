@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer;
 
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,7 +18,7 @@ import android.widget.TextView;
 public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 	
 	private DMTimers mDMTimers;
-	private DMTimerHistList mDMTimerHistList;
+	private List<DMTimerHistRec> mDMTimerHistList;
 	
 	private class ViewHolder {
 		public TextView mTitle;
@@ -32,7 +33,7 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		
 	}
 
-	public HistoryArrayAdapter(Context context, DMTimerHistList dmTimerHistList, DMTimers dmTimers) {
+	public HistoryArrayAdapter(Context context, List<DMTimerHistRec> dmTimerHistList, DMTimers dmTimers) {
 		super(context, R.layout.history_row_view);
 		mDMTimerHistList = dmTimerHistList;
 		mDMTimers = dmTimers;		
