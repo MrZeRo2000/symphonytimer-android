@@ -9,6 +9,6 @@
  	    android:id="@+id/settingsfragment"
  	    android:layout_width="fill_parent"
  	    android:layout_height="fill_parent"
- 	    class="com.romanpulov.symphonytimer.SettingsFragment" />
+ 	    class="com.romanpulov.symphonytimer.fragment.SettingsFragment" />
     
 </LinearLayout>
