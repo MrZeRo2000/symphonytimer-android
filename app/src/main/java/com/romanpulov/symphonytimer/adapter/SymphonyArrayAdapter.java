@@ -2,7 +2,7 @@ package com.romanpulov.symphonytimer.adapter;
 
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
-import com.romanpulov.symphonytimer.controls.ProgressCircle;
+import com.romanpulov.library.view.ProgressCircle;
 import com.romanpulov.symphonytimer.helper.UriHelper;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;

@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:background="@drawable/main_list_bg_selector"
-    xmlns:app="http://schemas.android.com/apk/res/com.romanpulov.symphonytimer">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent" 
@@ -18,12 +18,13 @@
         	android:paddingTop="4dp"
         	android:paddingBottom="4dp"
         	android:gravity="left">
-		    <com.romanpulov.symphonytimer.controls.ProgressCircle
+		    <com.romanpulov.library.view.ProgressCircle
 		        android:id="@+id/progress_circle"
 		        app:min="0"
 		        app:max="100"
 		        app:progress="35"
-		        app:autohide="true"
+		        app:autoHide="true"
+                app:arcThickness="8dp"
 		        android:layout_marginLeft="4dp"
 		        android:layout_marginTop="0dp"
 		        android:layout_marginRight="4dp"
@@ -32,7 +33,7 @@
 		        android:layout_gravity="center_vertical"
 	         />    
 	    </LinearLayout>
-        <LinearLayout 
+        <LinearLayout
 	        android:orientation="vertical"
 	        android:layout_width="wrap_content" 
 	        android:layout_height="wrap_content"
