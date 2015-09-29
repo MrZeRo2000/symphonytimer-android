@@ -17,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.EditText;
 
+import com.romanpulov.library.view.SlideNumberPicker;
+
 
 public class AddItemActivity extends ActionBarActivity {
 	public static final String EDIT_REC_NAME = "rec";
@@ -64,10 +66,10 @@ public class AddItemActivity extends ActionBarActivity {
 		long hours =  editRec.mTimeSec / 3600;
 		long minutes = editRec.mTimeSec % 3600 / 60;
 		long seconds = editRec.mTimeSec % 60;
-		((EditText)findViewById(R.id.hours_edit_text)).setText(String.valueOf(hours));
-		((EditText)findViewById(R.id.minutes_edit_text)).setText(String.valueOf(minutes));
-		((EditText)findViewById(R.id.seconds_edit_text)).setText(String.valueOf(seconds));
-		
+		((SlideNumberPicker)findViewById(R.id.hours_number_picker)).setValue((int) hours);
+        ((SlideNumberPicker)findViewById(R.id.minutes_number_picker)).setValue((int) minutes);
+        ((SlideNumberPicker)findViewById(R.id.seconds_number_picker)).setValue((int) seconds);
+
 		// update sound and image controls
 		updateSoundImageFromFile(editRec.mSoundFile, editRec.mImageName);
 	}
@@ -98,9 +100,9 @@ public class AddItemActivity extends ActionBarActivity {
 			throw new AddItemInputException(getResources().getString(R.string.error_title_not_assigned));
 		}
 
-		String hoursString = ((EditText)findViewById(R.id.hours_edit_text)).getText().toString().trim();
-		String minutesString = ((EditText)findViewById(R.id.minutes_edit_text)).getText().toString().trim();
-		String secondsString = ((EditText)findViewById(R.id.seconds_edit_text)).getText().toString().trim();
+		String hoursString =  String.valueOf(((SlideNumberPicker)findViewById(R.id.hours_number_picker)).getValue());
+        String minutesString =  String.valueOf(((SlideNumberPicker)findViewById(R.id.minutes_number_picker)).getValue());
+        String secondsString =  String.valueOf(((SlideNumberPicker)findViewById(R.id.seconds_number_picker)).getValue());
 		long hours = Long.valueOf(hoursString);
 		long minutes = Long.valueOf(minutesString); 
 		long seconds = Long.valueOf(secondsString);
@@ -125,6 +127,7 @@ public class AddItemActivity extends ActionBarActivity {
 	
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 		if (null != mEditSoundURI) {
 			outState.putString(EDIT_SOUND_URI, UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI));
 		}

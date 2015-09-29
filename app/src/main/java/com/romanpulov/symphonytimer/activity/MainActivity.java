@@ -14,7 +14,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -88,7 +87,7 @@ public class MainActivity extends ActionBarActivity {
 		}
 	};
 	
-	private final class ScheduleHelper {
+	private class ScheduleHelper {
 		
 		private ScheduledFuture<?> scheduleExecutorTask;
 		
@@ -156,8 +155,7 @@ public class MainActivity extends ActionBarActivity {
         loadTimers();
         updateTimers();
         
-        Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
-        
+        //Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
         AssetsHelper.listAssets(this, "pre_inst_images");
         
         // the below is for testing only
@@ -181,7 +179,7 @@ public class MainActivity extends ActionBarActivity {
     	MediaPlayerHelper.getInstance(this).release();
     	scheduleExecutor.shutdown();  
     	super.onDestroy();
-    	Log.d("MainActivity", "OnDestroy");
+    	//Log.d("MainActivity", "OnDestroy");
     }
     
     @Override
@@ -189,7 +187,7 @@ public class MainActivity extends ActionBarActivity {
     	// TODO Auto-generated method stub
     	super.onPause();
     	activityVisible = false;
-    	Log.d("MainActivity", "OnPause");
+    	//Log.d("MainActivity", "OnPause");
     }
     
     @Override
@@ -243,7 +241,6 @@ public class MainActivity extends ActionBarActivity {
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-    	// TODO Auto-generated method stub
     	switch(item.getItemId()) {
     	case R.id.action_add:
     		startAddItemActivity(new DMTimerRec());
@@ -279,8 +276,7 @@ public class MainActivity extends ActionBarActivity {
     public AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
 		@Override
 		public void OnOkButtonClickEvent(DialogFragment dialog) {
-			// TODO Auto-generated method stub
-			DMTimerRec dmTimerRec = (DMTimerRec)dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+			DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
 			if (null != dmTimerRec) {
 				performDeleteTimer(dmTimerRec);
 			}
@@ -289,7 +285,6 @@ public class MainActivity extends ActionBarActivity {
    
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-    	// TODO Auto-generated method stub
     	if (0 != dmTasks.size()) {
     		Toast.makeText(getApplicationContext(), this.getString(R.string.action_not_allowed), Toast.LENGTH_SHORT).show();
     		return super.onContextItemSelected(item);
@@ -448,7 +443,7 @@ public class MainActivity extends ActionBarActivity {
     		intent.setComponent(new ComponentName(this.getPackageName(), this.getClass().getName()));
     		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    		
     		getApplicationContext().startActivity(intent);   
-    		Log.d("MainActivity", "Activity was not visible, bringing to front");    		
+    		//Log.d("MainActivity", "Activity was not visible, bringing to front");
     	}
     	
     	//prevent from sleeping while not turned off

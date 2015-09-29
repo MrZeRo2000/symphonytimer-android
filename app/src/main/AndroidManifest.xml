@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.romanpulov.symphonytimer"
     android:versionCode="1"
-    android:versionName="0.4.2" >
+    android:versionName="0.4.3" >
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -49,8 +49,6 @@
         <receiver android:name=".utils.AlarmManagerBroadcastReceiver" >
         </receiver>
 
-        <activity android:name="com.romanpulov.symphonytimer.ImageSelectionActivity" >
-        </activity>
         <activity
             android:name=".activity.HistoryActivity"
             android:label="@string/title_activity_history"
