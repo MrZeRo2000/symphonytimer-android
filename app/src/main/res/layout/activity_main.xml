@@ -34,8 +34,8 @@
         android:layout_alignParentTop="true"  
         android:padding="8dp"            
         android:divider="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent"        
-        android:dividerHeight="8dp"    
+        android:cacheColorHint="@android:color/transparent"
+        android:dividerHeight="8dp"
     	android:listSelector="@drawable/main_list_selector"  	
     	>
 

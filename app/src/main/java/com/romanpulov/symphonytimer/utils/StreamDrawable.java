@@ -3,10 +3,15 @@ package com.romanpulov.symphonytimer.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.ComposeShader;
+import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.Shader;
@@ -64,6 +69,19 @@ public class StreamDrawable extends Drawable {
 
 	@Override
 	public void draw(Canvas canvas) {
+        //mPaint.setColorFilter(new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY));
+        //mPaint.setColorFilter(new android.graphics.LightingColorFilter(Color.RED, Color.RED));
+        float[] colorTransform = {
+                0, 1f, 0, 0, 0,
+                0, 0, 0f, 0, 0,
+                0, 0, 0, 0f, 0,
+                0, 0, 0, 1f, 0};
+
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0f); //Remove Colour
+        colorMatrix.set(colorTransform); //Apply Red say
+        ColorMatrixColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
+
 		canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
 	}
 
