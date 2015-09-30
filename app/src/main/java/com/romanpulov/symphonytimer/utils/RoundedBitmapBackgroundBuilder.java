@@ -12,7 +12,7 @@ import com.romanpulov.symphonytimer.R;
 
 public class RoundedBitmapBackgroundBuilder {
 
-	final public static int BG_NORMAL = 0; 
+	final public static int BG_NORMAL = 0;
 	final public static int BG_FINAL = 1;
 	final private static int BRIGHTENING_FACTOR = 100;
 	
@@ -22,6 +22,9 @@ public class RoundedBitmapBackgroundBuilder {
 	private float mCornerRadius;
 	
 	private Boolean mIsBitmapPrepared = false;
+
+    private Boolean mIsDrawablePrepared = false;
+    private Drawable[] mDrawables = new Drawable[2];
 	
 	private Bitmap mScaledBg;
 	private Bitmap mScaledBrightBg;
@@ -51,23 +54,46 @@ public class RoundedBitmapBackgroundBuilder {
 		mIsBitmapPrepared = true;
 
 	}
+
+    private void prepareDrawables() {
+        for (int drawableType = BG_NORMAL; drawableType <= BG_FINAL; drawableType++ ) {
+            final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+            final Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
+            final Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
+            final Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
+
+            final StateListDrawable drawable = new StateListDrawable();
+            drawable.addState(new int[] { android.R.attr.state_pressed }, (drawableType == BG_NORMAL) ? bgBrightDrawable : bgFinalBrightDrawable);
+            drawable.addState(StateSet.WILD_CARD, (drawableType == BG_NORMAL) ? bgDrawable : bgFinalDrawable);
+
+            mDrawables[drawableType] = drawable;
+        }
+        mIsDrawablePrepared = true;
+    }
 	
 	public Drawable buildDrawable(int type) {
 		
 		if (!mIsBitmapPrepared) {
 			prepareBitmaps();
 		}
-		
+
 		final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
 		final Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
 		final Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
 		final Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
-		
-		final StateListDrawable drawable = new StateListDrawable(); 
-		drawable.addState(new int[] { android.R.attr.state_pressed }, (type == 0) ? bgBrightDrawable : bgFinalBrightDrawable);
-		drawable.addState(StateSet.WILD_CARD, (type == 0) ? bgDrawable : bgFinalDrawable);
+
+		final StateListDrawable drawable = new StateListDrawable();
+		drawable.addState(new int[] { android.R.attr.state_pressed }, (type == BG_NORMAL) ? bgBrightDrawable : bgFinalBrightDrawable);
+		drawable.addState(StateSet.WILD_CARD, (type == BG_NORMAL) ? bgDrawable : bgFinalDrawable);
 		
 		return drawable;
+
+        /*
+        if (!mIsDrawablePrepared) {
+            prepareDrawables();
+        }
+        return mDrawables[type].getConstantState().newDrawable();
+        */
 	}
 	
 	private Bitmap createBrightBitmap(Bitmap src, int value) {
