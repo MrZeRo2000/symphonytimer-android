@@ -8,7 +8,6 @@ import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.util.Log;
 import android.util.StateSet;
 
 import com.romanpulov.symphonytimer.R;
@@ -17,7 +16,7 @@ public class RoundedBitmapBackgroundBuilder {
 
     final public static int BG_NORMAL = 0;
     final public static int BG_FINAL = 1;
-    final private static int BRIGHTENING_FACTOR = 100;
+    final private static float BRIGHTENING_FACTOR = 100f;
 
     private Context mContext;
     private int mWidth;
@@ -26,33 +25,16 @@ public class RoundedBitmapBackgroundBuilder {
 
     private Boolean mIsBitmapPrepared = false;
 
-    private Boolean mIsDrawablePrepared = false;
-    private Drawable[] mDrawables = new Drawable[2];
-
     private Bitmap mScaledBg;
-    private Bitmap mScaledBrightBg;
-
-    private Bitmap mFinalScaledBg;
-    private Bitmap mFinalScaledBrightBg;
 
     private final ColorFilter mBrightBgColorFilter = new ColorMatrixColorFilter(
             new float[]{
-                    1f, 0f, 0f, 0f, 100f,
-                    0f, 1f, 0f, 0f, 100f,
-                    0f, 0f, 1f, 0f, 100f,
-                    0f, 0f, 0f, 1f, 100f
+                    1f, 0f, 0f, 0f, BRIGHTENING_FACTOR,
+                    0f, 1f, 0f, 0f, BRIGHTENING_FACTOR,
+                    0f, 0f, 1f, 0f, BRIGHTENING_FACTOR,
+                    0f, 0f, 0f, 1f, BRIGHTENING_FACTOR
             }
     );
-
-    private final ColorFilter mFinalBrightBgColorFilter = new ColorMatrixColorFilter(
-            new float[]{
-                    0f, 0f, 1f, 0f, 100f,
-                    0f, 1f, 0f, 0f, 100f,
-                    1f, 0f, 0f, 0f, 100f,
-                    0f, 0f, 0f, 1f, 100f
-            }
-    );
-
     private final ColorFilter mFinalBgColorFilter = new ColorMatrixColorFilter(
             new float[]{
                     0f, 0f, 1f, 0f, 0f,
@@ -61,7 +43,14 @@ public class RoundedBitmapBackgroundBuilder {
                     0f, 0f, 0f, 1f, 0f
             }
     );
-
+    private final ColorFilter mFinalBrightBgColorFilter = new ColorMatrixColorFilter(
+            new float[]{
+                    0f, 0f, 1f, 0f, BRIGHTENING_FACTOR,
+                    0f, 1f, 0f, 0f, BRIGHTENING_FACTOR,
+                    1f, 0f, 0f, 0f, BRIGHTENING_FACTOR,
+                    0f, 0f, 0f, 1f, BRIGHTENING_FACTOR
+            }
+    );
 
     public RoundedBitmapBackgroundBuilder(Context context, int width, int height, float cornerRadius) {
         this.mContext = context;
@@ -71,89 +60,39 @@ public class RoundedBitmapBackgroundBuilder {
     }
 
     private void prepareBitmaps() {
-
         final Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky_home_sm);
-        final Bitmap brightBg = createBrightBitmap(bg, BRIGHTENING_FACTOR);
         mScaledBg = Bitmap.createScaledBitmap(bg, mWidth, mHeight, false);
-        mScaledBrightBg = Bitmap.createScaledBitmap(brightBg, mWidth, mHeight, false);
-
-        final Bitmap finalBg = createBlueToRedBitmap(bg);
-        final Bitmap finalBrightBg = createBrightBitmap(finalBg, BRIGHTENING_FACTOR);
-        mFinalScaledBg = Bitmap.createScaledBitmap(finalBg, mWidth, mHeight, false);
-        mFinalScaledBrightBg = Bitmap.createScaledBitmap(finalBrightBg, mWidth, mHeight, false);
-
         mIsBitmapPrepared = true;
-
     }
 
-    private void prepareDrawables() {
-        for (int drawableType = BG_NORMAL; drawableType <= BG_FINAL; drawableType++ ) {
-            final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-            final Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
-            final Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
-            final Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        Log.d(toString(), "prepareBitmaps elapsed time=" + elapsedTime);
-    }
-
-    private Drawable newDrawable(int drawableType) {
-        //ensure bitmaps are prepared
+    public Drawable buildDrawable(int bgType) {
         if (!mIsBitmapPrepared) {
             prepareBitmaps();
         }
 
-        long startTime = System.currentTimeMillis();
+        StreamDrawable normalDrawable;
+        StreamDrawable pressedDrawable;
 
-        final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-        final Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
-        final Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
-        final Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
-
-        final StateListDrawable drawable = new StateListDrawable();
-        drawable.addState(new int[] { android.R.attr.state_pressed }, (drawableType == BG_NORMAL) ? bgBrightDrawable : bgFinalBrightDrawable);
-        drawable.addState(StateSet.WILD_CARD, (drawableType == BG_NORMAL) ? bgDrawable : bgFinalDrawable);
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        Log.d(toString(), "newDrawable elapsed time=" + elapsedTime);
-
-        return drawable;
-    }
-
-    public Drawable buildDrawable(int type) {
-
-        if (!mIsBitmapPrepared) {
-            prepareBitmaps();
+        switch (bgType) {
+            case BG_NORMAL:
+                normalDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+                pressedDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+                pressedDrawable.setStreamColorFilter(mBrightBgColorFilter);
+                break;
+            case BG_FINAL:
+                normalDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+                normalDrawable.setStreamColorFilter(mFinalBgColorFilter);
+                pressedDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+                pressedDrawable.setStreamColorFilter(mFinalBrightBgColorFilter);
+                break;
+            default:
+                return null;
         }
 
-        /*
-        final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-        final Drawable bgBrightDrawable = new StreamDrawable(mScaledBrightBg, mCornerRadius, 0);
-        final Drawable bgFinalDrawable = new StreamDrawable(mFinalScaledBg, mCornerRadius, 0);
-        final Drawable bgFinalBrightDrawable = new StreamDrawable(mFinalScaledBrightBg, mCornerRadius, 0);
-        */
-        final Drawable bgDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-        final Drawable bgBrightDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-        bgBrightDrawable.setColorFilter(mBrightBgColorFilter);
-        final Drawable bgFinalDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-        bgFinalDrawable.setColorFilter(mFinalBgColorFilter);
-        final Drawable bgFinalBrightDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-        bgFinalBrightDrawable.setColorFilter(mFinalBrightBgColorFilter);
-
         final StateListDrawable drawable = new StateListDrawable();
-        drawable.addState(new int[] { android.R.attr.state_pressed }, (type == BG_NORMAL) ? bgBrightDrawable : bgFinalBrightDrawable);
-        drawable.addState(StateSet.WILD_CARD, (type == BG_NORMAL) ? bgDrawable : bgFinalDrawable);
-
+        drawable.addState(new int[] { android.R.attr.state_pressed }, pressedDrawable);
+        drawable.addState(StateSet.WILD_CARD, normalDrawable);
         return drawable;
-
-        /*
-        if (!mIsDrawablePrepared) {
-            prepareDrawables();
-        }
-        return mDrawables[type].getConstantState().newDrawable();
-        */
     }
 
     private Bitmap createBrightBitmap(Bitmap src, int value) {
