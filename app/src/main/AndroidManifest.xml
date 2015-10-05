@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.romanpulov.symphonytimer"
     android:versionCode="1"
-    android:versionName="0.4.3" >
+    android:versionName="0.4.4" >
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
