@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -31,6 +32,8 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		ImageView mImageView;
 		TextView mProgressTextView;
 		ProgressCircle mProgressCircle;
+        Drawable mNormalDrawable;
+        Drawable mFinalDrawable;
 		
 		public ViewHolder(View view) {
 			this.mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
@@ -42,7 +45,7 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 	}
 	
 	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
-		super(context, R.layout.symphony_row_view);
+		super(context, R.layout.symphony_row_2_view);
 		this.mContext = context;
 		this.mValues = values;
 		this.mTasks = tasks;
@@ -64,6 +67,8 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+
+        long startTime = System.nanoTime();
 		
 		final DMTimerRec dmTimerRec = mValues.get(position);
 		
@@ -78,18 +83,45 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		ViewHolder viewHolder;
 		
 		if (convertView == null) {
+            Log.d("SymphonyArrayAdapter", "convertView = null");
 			
 			//inflate from layout
 			LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
-			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
+			rowView = inflater.inflate(R.layout.symphony_row_2_view, parent, false);
 			
 			//setup holder
 			viewHolder = new ViewHolder(rowView);
-			
-			//store holder
+
+            if (isBitmapBackground && (null != mBackgroundBuilder)) {
+                viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+                viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+            }
+
+            //store holder
 			rowView.setTag(viewHolder);
 
-		}
+            //setup listener to query layout only once
+            if (isBitmapBackground && (null == mBackgroundBuilder)) {
+                rowView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        if (isBitmapBackground && (null == mBackgroundBuilder)) {
+                            int measuredWidth = right - left;
+                            int measuredHeight = bottom - top;
+                            if ((measuredWidth > 0) && (measuredHeight > 0)) {
+                                Log.d("SymphonyArrayAdapter", "creating Background Builder");
+                                mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, measuredWidth, measuredHeight, 6);
+                                ViewHolder viewHolder = (ViewHolder)v.getTag();
+                                viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+                                viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+                                v.setBackground(viewHolder.mNormalDrawable);
+                            }
+                        }
+                    }
+                });
+            }
+
+        }
 		else { 
 			rowView = convertView;
 			viewHolder = (ViewHolder)rowView.getTag();
@@ -99,47 +131,36 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		if (null == viewHolder) {
 			viewHolder = new ViewHolder(rowView);
 			rowView.setTag(viewHolder);
+            Log.d("SymphonyArrayAdapter", "viewHolder unexpectedly created !!!");
 		}
-		
-		//handle background settings
-		if (isBitmapBackground) {
-			
-			// create drawable source for background
-			if (null == mBackgroundBuilder) {
-				rowView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-				int measuredWidth = parent.getMeasuredWidth();
-				int measuredHeight =  rowView.getMeasuredHeight();
-				if ((measuredWidth > 0) && (measuredHeight > 0)) {
-					mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, measuredWidth, measuredHeight, 6);
-				}
-			}
-		}
-				
+
 		viewHolder.mTitleTextView.setText(dmTimerRec.mTitle);
 
 		//display image
 		viewHolder.mImageView.setImageURI(
 				null != dmTimerRec.mImageName ? UriHelper.fileNameToUri(getContext(), dmTimerRec.mImageName) : null);
-		
+
 		//display text
 		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", (long) displayProgress / 3600, (long) displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display circle bar
 		viewHolder.mProgressCircle.setMax((int)dmTimerRec.mTimeSec);
 		viewHolder.mProgressCircle.setProgress((int)timerProgress);
-		
-		if (isBitmapBackground) {
-			//update bitmap background
-			if (null != mBackgroundBuilder) {
-				Drawable backGround = (0 == displayProgress ) ? mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL) : mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-				rowView.setBackground(backGround);
-			}
-		} else {
-			//update solid background
-			rowView.setBackgroundResource(
-					0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
-							);
-		}
+
+        //background change
+        if (isBitmapBackground) {
+            //update bitmap background
+            Drawable brDrawable = (0 == displayProgress ) ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
+            rowView.setBackground(brDrawable);
+        } else {
+            //update solid background
+            rowView.setBackgroundResource(
+                    0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
+            );
+        }
+
+        long endTime = System.nanoTime();
+        Log.d("SymphonyArrayAdapter", "Execution time: " + (endTime - startTime) + " ns");
 
 		return rowView;
 	}
