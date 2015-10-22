@@ -41,7 +41,6 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 			this.mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
 			this.mProgressCircle = (ProgressCircle)view.findViewById(R.id.progress_circle);
 		}
-				
 	}
 	
 	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
@@ -91,14 +90,13 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 			
 			//setup holder
 			viewHolder = new ViewHolder(rowView);
-
+            //store holder
+            rowView.setTag(viewHolder);
+            //create and store backgrounds for better performance
             if (isBitmapBackground && (null != mBackgroundBuilder)) {
                 viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
                 viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
             }
-
-            //store holder
-			rowView.setTag(viewHolder);
 
             //setup listener to query layout only once
             if (isBitmapBackground && (null == mBackgroundBuilder)) {
@@ -148,7 +146,7 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		viewHolder.mProgressCircle.setProgress((int)timerProgress);
 
         //background change
-        if (isBitmapBackground) {
+        if (isBitmapBackground && (viewHolder.mNormalDrawable != null) && (viewHolder.mFinalDrawable != null)) {
             //update bitmap background
             Drawable brDrawable = (0 == displayProgress ) ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
             rowView.setBackground(brDrawable);

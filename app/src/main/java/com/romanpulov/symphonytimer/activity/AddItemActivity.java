@@ -28,7 +28,7 @@ public class AddItemActivity extends ActionBarActivity {
 	
 	private static int SOUND_REQ_CODE = 1;
 	private static int IMAGE_REQ_CODE = 2;
-	
+
 	private DMTimerRec editRec;
 	
 	private long mEditId;
@@ -113,7 +113,9 @@ public class AddItemActivity extends ActionBarActivity {
 		}
 		
 		rec.mSoundFile = null != mEditSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI) : null;
-		rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
+
+        //rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
+        rec.mImageName = null != mEditImageURI ? UriHelper.getPath(getApplicationContext(), mEditImageURI) : null;
 		
 		return rec;
 	}
@@ -177,8 +179,8 @@ public class AddItemActivity extends ActionBarActivity {
 
 	    if(resultCode == RESULT_OK){
 	        //the selected audio.   	    		    	
-	        mEditSoundURI = data.getData();
-	        ((Button)findViewById(R.id.sound_file_button)).setText(UriHelper.getSoundTitleFromUri(getApplicationContext(), mEditSoundURI));	        
+            mEditSoundURI = data.getData();
+            ((Button)findViewById(R.id.sound_file_button)).setText(UriHelper.getSoundTitleFromUri(getApplicationContext(), mEditSoundURI));
 	    }
 	  }
 	  
