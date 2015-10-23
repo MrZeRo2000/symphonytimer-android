@@ -26,6 +26,8 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 	private final DMTimers mValues;
 	private DMTasks mTasks;
 	private RoundedBitmapBackgroundBuilder mBackgroundBuilder;
+    private int mItemHeight = 0;
+    private int mItemWidth = 0;
 	
 	static class ViewHolder {
 		TextView mTitleTextView;
@@ -99,20 +101,22 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
             }
 
             //setup listener to query layout only once
-            if (isBitmapBackground && (null == mBackgroundBuilder)) {
+            if ((mItemHeight == 0) || (mItemWidth == 0)) {
                 rowView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
                     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        if (isBitmapBackground && (null == mBackgroundBuilder)) {
+                        if ((mItemHeight == 0) || (mItemWidth == 0)) {
                             int measuredWidth = right - left;
                             int measuredHeight = bottom - top;
                             if ((measuredWidth > 0) && (measuredHeight > 0)) {
-                                Log.d("SymphonyArrayAdapter", "creating Background Builder");
-                                mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, measuredWidth, measuredHeight, 6);
-                                ViewHolder viewHolder = (ViewHolder)v.getTag();
-                                viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-                                viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
-                                v.setBackground(viewHolder.mNormalDrawable);
+                                mItemHeight = measuredHeight;
+                                mItemWidth = measuredWidth;
+                                if (isBitmapBackground && createBackgroundBuilder()) {
+                                    ViewHolder viewHolder = (ViewHolder) v.getTag();
+                                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+                                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+                                    v.setBackground(viewHolder.mNormalDrawable);
+                                }
                             }
                         }
                     }
@@ -146,10 +150,15 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		viewHolder.mProgressCircle.setProgress((int)timerProgress);
 
         //background change
-        if (isBitmapBackground && (viewHolder.mNormalDrawable != null) && (viewHolder.mFinalDrawable != null)) {
+        if (isBitmapBackground ) {
+            if ((viewHolder.mNormalDrawable == null) || (viewHolder.mFinalDrawable == null)) {
+                if (createBackgroundBuilder()) {
+                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+                }
+            }
             //update bitmap background
-            Drawable brDrawable = (0 == displayProgress ) ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
-            rowView.setBackground(brDrawable);
+            rowView.setBackground((0 == displayProgress ) ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable);
         } else {
             //update solid background
             rowView.setBackgroundResource(
@@ -162,4 +171,14 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 
 		return rowView;
 	}
+
+    public boolean createBackgroundBuilder() {
+        if ((mItemWidth > 0) && (mItemHeight > 0)) {
+            Log.d("SymphonyArrayAdapter", "creating Background Builder");
+            if (mBackgroundBuilder == null)
+                mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, mItemWidth, mItemHeight, 6);
+        };
+        return (mBackgroundBuilder != null);
+    }
+
 }
