@@ -115,7 +115,7 @@ public class AddItemActivity extends ActionBarActivity {
 		rec.mSoundFile = null != mEditSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI) : null;
 
         //rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
-        rec.mImageName = null != mEditImageURI ? UriHelper.getPath(getApplicationContext(), mEditImageURI) : null;
+        rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
 		
 		return rec;
 	}
@@ -162,8 +162,7 @@ public class AddItemActivity extends ActionBarActivity {
 	public void onClearImageFileButtonClick(View v){
 		mEditImageURI = null;
 		((ImageButton)findViewById(R.id.image_file_image_button)).setImageResource(R.drawable.btn_check_off);
-	}	
-	
+	}
 	
 	public void onImageFileImageButtonClick(View v) {
 		Intent imageIntent = new Intent();
