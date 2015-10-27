@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.adapter;
 
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
 import com.romanpulov.library.view.ProgressCircle;
 import com.romanpulov.symphonytimer.helper.UriHelper;
@@ -69,9 +70,10 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		final DMTimerRec dmTimerRec = mValues.get(position);
 		
 		//calculate progress
-		final long timerProgress = mTasks.getTaskItemProgress(dmTimerRec.mId);
+        DMTaskItem taskItem = mTasks.getTaskItemById(dmTimerRec.mId);
+		int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
 		final long displayProgress = dmTimerRec.mTimeSec - timerProgress;
-		
+
 		//background drawer
 		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
 		
@@ -132,14 +134,16 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 
 		//display image
 		viewHolder.mImageView.setImageURI(
-				null != dmTimerRec.mImageName ? UriHelper.fileNameToUri(getContext(), dmTimerRec.mImageName) : null);
+                null != dmTimerRec.mImageName ? UriHelper.fileNameToUri(getContext(), dmTimerRec.mImageName) : null);
 
 		//display text
 		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display circle bar
-		viewHolder.mProgressCircle.setMax((int)dmTimerRec.mTimeSec);
-		viewHolder.mProgressCircle.setProgress((int)timerProgress);
+		viewHolder.mProgressCircle.setMax((int) dmTimerRec.mTimeSec);
+		viewHolder.mProgressCircle.setProgress(timerProgress);
+        //ensure minimum progress for active item
+        viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
 
         //background change
         if (isBitmapBackground ) {

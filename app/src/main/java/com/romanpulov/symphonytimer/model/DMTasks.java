@@ -35,14 +35,13 @@ public class DMTasks implements Parcelable {
 	
 	public long getTaskItemProgress(long id){
 		DMTaskItem taskItem = getTaskItemById(id);
-		
 		if(null != taskItem) {
 			return taskItem.getProgressInSec();		
 		} else {
 			return 0;
 		}
 	}
-	
+
 	public DMTaskItem getFirstTaskItemCompleted() {
 		for (DMTaskItem taskItem : dataItems) {
 			if (taskItem.getCompleted()) {
@@ -107,5 +106,4 @@ public class DMTasks implements Parcelable {
             return new DMTasks[size];
         }
     };
-
 }
