@@ -12,10 +12,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -46,7 +44,7 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 	}
 	
 	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
-		super(context, R.layout.symphony_row_2_view);
+		super(context, R.layout.symphony_row_view);
 		this.mContext = context;
 		this.mValues = values;
 		this.mTasks = tasks;
@@ -68,9 +66,6 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-
-        long startTime = System.nanoTime();
-		
 		final DMTimerRec dmTimerRec = mValues.get(position);
 		
 		//calculate progress
@@ -84,11 +79,9 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		ViewHolder viewHolder;
 		
 		if (convertView == null) {
-            Log.d("SymphonyArrayAdapter", "convertView = null");
-			
 			//inflate from layout
 			LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
-			rowView = inflater.inflate(R.layout.symphony_row_2_view, parent, false);
+			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
 			
 			//setup holder
 			viewHolder = new ViewHolder(rowView);
@@ -133,7 +126,6 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		if (null == viewHolder) {
 			viewHolder = new ViewHolder(rowView);
 			rowView.setTag(viewHolder);
-            Log.d("SymphonyArrayAdapter", "viewHolder unexpectedly created !!!");
 		}
 
 		viewHolder.mTitleTextView.setText(dmTimerRec.mTitle);
@@ -143,7 +135,7 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 				null != dmTimerRec.mImageName ? UriHelper.fileNameToUri(getContext(), dmTimerRec.mImageName) : null);
 
 		//display text
-		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", (long) displayProgress / 3600, (long) displayProgress % 3600 / 60, displayProgress % 60));
+		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display circle bar
 		viewHolder.mProgressCircle.setMax((int)dmTimerRec.mTimeSec);
@@ -166,19 +158,14 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
             );
         }
 
-        long endTime = System.nanoTime();
-        Log.d("SymphonyArrayAdapter", "Execution time: " + (endTime - startTime) + " ns");
-
 		return rowView;
 	}
 
     public boolean createBackgroundBuilder() {
         if ((mItemWidth > 0) && (mItemHeight > 0)) {
-            Log.d("SymphonyArrayAdapter", "creating Background Builder");
             if (mBackgroundBuilder == null)
                 mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, mItemWidth, mItemHeight, 6);
         };
         return (mBackgroundBuilder != null);
     }
-
 }

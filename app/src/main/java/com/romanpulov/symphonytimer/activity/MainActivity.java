@@ -487,12 +487,11 @@ public class MainActivity extends ActionBarActivity {
     		newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		
-    		
     		dmTasks.add(newTaskItem);    		
     		
     		updateNotification();
-    		
-    		mScheduleHelper.startScheduler();  		
+
+            mScheduleHelper.startScheduler();
     		
     		
     		/*
