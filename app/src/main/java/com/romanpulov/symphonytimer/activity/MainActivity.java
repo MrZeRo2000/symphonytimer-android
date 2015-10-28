@@ -470,7 +470,9 @@ public class MainActivity extends ActionBarActivity {
 			     notificationIntent, 0);    			
 		Notification.Builder mBuilder =
 				new Notification.Builder(this)
-        			.setSmallIcon(R.drawable.icon_notification)     		
+        			.setSmallIcon(R.drawable.wait_notification)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
         			.setContentTitle(this.getTitle())
         			.setContentText(dmTasks.getTaskTitles())
         			.setContentIntent(contentIntent);        		

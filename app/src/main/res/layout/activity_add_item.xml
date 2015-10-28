@@ -4,7 +4,6 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     tools:context=".AddItemActivity" >
- 
 <LinearLayout   
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -79,11 +78,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_margin="@dimen/activity_input_margin"
+        android:baselineAligned="false"
         >
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:gravity="center"
             >
@@ -91,20 +91,21 @@
             <com.romanpulov.library.view.SlideNumberPicker
                 android:id="@+id/hours_number_picker"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/slide_number_picker_bg"
+                android:layout_height="fill_parent"
+                android:background="@android:color/transparent"
                 app:min="0"
                 app:max="23"
-                app:textSize="16sp"
+                app:textSize="18dp"
+                app:textStyle = "bold"
                 app:textColor="@android:color/white"
-                app:frameColor="@android:color/transparent"
+                app:frameColor="@android:color/white"
                 />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:gravity="center"
             >
@@ -112,20 +113,21 @@
             <com.romanpulov.library.view.SlideNumberPicker
                 android:id="@+id/minutes_number_picker"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/slide_number_picker_bg"
+                android:layout_height="fill_parent"
+                android:background="@android:color/transparent"
                 app:min="0"
                 app:max="59"
-                app:textSize="16sp"
+                app:textSize="18dp"
+                app:textStyle = "bold"
                 app:textColor="@android:color/white"
-                app:frameColor="@android:color/transparent"
+                app:frameColor="@android:color/white"
                 />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:gravity="center"
             >
@@ -133,13 +135,14 @@
             <com.romanpulov.library.view.SlideNumberPicker
                 android:id="@+id/seconds_number_picker"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/slide_number_picker_bg"
+                android:layout_height="fill_parent"
+                android:background="@android:color/transparent"
                 app:min="0"
                 app:max="59"
-                app:textSize="16sp"
+                app:textSize="18dp"
+                app:textStyle = "bold"
                 app:textColor="@android:color/white"
-                app:frameColor="@android:color/transparent"
+                app:frameColor="@android:color/white"
                 />
 
         </LinearLayout>
@@ -154,14 +157,14 @@
 	    />
  	<LinearLayout  
 	    android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
+    	android:layout_height="@dimen/activity_input_button_size"
     	android:orientation="horizontal"
     	android:padding="0dp"
 	    >
 		<Button
 		    android:id="@+id/sound_file_button"
 	    	android:layout_width="0dp"
-	    	android:layout_height="60dp"
+	    	android:layout_height="fill_parent"
 	    	android:layout_margin="@dimen/activity_input_margin"
 	    	android:layout_weight="1"	    
 	    	android:text="@string/default_sound"
@@ -171,10 +174,9 @@
 		    android:id="@+id/clear_sound_file_button"
 		    android:contentDescription="@string/clear"
 		    android:layout_width="@dimen/activity_input_button_size"
-	    	android:layout_height="@dimen/activity_input_button_size"
+	    	android:layout_height="fill_parent"
 		    android:layout_margin="@dimen/activity_input_margin"
 		    android:src="@android:drawable/ic_delete"	    	    
-	    	android:text=""
 	    	android:onClick="onClearSoundFileButtonClick"
 	    	/>
 		</LinearLayout>
@@ -186,7 +188,7 @@
 	    />
 	<LinearLayout  
 	    android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
+    	android:layout_height="@dimen/activity_input_button_size"
     	android:orientation="horizontal"
     	android:padding="0dp"
 	    >
@@ -194,49 +196,69 @@
 		    android:id="@+id/image_file_image_button"
 		    android:contentDescription="@string/image_selection"
 		    android:layout_width="0dp"
-		    android:layout_height="@dimen/activity_input_button_size"
+		    android:layout_height="fill_parent"
 		    android:layout_margin="@dimen/activity_input_margin"
 		    android:layout_weight="1"		    
 		    android:adjustViewBounds="false"
 		    android:scaleType="fitCenter"
-		    android:onClick="onImageFileImageButtonClick"
-		    android:src="@drawable/btn_check_off"	    
+		    android:src="@drawable/btn_check_off"
+            android:onClick="onImageFileImageButtonClick"
 		    />	
 		<ImageButton
 		    android:id="@+id/clear_image_file_button"
 		    android:contentDescription="@string/clear"
 		    android:layout_width="@dimen/activity_input_button_size"
-	    	android:layout_height="@dimen/activity_input_button_size"
+	    	android:layout_height="fill_parent"
 		    android:layout_margin="@dimen/activity_input_margin"
 		    android:src="@android:drawable/ic_delete"	    
-	    	android:text=""
 	    	android:onClick="onClearImageFileButtonClick"
 	    	/>    
 	</LinearLayout>	
-	<TableRow
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_margin="@dimen/activity_input_margin"
-	    >				    
-		<Button
-		    android:id="@+id/ok_button"
-	    	android:layout_width="fill_parent"
-	    	android:layout_height="wrap_content"
-  	        android:layout_weight="1"
-	        android:gravity="center"
-	        android:text="@string/caption_ok"
-	        android:onClick="onCommandClick"	          
-	        />
-		<Button
-		    android:id="@+id/cancel_button"
-	    	android:layout_width="fill_parent"
-	    	android:layout_height="wrap_content"
-  	        android:layout_weight="1"
-	        android:gravity="center"
-	        android:text="@string/caption_cancel"
-	        android:onClick="onCommandClick"	        
-	        />
-	    </TableRow>
-			
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_alignParentTop="true"/>
+        <View
+            android:id="@+id/ViewVerticalHelper"
+            android:layout_width="1dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="4dip"
+            android:layout_marginTop="4dip"
+            android:background="?android:attr/dividerVertical"
+            android:layout_centerHorizontal="true"/>
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/ViewVerticalHelper"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@android:string/cancel"
+            android:layout_alignParentBottom="true"
+            android:onClick="onCommandClick"
+            />
+        <Button
+            android:id="@+id/ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@android:string/ok"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/ViewVerticalHelper"
+            android:onClick="onCommandClick"
+            />
+    </RelativeLayout>
 </LinearLayout>
 </ScrollView>
