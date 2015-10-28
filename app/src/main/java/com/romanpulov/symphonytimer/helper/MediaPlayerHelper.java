@@ -32,6 +32,7 @@ public class MediaPlayerHelper {
 				mMediaPlayer.stop();				
 			}
 			mMediaPlayer.reset();
+            mMediaPlayer.release();
 			mMediaPlayer = null;
 			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mOriginalVolume, 0);
 		}

@@ -13,7 +13,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Xml;
 
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
@@ -119,39 +118,28 @@ public class DBXMLHelper {
 	// this one is for debugging purposes only
 	@SuppressWarnings("unused")
 	private void logXMLDocument(InputStream inputStream) throws XmlPullParserException, IOException {
-		
 		XmlPullParser xmlParser = Xml.newPullParser();
     	xmlParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
     	xmlParser.setInput(inputStream, null);
 
     	//log everything in the xml
-    	Log.d("DBXMLHelper_parseDBXML", "Log all xml ===================================================");
     	int eventType = xmlParser.getEventType();
     	while (eventType != XmlPullParser.END_DOCUMENT) {
-    		
-    		Log.d("DBXMLHelper_parseDBXML", "Name = " + xmlParser.getName() + ", event = " + eventType + ", text = " + xmlParser.getText());
-    		
     		xmlParser.next();
     		eventType = xmlParser.getEventType();
     	}
-		
 	}
 	
 	public int parseDBXML(InputStream inputStream, Map<String, List<DBHelper.RawRecItem>> tableData ) {
-		
-//		= new HashMap<String, List<DBHelper.RawRecItem>>();
-		
 		int res = 0;
 		int a1_s = 0; 
 		
         XmlPullParser xmlParser = Xml.newPullParser();
         
         try {
-        	
         	xmlParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         	xmlParser.setInput(inputStream, null);
         	
-        	//
         	String tableName = null;
         	String tableItem = null;
         	String fieldName = null;
@@ -165,9 +153,7 @@ public class DBXMLHelper {
         		
         		switch (a1_s) {
         		case 0:
-        			Log.d("DBXMLHelper_parseDBXML", "case = 0");
-        			//starting        			
-        			
+        			//starting
                 	//reading root
                 	xmlParser.next();
                 	//check for correct tag
@@ -177,12 +163,9 @@ public class DBXMLHelper {
                 	break;
                 	
         		case 100:
-        			Log.d("DBXMLHelper_parseDBXML", "case = 100");
         			//searching for some table name
-        			
         			xmlParser.next();
-        			Log.d("DBXMLHelper_parseDBXML", "case = 100, event = " + xmlParser.getEventType() + ", name = " + xmlParser.getName());
-        			
+
         			//looking for table name name
         			if ((XmlPullParser.START_TAG == xmlParser.getEventType())) {
             			//getting table name
@@ -194,86 +177,61 @@ public class DBXMLHelper {
             				a1_s = 10100;
             				
             			} else {
-            				
             				//create data structure for table item
-            				Log.d("DBXMLHelper_tableData", "New tableDataRecList");            				
 	        				tableDataRecList = new ArrayList<DBHelper.RawRecItem>();
 	        				//table item name
 	        				tableItem = getTableItem(tableName);
 	        				
 	        				//move to reading table item	        				
 	        				a1_s = 200;
-	        				
             			}
-            			
-
         			} else {
         				if ((XmlPullParser.END_TAG == xmlParser.getEventType()))  {
         					//finished reading tables
         					a1_s = 10001;
-        					
         				} else {
 	        				// no table name found
 	        				a1_s = 10100;
         				}
         			}
         			break;     		
-        			
         		case 200:
-        			Log.d("DBXMLHelper_parseDBXML", "case = 200, tableName = " + tableName + ", tableItem = " + tableItem);
-        			
         			//reading table item
         			xmlParser.next();
         			
-        			Log.d("DBXMLHelper_parseDBXML", "case = 200, event = " + xmlParser.getEventType() + ", name = " + xmlParser.getName());
-
         			if ((XmlPullParser.START_TAG == xmlParser.getEventType()) && (tableItem.equals(xmlParser.getName()))) {
-
         				//create new record item
-        				Log.d("DBXMLHelper_tableData", "New tableDataRecItem");
         				tableDataRecItem = /*DBHelper.getInstance(context).*/ new DBHelper.RawRecItem();
-        				
-        				//move to reading table item attributes        				        				
+        				//move to reading table item attributes
         				a1_s = 300;
-        				
         			} else {
         				if ((XmlPullParser.END_TAG == xmlParser.getEventType())) {
-        					
         					//put read data
-        					Log.d("DBXMLHelper_tableData", "Put tableDataRecList");
         					tableData.put(tableName, tableDataRecList);
         					
         					//move to read next table        					
         					a1_s = 100;
-        					
-        				} else {        				
+        				} else {
 	        				//no table closing tag found where expected
 	        				a1_s = 10200;
         				}
         			}
         			
         			break;
-        			
         		case 300:
-        			Log.d("DBXMLHelper_parseDBXML", "case = 300, name = " + xmlParser.getName());
-        			
         			//reading table item attributes
         			xmlParser.next();
         			
         			//attribute title
         			if (XmlPullParser.START_TAG == xmlParser.getEventType()) {
-        				
         				fieldName = xmlParser.getName();
         				//move to read text
         				a1_s = 400;
         			} else {
         				//start tag not found where expected
         				if (XmlPullParser.END_TAG == xmlParser.getEventType()) {
-        					
         					//save record item
-        					Log.d("DBXMLHelper_tableData", "add tableDataRecItem");
         					tableDataRecList.add(tableDataRecItem);
-        					
         					//move to read next table item
         					a1_s = 200;
         				} else {
@@ -281,25 +239,17 @@ public class DBXMLHelper {
         					a1_s = 10300;
         				}
         			}
-        			
         			break;
-        		
         		case 400:
-        			Log.d("DBXMLHelper_parseDBXML", "case = 400, fieldName = " + fieldName);
-        			
         			//reading field text
         			xmlParser.next();
-        			
         			//attribute name
         			if (XmlPullParser.TEXT == xmlParser.getEventType()) {
         				//read text
         				fieldValue = xmlParser.getText();
         				//
-        				Log.d("DBXMLHelper_dataDBXML", "tableName = " + tableName + ", fieldName = " + fieldName + ", fieldValue = " + fieldValue);
-        				Log.d("DBXMLHelper_tableData", "putFieldNameValue");
         				tableDataRecItem.putFieldNameValue(fieldName, fieldValue);
         				a1_s = 500;
-        				
         			} else {
         				//text not found where expected
         				a1_s = 10400;
@@ -308,47 +258,30 @@ public class DBXMLHelper {
         			break;
         		
         		case 500:
-        			Log.d("DBXMLHelper_parseDBXML", "case = 500, fieldName = " + fieldName + ", fieldValue = " + fieldValue);
-        			
         			//reading text closing tag
         			xmlParser.next();
-        			
         			if (XmlPullParser.END_TAG == xmlParser.getEventType()) {
         				//move to next attribute
-        				
         				a1_s = 300;
         			} else {
         				//text closing tag not found
         				a1_s = 10500;
         			}
-        			
         			break;
-        			
         		}
-        		
         	}
-        	
-        	Log.d("DBXMLHelper_parseDBXML", "Exiting with state =" + a1_s);
-        	
         	//for test purposes
         	//logXMLDocument(inputStream);
         	
         } catch (XmlPullParserException e) {
-        	
         	e.printStackTrace();
         	res = 20000;
-        	
         }
         catch (IOException e) {
-        	
         	e.printStackTrace();
         	res = 30000;
-        	
         }
-        
         res = (a1_s > 10001) ? a1_s : 0;
-        
         return res;
 	}
-
 }
