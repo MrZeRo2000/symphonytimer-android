@@ -8,10 +8,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.app.Notification;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -300,7 +299,7 @@ public class MainActivity extends ActionBarActivity {
     		case (CONTEXT_MENU_DELETE):
     			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimerRec, R.string.question_are_you_sure);
     			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
-    			deleteDialog.show(getSupportFragmentManager(), null);
+    			deleteDialog.show(getFragmentManager(), null);
     			return true;
     		case (CONTEXT_MENU_MOVE_UP):
     			performMoveUpTimer(actionTimerRec);
