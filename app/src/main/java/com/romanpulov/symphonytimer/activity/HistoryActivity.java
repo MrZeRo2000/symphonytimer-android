@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 
 import com.romanpulov.symphonytimer.fragment.HistoryFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryListFragment;
+import com.romanpulov.symphonytimer.fragment.HistoryTopChartFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryTopFragment;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.model.DMTimers;
@@ -34,13 +35,14 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
     }
 
     public interface HistoryFilterHandler {
-        public abstract void onHistoryFilterChange(int filterId);
+        void onHistoryFilterChange(int filterId);
     }
 
     private class HistoryPagerAdapter extends FragmentPagerAdapter {
 
         public HistoryListFragment mHistoryListFragment;
         public HistoryTopFragment mHistoryTopFragment;
+        public HistoryTopChartFragment mHistoryTopChartFragment;
 
         public String[] mFragmentTags;
 
@@ -51,8 +53,7 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
         @Override
         public Fragment getItem(int index) {
-
-            HistoryFragment historyFragment = null;
+            HistoryFragment historyFragment;
 
             switch (index) {
             case 0:
@@ -63,6 +64,12 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
                 mHistoryTopFragment = new HistoryTopFragment();
                 historyFragment = mHistoryTopFragment;
                 break;
+                case 2:
+                    mHistoryTopChartFragment = HistoryTopChartFragment.newInstance(mDMTimers,  mActionBar.getSelectedNavigationIndex());
+                    historyFragment = mHistoryTopChartFragment;
+                    break;
+                default:
+                    return null;
             }
 
             historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
@@ -71,18 +78,18 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
         @Override
         public int getCount() {
-            // get item count - equal to number of tabs
-            return 2;
+            return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            // TODO Auto-generated method stub
             switch (position) {
-            case 0:
-                return getResources().getString(R.string.tab_history_list);
-            case 1:
-                return getResources().getString(R.string.tab_history_top);
+                case 0:
+                    return getResources().getString(R.string.tab_history_list);
+                case 1:
+                    return getResources().getString(R.string.tab_history_top);
+                case 2:
+                    return getResources().getString(R.string.tab_history_top_chart);
             default:
                 return null;
             }
@@ -90,7 +97,6 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            // TODO Auto-generated method stub
             HistoryFragment historyFragment = (HistoryFragment)super.instantiateItem(container, position);
             mFragmentTags[position] = historyFragment.getTag();
             return historyFragment;
@@ -101,14 +107,6 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-
-        /*
-        final ArrayList<DMTimerRec> timers = this.getIntent().getExtras().getParcelableArrayList(HistoryActivity.TIMERS_NAME);
-        mDMTimers = new DMTimers();
-        for (DMTimerRec timer : timers) {
-            mDMTimers.add(timer);
-        }
-        */
 
         mDMTimers = this.getIntent().getExtras().getParcelable(HistoryActivity.TIMERS_NAME);
 
@@ -143,13 +141,11 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        // TODO Auto-generated method stub
-        //Fragment fr = getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":0");
         for (int i = 0; i < mAdapter.getCount(); i++) {
             HistoryFragment historyFragment = (HistoryFragment)getSupportFragmentManager().findFragmentByTag(mAdapter.mFragmentTags[i]);
-            historyFragment.setHistoryFilterId(itemPosition);
+            if (historyFragment != null)
+                historyFragment.setHistoryFilterId(itemPosition);
         }
         return false;
     }
-
 }

@@ -50,5 +50,9 @@
     <string name="title_activity_history">History</string>
     <string name="tab_history_list">List</string>
     <string name="tab_history_top">Top</string>
+    <string name="tab_history_top_chart">Top Chart</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

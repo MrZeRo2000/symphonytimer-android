@@ -22,7 +22,7 @@ public class HistoryListFragment extends HistoryFragment {
 	
 	private final static String tag = "HistoryListFragment"; 
 	
-	private List<DMTimerHistRec> mDMimerHistList = new ArrayList<DMTimerHistRec>();
+	private List<DMTimerHistRec> mDMimerHistList = new ArrayList<>();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

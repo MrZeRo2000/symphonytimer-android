@@ -1,0 +1,27 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             tools:context="com.romanpulov.symphonytimer.fragment.HistoryTopChartFragment">
+    <HorizontalScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="horizontal"
+        android:paddingTop="10dp"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.romanpulov.library.view.BarChart
+                android:id="@+id/history_top_bar_chart"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                app:axisColor="#FFAAAAAA"
+                app:textColor="#FFCCCCCC"
+                />
+        </LinearLayout>
+    </HorizontalScrollView >
+
+</FrameLayout>
