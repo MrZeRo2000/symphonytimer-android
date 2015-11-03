@@ -10,6 +10,7 @@
         android:scrollbars="horizontal"
         android:paddingTop="10dp"
         android:scrollbarAlwaysDrawHorizontalTrack="true"
+        android:background="#99000000"
         >
         <LinearLayout
             android:layout_width="wrap_content"

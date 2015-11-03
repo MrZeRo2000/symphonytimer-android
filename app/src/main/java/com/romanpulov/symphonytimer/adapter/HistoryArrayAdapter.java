@@ -6,7 +6,6 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 
 
 public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
-	
 	private DMTimers mDMTimers;
 	private List<DMTimerHistRec> mDMTimerHistList;
 	
@@ -35,7 +33,6 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 			mImage = (ImageView)view.findViewById(R.id.history_image_view);
 			mTime = (TextView)view.findViewById(R.id.history_time_view);
 		}
-		
 	}
 
 	public HistoryArrayAdapter(Context context, List<DMTimerHistRec> dmTimerHistList, DMTimers dmTimers) {
@@ -56,22 +53,16 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final String tag = getClass().toString();
-		// TODO Auto-generated method stub
-		
 		View rowView;
 		ViewHolder viewHolder;
 	
 		if (convertView == null) {
-			
 			//inflate view
 			LayoutInflater inflater = ((Activity)getContext()).getLayoutInflater();
 			rowView = inflater.inflate(R.layout.history_row_view, parent, false);
-			
 			//setup viewholder
 			viewHolder = new ViewHolder(rowView);
 			rowView.setTag(viewHolder);			
-			
 		}
 		else { 
 			rowView = convertView;
@@ -92,8 +83,6 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		viewHolder.mImage.setImageURI(
 				null != dmTimerRec.mImageName ? Uri.parse(dmTimerRec.mImageName) : null);
 		
-		Log.d(tag, dmTimerRec.mTitle + " " + dmTimerRec.mImageName);
 		return rowView;
 	}
-
 }

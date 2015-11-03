@@ -1,0 +1,1 @@
+adb.exe push D:\Work\AndroidStudioProjects\SymphonyTimer\data\symphonytimerdb data/data/com.romanpulov.symphonytimer/databases/symphonytimerdb 

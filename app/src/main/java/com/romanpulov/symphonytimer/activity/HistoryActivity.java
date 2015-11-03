@@ -1,6 +1,5 @@
 package com.romanpulov.symphonytimer.activity;
 
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,35 +14,25 @@ import android.widget.ArrayAdapter;
 import com.romanpulov.symphonytimer.fragment.HistoryFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryListFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryTopChartFragment;
-import com.romanpulov.symphonytimer.fragment.HistoryTopFragment;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
-
-    private static String HISTORY_NAVIGATION_INDEX;
-
+    //storage
     public static String TIMERS_NAME = "timers";
+    private static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";
+    //underlying fragments for creation
+    private static List<Class<? extends HistoryFragment>> HISTORY_FRAGMENT_CLASS_LIST = Arrays.asList(HistoryListFragment.class, HistoryTopChartFragment.class);
 
     private DMTimers mDMTimers;
     private ActionBar mActionBar;
     private ViewPager mViewPager;
     private HistoryPagerAdapter mAdapter;
 
-    public DMTimers getTimers() {
-        return mDMTimers;
-    }
-
-    public interface HistoryFilterHandler {
-        void onHistoryFilterChange(int filterId);
-    }
-
     private class HistoryPagerAdapter extends FragmentPagerAdapter {
-
-        public HistoryListFragment mHistoryListFragment;
-        public HistoryTopFragment mHistoryTopFragment;
-        public HistoryTopChartFragment mHistoryTopChartFragment;
-
         public String[] mFragmentTags;
 
         public HistoryPagerAdapter(FragmentManager fm) {
@@ -53,32 +42,14 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
         @Override
         public Fragment getItem(int index) {
-            HistoryFragment historyFragment;
-
-            switch (index) {
-            case 0:
-                mHistoryListFragment = new HistoryListFragment();
-                historyFragment = mHistoryListFragment;
-                break;
-            case 1:
-                mHistoryTopFragment = new HistoryTopFragment();
-                historyFragment = mHistoryTopFragment;
-                break;
-                case 2:
-                    mHistoryTopChartFragment = HistoryTopChartFragment.newInstance(mDMTimers,  mActionBar.getSelectedNavigationIndex());
-                    historyFragment = mHistoryTopChartFragment;
-                    break;
-                default:
-                    return null;
-            }
-
+            HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mActionBar.getSelectedNavigationIndex());;
             historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
             return historyFragment;
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
 
         @Override
@@ -88,8 +59,6 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
                     return getResources().getString(R.string.tab_history_list);
                 case 1:
                     return getResources().getString(R.string.tab_history_top);
-                case 2:
-                    return getResources().getString(R.string.tab_history_top_chart);
             default:
                 return null;
             }
@@ -134,7 +103,6 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // TODO Auto-generated method stub
         super.onSaveInstanceState(outState);
         outState.putInt(HISTORY_NAVIGATION_INDEX, mActionBar.getSelectedNavigationIndex());
     }
