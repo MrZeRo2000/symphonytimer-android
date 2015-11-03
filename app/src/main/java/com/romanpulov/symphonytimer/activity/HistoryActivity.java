@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Pair;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -42,14 +43,15 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
 
         @Override
         public Fragment getItem(int index) {
-            HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mActionBar.getSelectedNavigationIndex());;
-            historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
+            HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mActionBar.getSelectedNavigationIndex());
+            if (historyFragment != null)
+                historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
             return historyFragment;
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return HISTORY_FRAGMENT_CLASS_LIST.size();
         }
 
         @Override
@@ -67,7 +69,8 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             HistoryFragment historyFragment = (HistoryFragment)super.instantiateItem(container, position);
-            mFragmentTags[position] = historyFragment.getTag();
+            if (historyFragment != null)
+                mFragmentTags[position] = historyFragment.getTag();
             return historyFragment;
         }
     }
