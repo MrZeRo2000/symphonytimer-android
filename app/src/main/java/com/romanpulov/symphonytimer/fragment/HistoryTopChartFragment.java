@@ -32,9 +32,6 @@ public class HistoryTopChartFragment extends HistoryFragment {
         //update data
         mBarChart.clearSeries();
         BarChart.Series series = mBarChart.addSeries();
-        series.setGradientColors(
-                getResources().getColor(R.color.history_top_chart_gradient_color0),
-                getResources().getColor(R.color.history_top_chart_gradient_color));
         for (int position = 0; position < timerHistTopList.size(); position++) {
             DMTimerHistTopRec rec =  timerHistTopList.get(position);
             series.addXY(position + 1, mDMTimers.getItemById(rec.mTimerId).mTitle, rec.mExecCnt);

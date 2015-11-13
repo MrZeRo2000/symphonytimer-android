@@ -21,6 +21,8 @@
                 android:layout_height="fill_parent"
                 app:axisColor="#FFAAAAAA"
                 app:textColor="#FFCCCCCC"
+                app:defaultGradientColor0="#FF4B6CB7"
+                app:defaultGradientColor="#FF182848"
                 />
         </LinearLayout>
     </HorizontalScrollView >
