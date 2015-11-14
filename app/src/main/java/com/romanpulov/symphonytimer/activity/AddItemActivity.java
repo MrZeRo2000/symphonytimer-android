@@ -38,7 +38,7 @@ public class AddItemActivity extends ActionBarActivity {
     private long mEditId;
     private Uri mEditSoundURI;
     //private Uri mEditImageURI;
-    private String mEditImageFileName;
+    private File mEditImageFile;
 
     private class AddItemInputException extends Exception {
 
@@ -91,8 +91,11 @@ public class AddItemActivity extends ActionBarActivity {
         ((Button)findViewById(R.id.sound_file_button)).setText(soundFileTitle);
 
         if (null != imageFile) {
-            mEditImageURI = UriHelper.fileNameToUri(getApplicationContext(), imageFile);
-            ((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(mEditImageURI);
+            mEditImageFile = new File(imageFile);
+            if (mEditImageFile.exists())
+                ((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
+            else
+                mEditImageFile = null;
         }
     }
 
@@ -120,7 +123,7 @@ public class AddItemActivity extends ActionBarActivity {
         rec.mSoundFile = null != mEditSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI) : null;
 
         //rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
-        rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
+        rec.mImageName = mEditImageFile.getPath();
 
         return rec;
     }
@@ -138,8 +141,8 @@ public class AddItemActivity extends ActionBarActivity {
         if (null != mEditSoundURI) {
             outState.putString(EDIT_SOUND_URI, UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI));
         }
-        if (null != mEditImageURI) {
-            outState.putString(EDIT_IMAGE_URI, UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI));
+        if (null != mEditImageFile) {
+            outState.putString(EDIT_IMAGE_URI, mEditImageFile.getPath());
         }
     }
 
@@ -165,7 +168,7 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     public void onClearImageFileButtonClick(View v){
-        mEditImageURI = null;
+        mEditImageFile = null;
         ((ImageButton)findViewById(R.id.image_file_image_button)).setImageResource(R.drawable.btn_check_off);
     }
 
@@ -191,15 +194,15 @@ public class AddItemActivity extends ActionBarActivity {
       if(requestCode == IMAGE_REQ_CODE){
             if(resultCode == RESULT_OK){
                 //the selected image.
-                mEditImageURI = data.getData();
+                Uri uri = data.getData();
 
                 //load and save to media storage
-                File imageFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_IMAGE, (int)mEditId);
-                UriHelper.uriSaveToFile(getApplicationContext(), mEditImageURI, imageFile);
+                mEditImageFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_IMAGE, (int)mEditId);
+                UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditImageFile);
 
                 //update image from file to ensure it was loaded correctly
                 ImageButton ib = (ImageButton)findViewById(R.id.image_file_image_button);
-                ib.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), imageFile.getPath()));
+                ib.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
             }
       }
 
