@@ -21,6 +21,7 @@
     <string name="clear">Clear</string>
     <string name="caption_ok">OK</string>
     <string name="caption_cancel">Cancel</string>
+    <string name="caption_loading">Loading ...</string>
     <string name="action_add">Add</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>

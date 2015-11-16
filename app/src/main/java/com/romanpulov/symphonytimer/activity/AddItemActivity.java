@@ -7,9 +7,11 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Pair;
 import android.view.View;
 import android.view.WindowManager;
 import android.content.Intent;
@@ -181,15 +183,24 @@ public class AddItemActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if ((requestCode == SOUND_REQ_CODE) && (resultCode == RESULT_OK)){
-            //the selected image.
-            Uri uri = data.getData();
+            ((Button)findViewById(R.id.sound_file_button)).setText(R.string.caption_loading);
 
-            //load and save to media storage
-            mEditSoundFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_SOUND, (int)mEditId);
-            UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditSoundFile);
+            class ProcessSoundUri extends AsyncTask<Uri, Void, Pair<File, String>> {
+                @Override
+                protected Pair<File, String> doInBackground(Uri... params) {
+                    File file = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_SOUND, (int)mEditId);
+                    UriHelper.uriSaveToFile(getApplicationContext(), params[0], file);
+                    return new Pair(file, getMediaFileTitle(file));
+                }
 
-            //update from file
-            ((Button)findViewById(R.id.sound_file_button)).setText(getMediaFileTitle(mEditSoundFile));
+                @Override
+                protected void onPostExecute(Pair<File, String> p) {
+                    super.onPostExecute(p);
+                    mEditSoundFile = p.first;
+                    ((Button)findViewById(R.id.sound_file_button)).setText(p.second);
+                }
+            }
+            new ProcessSoundUri().execute(data.getData());
         }
 
         if ((requestCode == IMAGE_REQ_CODE) && (resultCode == RESULT_OK)){
