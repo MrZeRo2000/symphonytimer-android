@@ -5,6 +5,7 @@ import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.UriHelper;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -21,14 +22,13 @@ import android.widget.EditText;
 import com.romanpulov.library.view.SlideNumberPicker;
 
 import java.io.File;
-import java.io.IOException;
 
 
 public class AddItemActivity extends ActionBarActivity {
     public static final String EDIT_REC_NAME = "rec";
 
-    private static final String EDIT_SOUND_URI = "EDIT_SOUND_URI";
-    private static final String EDIT_IMAGE_URI = "EDIT_IMAGE_URI";
+    private static final String EDIT_SOUND_DATA = "EDIT_SOUND_DATA";
+    private static final String EDIT_IMAGE_DATA = "EDIT_IMAGE_DATA";
 
     private static int SOUND_REQ_CODE = 1;
     private static int IMAGE_REQ_CODE = 2;
@@ -36,9 +36,8 @@ public class AddItemActivity extends ActionBarActivity {
     private DMTimerRec editRec;
 
     private long mEditId;
-    private Uri mEditSoundURI;
-    //private Uri mEditImageURI;
     private File mEditImageFile;
+    private File mEditSoundFile;
 
     private class AddItemInputException extends Exception {
 
@@ -80,15 +79,16 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     private void updateSoundImageFromFile(String soundFile, String imageFile) {
-        String soundFileTitle;
         if (null != soundFile) {
-            mEditSoundURI = UriHelper.fileNameToUri(getApplicationContext(), soundFile);
-            soundFileTitle = (null == mEditSoundURI) ? getString(R.string.default_sound) : UriHelper.getSoundTitleFromFileName(getApplicationContext(), soundFile);
+            mEditSoundFile = new File(soundFile);
+            if (mEditSoundFile.exists())
+                ((Button)findViewById(R.id.sound_file_button)).setText(getMediaFileTitle(mEditSoundFile));
+            else
+                mEditSoundFile = null;
         } else {
-            soundFileTitle = getString(R.string.default_sound);
+            mEditSoundFile = null;
         }
-
-        ((Button)findViewById(R.id.sound_file_button)).setText(soundFileTitle);
+        ((Button)findViewById(R.id.sound_file_button)).setText(getMediaFileTitle(mEditSoundFile));
 
         if (null != imageFile) {
             mEditImageFile = new File(imageFile);
@@ -96,7 +96,8 @@ public class AddItemActivity extends ActionBarActivity {
                 ((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
             else
                 mEditImageFile = null;
-        }
+        } else
+            mEditImageFile = null;
     }
 
     private DMTimerRec getEditRec() throws AddItemInputException {
@@ -120,10 +121,8 @@ public class AddItemActivity extends ActionBarActivity {
             throw new AddItemInputException(getResources().getString(R.string.error_time_zero));
         }
 
-        rec.mSoundFile = null != mEditSoundURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI) : null;
-
-        //rec.mImageName = null != mEditImageURI ? UriHelper.uriMediaToFileName(getApplicationContext(), mEditImageURI) : null;
-        rec.mImageName = mEditImageFile.getPath();
+        rec.mSoundFile = null != mEditSoundFile ? mEditSoundFile.getPath() : null;
+        rec.mImageName = null != mEditImageFile ? mEditImageFile.getPath() : null;
 
         return rec;
     }
@@ -138,19 +137,19 @@ public class AddItemActivity extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (null != mEditSoundURI) {
-            outState.putString(EDIT_SOUND_URI, UriHelper.uriMediaToFileName(getApplicationContext(), mEditSoundURI));
+        if (null != mEditSoundFile) {
+            outState.putString(EDIT_SOUND_DATA, mEditSoundFile.getPath());
         }
         if (null != mEditImageFile) {
-            outState.putString(EDIT_IMAGE_URI, mEditImageFile.getPath());
+            outState.putString(EDIT_IMAGE_DATA, mEditImageFile.getPath());
         }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        final String soundFile = savedInstanceState.getString(EDIT_SOUND_URI);
-        final String imageFile = savedInstanceState.getString(EDIT_IMAGE_URI);
+        final String soundFile = savedInstanceState.getString(EDIT_SOUND_DATA);
+        final String imageFile = savedInstanceState.getString(EDIT_IMAGE_DATA);
 
         updateSoundImageFromFile(soundFile, imageFile);
     }
@@ -163,7 +162,7 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     public void onClearSoundFileButtonClick(View v){
-        mEditSoundURI = null;
+        mEditSoundFile = null;
         ((Button)findViewById(R.id.sound_file_button)).setText(R.string.default_sound);
     }
 
@@ -181,32 +180,48 @@ public class AddItemActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if ((requestCode == SOUND_REQ_CODE) && (resultCode == RESULT_OK)){
+            //the selected image.
+            Uri uri = data.getData();
 
-      if(requestCode == SOUND_REQ_CODE){
+            //load and save to media storage
+            mEditSoundFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_SOUND, (int)mEditId);
+            UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditSoundFile);
 
-        if(resultCode == RESULT_OK){
-            //the selected audio.
-            mEditSoundURI = data.getData();
-            ((Button)findViewById(R.id.sound_file_button)).setText(UriHelper.getSoundTitleFromUri(getApplicationContext(), mEditSoundURI));
+            //update from file
+            ((Button)findViewById(R.id.sound_file_button)).setText(getMediaFileTitle(mEditSoundFile));
         }
-      }
 
-      if(requestCode == IMAGE_REQ_CODE){
-            if(resultCode == RESULT_OK){
-                //the selected image.
-                Uri uri = data.getData();
+        if ((requestCode == IMAGE_REQ_CODE) && (resultCode == RESULT_OK)){
+            //the selected image.
+            Uri uri = data.getData();
 
-                //load and save to media storage
-                mEditImageFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_IMAGE, (int)mEditId);
-                UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditImageFile);
+            //load and save to media storage
+            mEditImageFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_IMAGE, (int)mEditId);
+            UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditImageFile);
 
-                //update image from file to ensure it was loaded correctly
-                ImageButton ib = (ImageButton)findViewById(R.id.image_file_image_button);
-                ib.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
-            }
-      }
+            //update image from file to ensure it was loaded correctly
+            ImageButton ib = (ImageButton)findViewById(R.id.image_file_image_button);
+            ib.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
+       }
 
       super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private String getMediaFileTitle(File file) {
+        if (file == null)
+            return getString(R.string.default_sound);
+        if (!file.exists())
+            return getString(R.string.default_sound);
+
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(file.getPath());
+        String mediaData = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        mediaMetadataRetriever.release();
+        if (mediaData == null)
+            return getString(R.string.unknown_sound);
+        else
+            return mediaData;
     }
 
     public void onCommandClick(View v) {

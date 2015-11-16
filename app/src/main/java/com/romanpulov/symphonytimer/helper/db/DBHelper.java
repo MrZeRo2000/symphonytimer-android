@@ -125,6 +125,29 @@ public class DBHelper {
 			}	
 		}		
 	}
+
+    private List<String> getStringListSQL(String sql) {
+        List<String> result = new ArrayList<>();
+        Cursor c = mDB.rawQuery(sql, null);
+        try {
+            for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                result.add(c.getString(0));
+            }
+        }
+        finally {
+            if (null != c && !c.isClosed()) {
+                c.close();
+            }
+        }
+        return result;
+    }
+
+    public List<String> getMediaFileNameList() {
+        return getStringListSQL(
+                "SELECT " + DBOpenHelper.TIMER_TABLE_COLS[3] + " FROM " + DBOpenHelper.TIMER_TABLE_NAME + " UNION " +
+                        "SELECT " + DBOpenHelper.TIMER_TABLE_COLS[4] + " FROM " + DBOpenHelper.TIMER_TABLE_NAME
+        );
+    }
 	
 	public long getMaxOrderId() {
 		return getLongSQL("SELECT MAX(order_id) AS " + DBOpenHelper.MAX_ORDER_ID_COL + " FROM " + DBOpenHelper.TIMER_TABLE_NAME);

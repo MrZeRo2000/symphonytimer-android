@@ -28,7 +28,7 @@ public class MediaStorageHelper {
     public File createMediaFile(int mediaType, int mediaId) {
         File result;
         try {
-            result = File.createTempFile(MEDIA_TAGS[mediaType] + mediaId, "IMG", mDir);
+            result = File.createTempFile(MEDIA_TAGS[mediaType] + mediaId, MEDIA_TAGS[mediaType], mDir);
             return result;
         } catch (IOException e) {
             return null;
@@ -39,12 +39,26 @@ public class MediaStorageHelper {
         File[] cleanupFiles = mDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
-                boolean result = true;
+                if (s == null)
+                    return false;
+
+                String prefix = s.substring(0, 3);
+                boolean tagFound = false;
+                for (String mediaTag : MEDIA_TAGS) {
+                    if (prefix.equals(mediaTag)) {
+                        tagFound = true;
+                        break;
+                    }
+                }
+                if (!tagFound)
+                    return  false;
+
+                String filterFileName = file.getPath() + "/" + s;
                 for (String name : fileNames) {
-                    if (s.equals(name))
+                    if (filterFileName.equals(name))
                         return false;
                 }
-                return result;
+                return true;
             }
         });
 
@@ -52,5 +66,4 @@ public class MediaStorageHelper {
             f.delete();
         }
     }
-
 }

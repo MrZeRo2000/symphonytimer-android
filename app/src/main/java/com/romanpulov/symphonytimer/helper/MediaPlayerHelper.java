@@ -51,14 +51,18 @@ public class MediaPlayerHelper {
 			mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
 		} else {
 			Uri uri = UriHelper.fileNameToUri(mContext, soundFile);
-			mMediaPlayer = new MediaPlayer();
-			mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			try {
-				mMediaPlayer.setDataSource(mContext, uri);
-				mMediaPlayer.prepare();
-			} catch (Exception e) {
-				startSoundFile(null);
-			}
+            if (uri == null)
+                mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
+            else {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                try {
+                    mMediaPlayer.setDataSource(mContext, uri);
+                    mMediaPlayer.prepare();
+                } catch (Exception e) {
+                    startSoundFile(null);
+                }
+            }
 		}
 		
 		mOriginalVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);

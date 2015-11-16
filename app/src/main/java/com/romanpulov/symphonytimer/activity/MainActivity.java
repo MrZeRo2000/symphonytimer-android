@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer.activity;
 
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
 import com.romanpulov.symphonytimer.R;
@@ -549,9 +551,9 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult (int requestCode, int resultCode, Intent data) {
     	if (RESULT_OK == resultCode) {    		
     		if ((null != data) && (null != data.getExtras())) {
-    		
+    		    //retrieve data
     			DMTimerRec newTimer = data.getExtras().getParcelable(AddItemActivity.EDIT_REC_NAME);
-    			
+    			//action
     			switch (requestCode) {
     				case (ADD_ITEM_RESULT_CODE):
     					performInsertTimer(newTimer);
@@ -559,7 +561,10 @@ public class MainActivity extends ActionBarActivity {
     				case (EDIT_ITEM_RESULT_CODE):
     					performUpdateTimer(newTimer);
     					break;    					
-    			}  			
+    			}
+                //cleanup media storage
+                List<String> mediaNameList = DBHelper.getInstance(getApplicationContext()).getMediaFileNameList();
+                MediaStorageHelper.getInstance(getApplicationContext()).cleanupMedia(mediaNameList);
     		}
     	}
     }
