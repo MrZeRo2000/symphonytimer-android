@@ -10,7 +10,7 @@ import android.app.DialogFragment;
 import android.widget.Toast;
 
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.helper.StorageHelper;
+import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 
 public class SettingsFragment extends PreferenceFragment implements
@@ -59,7 +59,7 @@ public class SettingsFragment extends PreferenceFragment implements
 			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
-					final String localBackupFileName = new StorageHelper(getActivity()).createLocalBackup();
+					final String localBackupFileName = new DBStorageHelper(getActivity()).createLocalBackup();
 					if (null != localBackupFileName) {
 						Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_SHORT).show();
 					}					
@@ -86,7 +86,7 @@ public class SettingsFragment extends PreferenceFragment implements
 			    private AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
 					@Override
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
-						int res = new StorageHelper(getActivity()).restoreLocalXmlBackup();
+						int res = new DBStorageHelper(getActivity()).restoreLocalXmlBackup();
 						if (res != 0) {
 							Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
 						} else {
@@ -101,7 +101,7 @@ public class SettingsFragment extends PreferenceFragment implements
 	
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
-		final String localBackupFileName = new StorageHelper(getActivity()).createLocalBackup();
+		final String localBackupFileName = new DBStorageHelper(getActivity()).createLocalBackup();
 		if (null != localBackupFileName) {
 			Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();
 		}
