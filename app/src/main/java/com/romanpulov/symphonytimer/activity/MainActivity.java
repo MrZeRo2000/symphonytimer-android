@@ -143,11 +143,9 @@ public class MainActivity extends ActionBarActivity {
 		
 		getTimersListView().setAdapter(adapter);
 		getTimersListView().setOnItemClickListener(new OnItemClickListener() {
-			
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
-
 				//action
 				performTimerAction((DMTimerRec)parent.getItemAtPosition(position));
 			}			
@@ -156,19 +154,12 @@ public class MainActivity extends ActionBarActivity {
         // Update List
         loadTimers();
         updateTimers();
-        
-        //Log.d("MainActivity", "OnCreate, savedInstanceState " + (savedInstanceState == null ? "is null" : "not null"));
-        AssetsHelper.listAssets(this, "pre_inst_images");
-        
-        // the below is for testing only
-        //startHistoryActivity();
-        //Toast.makeText(this, DBHelper.getInstance(this).getDatabasePathName(), Toast.LENGTH_LONG).show();
 
+        AssetsHelper.listAssets(this, "pre_inst_images");
     }
     
     @Override
     public void onBackPressed() {
-    	// TODO Auto-generated method stub
     	if (0 == dmTasks.size()) {
     		super.onBackPressed();
     	}
@@ -176,20 +167,16 @@ public class MainActivity extends ActionBarActivity {
     
     @Override
     protected void onDestroy() {
-    	// TODO Auto-generated method stub
     	DBHelper.getInstance(this).closeDB();
     	MediaPlayerHelper.getInstance(this).release();
     	scheduleExecutor.shutdown();  
     	super.onDestroy();
-    	//Log.d("MainActivity", "OnDestroy");
     }
     
     @Override
     protected void onPause() {
-    	// TODO Auto-generated method stub
     	super.onPause();
     	activityVisible = false;
-    	//Log.d("MainActivity", "OnPause");
     }
     
     @Override
@@ -233,12 +220,8 @@ public class MainActivity extends ActionBarActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-       // getMenuInflater().inflate(R.menu.main, menu);
-        //return true;
         getMenuInflater().inflate(R.menu.main_activity_actions, menu);
     	return super.onCreateOptionsMenu(menu);
-
     }
     
     @Override
@@ -260,14 +243,12 @@ public class MainActivity extends ActionBarActivity {
     		return true;
     	default:
   			return super.onOptionsItemSelected(item);
-  			
     	}
     }
     
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
     		ContextMenuInfo menuInfo) {
-    	// TODO Auto-generated method stub
     	menu.add(Menu.NONE, CONTEXT_MENU_EDIT, Menu.NONE, R.string.action_edit);
     	menu.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.NONE, R.string.action_delete);
         menu.add(Menu.NONE, CONTEXT_MENU_MOVE_UP, Menu.NONE, R.string.action_move_up);
@@ -321,13 +302,12 @@ public class MainActivity extends ActionBarActivity {
     private void startAddItemActivity(DMTimerRec dmTimerRec) {    
     	Intent startItemIntent = new Intent(this, AddItemActivity.class);
     	startItemIntent.putExtra(AddItemActivity.EDIT_REC_NAME, dmTimerRec);    	
-    	startActivityForResult(startItemIntent, 
-    			null == dmTimerRec.mTitle ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
+    	startActivityForResult(startItemIntent,
+                null == dmTimerRec.mTitle ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
     }
     
     private void startHistoryActivity() {
     	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
-    	//startHistoryIntent.putParcelableArrayListExtra(HistoryActivity.TIMERS_NAME, dmTimers);
     	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
         startActivity(startHistoryIntent);
     }
@@ -372,14 +352,16 @@ public class MainActivity extends ActionBarActivity {
     	return mLV;
     }    
     
-    public void add_image_button_click(View v) {
-    	startAddItemActivity(new DMTimerRec());    	
+    private void performMediaCleanup() {
+        List<String> mediaNameList = DBHelper.getInstance(getApplicationContext()).getMediaFileNameList();
+        MediaStorageHelper.getInstance(getApplicationContext()).cleanupMedia(mediaNameList);
     }
-    
+
     private void performInsertTimer(DMTimerRec dmTimerRec) {
 		try {
 			long retVal = DBHelper.getInstance(this).insertTimer(dmTimerRec);
 			if (retVal > 0) {
+                performMediaCleanup();
 				loadTimers();
 				updateTimers();  
 			}
@@ -392,6 +374,7 @@ public class MainActivity extends ActionBarActivity {
 		try {
 			long retVal = DBHelper.getInstance(this).deleteTimer(dmTimerRec.mId);
 			if (retVal > 0) {
+                performMediaCleanup();
 				loadTimers();
 				updateTimers();  
 			}
@@ -438,7 +421,6 @@ public class MainActivity extends ActionBarActivity {
     
     
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
-    	
     	//bring activity to front
     	if (!activityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
@@ -462,8 +444,7 @@ public class MainActivity extends ActionBarActivity {
     	if (preferencesVibrate)
     		VibratorHelper.getInstance(this).vibrate();
     }
-    
-    
+
     private void updateNotification() {
     	NotificationManager notificationManager = 
 				  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -495,20 +476,11 @@ public class MainActivity extends ActionBarActivity {
     		updateNotification();
 
             mScheduleHelper.startScheduler();
-    		
-    		
-    		/*
-    		if (null == scheduleExecutorTask) {
-    			scheduleExecutorTask = scheduleExecutor.scheduleWithFixedDelay(taskRunnable, 0, 1, TimeUnit.SECONDS);
-    		}
-    		*/
 
     		if (null == mAlarm) {
     			mAlarm = new AlarmManagerBroadcastReceiver();
     		}
     		mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
-    		
-    		
     	} else {
     		//finalize
     		if (null != mAlarm) {
@@ -532,11 +504,7 @@ public class MainActivity extends ActionBarActivity {
     		if (0 == dmTasks.size()) {		
     			//cancel scheduler  			
     			mScheduleHelper.stopScheduler();
-    			/*
-    			scheduleExecutorTask.cancel(false);
-    			scheduleExecutorTask = null;
-    			*/
-    			
+
     			// cancel notifications
     			NotificationManager notificationManager = 
     					  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -562,15 +530,7 @@ public class MainActivity extends ActionBarActivity {
     					performUpdateTimer(newTimer);
     					break;    					
     			}
-                //cleanup media storage
-                List<String> mediaNameList = DBHelper.getInstance(getApplicationContext()).getMediaFileNameList();
-                MediaStorageHelper.getInstance(getApplicationContext()).cleanupMedia(mediaNameList);
     		}
     	}
     }
-    
-    public void imageImageClick(View view) {
-    	//Toast.makeText(this, "imageImageClick", Toast.LENGTH_SHORT).show();
-    }
-   
 }

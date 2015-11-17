@@ -170,6 +170,16 @@
 	    	android:text="@string/default_sound"
 	    	android:onClick="onSoundFileButtonClick"
 	    	/>
+        <ImageButton
+            android:id="@+id/preview_sound_file_button"
+            android:contentDescription="@string/clear"
+            android:layout_width="@dimen/activity_input_button_size"
+            android:layout_height="fill_parent"
+            android:layout_margin="@dimen/activity_input_margin"
+            android:scaleType="fitCenter"
+            android:src="@drawable/tuba"
+            android:onClick="onPreviewSoundFileButtonClick"
+            />
 		<ImageButton
 		    android:id="@+id/clear_sound_file_button"
 		    android:contentDescription="@string/clear"

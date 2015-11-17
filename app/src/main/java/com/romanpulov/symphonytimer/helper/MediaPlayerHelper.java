@@ -45,6 +45,13 @@ public class MediaPlayerHelper {
 		}
 	}
 
+    public void toggleSound(String soundFile) {
+        if ((mMediaPlayer !=null) && (mMediaPlayer.isPlaying()))
+            stop();
+        else
+            startSoundFile(soundFile);
+    }
+
 	public void startSoundFile(String soundFile) {
 		stop();
 		if (null == soundFile) {

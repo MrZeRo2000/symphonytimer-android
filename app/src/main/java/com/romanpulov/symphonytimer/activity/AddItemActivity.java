@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.activity;
 
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.UriHelper;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
@@ -41,6 +42,10 @@ public class AddItemActivity extends ActionBarActivity {
     private File mEditImageFile;
     private File mEditSoundFile;
 
+    private Button mSoundFileButton;
+    private ImageButton mImageFileButton;
+    private ImageButton mPreviewSoundButton;
+
     private class AddItemInputException extends Exception {
 
         private static final long serialVersionUID = -6523044324262630252L;
@@ -61,6 +66,10 @@ public class AddItemActivity extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
         actionBar.setIcon(R.drawable.tuba);
+
+        mSoundFileButton = (Button)findViewById(R.id.sound_file_button);
+        mImageFileButton = (ImageButton)findViewById(R.id.image_file_image_button);
+        mPreviewSoundButton = (ImageButton)findViewById(R.id.preview_sound_file_button);
 
         editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
         updateEditRec();
@@ -84,18 +93,18 @@ public class AddItemActivity extends ActionBarActivity {
         if (null != soundFile) {
             mEditSoundFile = new File(soundFile);
             if (mEditSoundFile.exists())
-                ((Button)findViewById(R.id.sound_file_button)).setText(getMediaFileTitle(mEditSoundFile));
+                mSoundFileButton.setText(getMediaFileTitle(mEditSoundFile));
             else
                 mEditSoundFile = null;
         } else {
             mEditSoundFile = null;
         }
-        ((Button)findViewById(R.id.sound_file_button)).setText(getMediaFileTitle(mEditSoundFile));
+        mSoundFileButton.setText(getMediaFileTitle(mEditSoundFile));
 
         if (null != imageFile) {
             mEditImageFile = new File(imageFile);
             if (mEditImageFile.exists())
-                ((ImageButton)findViewById(R.id.image_file_image_button)).setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
+                mImageFileButton.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
             else
                 mEditImageFile = null;
         } else
@@ -137,6 +146,12 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (null != mEditSoundFile) {
@@ -157,20 +172,26 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     public void onSoundFileButtonClick(View v){
+        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
         Intent soundIntent = new Intent();
         soundIntent.setType("audio/*");
         soundIntent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(soundIntent, SOUND_REQ_CODE);
     }
 
+    public void onPreviewSoundFileButtonClick(View v){
+        MediaPlayerHelper.getInstance(getApplicationContext()).toggleSound(mEditSoundFile == null ? null : mEditSoundFile.getPath());
+    }
+
     public void onClearSoundFileButtonClick(View v){
+        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
         mEditSoundFile = null;
-        ((Button)findViewById(R.id.sound_file_button)).setText(R.string.default_sound);
+        mSoundFileButton.setText(R.string.default_sound);
     }
 
     public void onClearImageFileButtonClick(View v){
         mEditImageFile = null;
-        ((ImageButton)findViewById(R.id.image_file_image_button)).setImageResource(R.drawable.btn_check_off);
+        mImageFileButton.setImageResource(R.drawable.btn_check_off);
     }
 
     public void onImageFileImageButtonClick(View v) {
@@ -183,7 +204,7 @@ public class AddItemActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if ((requestCode == SOUND_REQ_CODE) && (resultCode == RESULT_OK)){
-            ((Button)findViewById(R.id.sound_file_button)).setText(R.string.caption_loading);
+            mSoundFileButton.setText(R.string.caption_loading);
 
             class ProcessSoundUri extends AsyncTask<Uri, Void, Pair<File, String>> {
                 @Override
@@ -197,7 +218,7 @@ public class AddItemActivity extends ActionBarActivity {
                 protected void onPostExecute(Pair<File, String> p) {
                     super.onPostExecute(p);
                     mEditSoundFile = p.first;
-                    ((Button)findViewById(R.id.sound_file_button)).setText(p.second);
+                    mSoundFileButton.setText(p.second);
                 }
             }
             new ProcessSoundUri().execute(data.getData());
@@ -212,8 +233,7 @@ public class AddItemActivity extends ActionBarActivity {
             UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditImageFile);
 
             //update image from file to ensure it was loaded correctly
-            ImageButton ib = (ImageButton)findViewById(R.id.image_file_image_button);
-            ib.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
+            mImageFileButton.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
        }
 
       super.onActivityResult(requestCode, resultCode, data);
@@ -249,6 +269,7 @@ public class AddItemActivity extends ActionBarActivity {
             setResult(RESULT_OK, resultIntent);
         } else if (findViewById(R.id.cancel_button) == v)
             setResult(RESULT_CANCELED);
+        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
         finish();
     }
 }
