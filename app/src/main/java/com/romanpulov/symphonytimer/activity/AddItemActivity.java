@@ -44,7 +44,6 @@ public class AddItemActivity extends ActionBarActivity {
 
     private Button mSoundFileButton;
     private ImageButton mImageFileButton;
-    private ImageButton mPreviewSoundButton;
 
     private class AddItemInputException extends Exception {
 
@@ -69,7 +68,6 @@ public class AddItemActivity extends ActionBarActivity {
 
         mSoundFileButton = (Button)findViewById(R.id.sound_file_button);
         mImageFileButton = (ImageButton)findViewById(R.id.image_file_image_button);
-        mPreviewSoundButton = (ImageButton)findViewById(R.id.preview_sound_file_button);
 
         editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
         updateEditRec();
@@ -211,7 +209,7 @@ public class AddItemActivity extends ActionBarActivity {
                 protected Pair<File, String> doInBackground(Uri... params) {
                     File file = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_SOUND, (int)mEditId);
                     UriHelper.uriSaveToFile(getApplicationContext(), params[0], file);
-                    return new Pair(file, getMediaFileTitle(file));
+                    return new Pair<>(file, getMediaFileTitle(file));
                 }
 
                 @Override
