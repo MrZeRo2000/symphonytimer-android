@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.romanpulov.library.view.BarChart;
 import com.romanpulov.symphonytimer.R;
@@ -13,6 +15,8 @@ import com.romanpulov.symphonytimer.model.DMTimerHistTopRec;
 
 public class HistoryTopChartFragment extends HistoryFragment {
     private BarChart mBarChart;
+    private Button mScaleUpButton;
+    private Button mScaleDownButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -20,7 +24,25 @@ public class HistoryTopChartFragment extends HistoryFragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_history_top_chart, container, false);
         mBarChart = (BarChart)rootView.findViewById(R.id.history_top_bar_chart);
+        mScaleUpButton = (Button) rootView.findViewById(R.id.scaleUpButton);
+        mScaleDownButton = (Button) rootView.findViewById(R.id.scaleDownButton);
         updateBarChart();
+
+        Button.OnClickListener buttonClickListener = new Button.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                int barChartWidth = mBarChart.getBarItemWidth();
+                int barChartDelta = v == mScaleUpButton ? barChartWidth / 10 : -barChartWidth / 10;
+                mBarChart.setBarItemWidth(barChartWidth + barChartDelta);
+                mBarChart.updateChartLayout();
+                mBarChart.requestLayout();
+                mBarChart.invalidate();
+            }
+        };
+        mScaleDownButton.setOnClickListener(buttonClickListener);
+        mScaleUpButton.setOnClickListener(buttonClickListener);
+
         return rootView;
     }
 
