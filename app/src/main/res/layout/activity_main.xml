@@ -36,7 +36,8 @@
         android:divider="@android:color/transparent"
         android:cacheColorHint="@android:color/transparent"
         android:dividerHeight="8dp"
-    	android:listSelector="@drawable/main_list_selector"  	
+    	android:listSelector="@drawable/main_list_selector"
+        android:addStatesFromChildren="true"
     	>
 
     </ListView>
