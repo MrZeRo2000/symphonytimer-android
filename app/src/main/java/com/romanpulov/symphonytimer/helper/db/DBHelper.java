@@ -379,13 +379,11 @@ public class DBHelper {
 	public void restoreBackupData (Map<String, List<DBHelper.RawRecItem>> tableData) {
 		//delete old data
 		clearData();
-		
 		//load timer
         List<DBHelper.RawRecItem> tableItemData = tableData.get(DBOpenHelper.TIMER_TABLE_NAME);
 		if (null != tableItemData) {
 			loadBackupTimer(tableItemData);
 		}
-		
 		//load timer history
 		tableItemData = tableData.get(DBOpenHelper.TIMER_HISTORY_TABLE_NAME);
 		if (null != tableItemData) {

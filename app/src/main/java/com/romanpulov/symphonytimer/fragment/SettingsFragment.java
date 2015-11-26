@@ -1,6 +1,8 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -17,7 +19,54 @@ public class SettingsFragment extends PreferenceFragment implements
 	SharedPreferences.OnSharedPreferenceChangeListener,
 	Preference.OnPreferenceClickListener {
 
-	public static final String SHARED_PREFS_NAME = "settings";
+    private class RestoreLocalXmlTask extends AsyncTask<Void, Void, Integer> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setTitle(R.string.caption_loading);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            return new DBStorageHelper(getActivity()).restoreLocalXmlBackup();
+        }
+
+        @Override
+        protected void onPostExecute(Integer res) {
+            progressDialog.dismiss();
+            if (res != 0) {
+                Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), getResources().getString(R.string.info_load_local_backup), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class CreateLocalBackupTask extends AsyncTask<Void, Void, String> {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setTitle(R.string.caption_saving);
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            return new DBStorageHelper(getActivity()).createLocalBackup();
+        }
+
+        @Override
+        protected void onPostExecute(String res) {
+            progressDialog.dismiss();
+            if (res != null)
+                Toast.makeText(getActivity(), res, Toast.LENGTH_LONG).show();
+        }
+    }
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -31,7 +80,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		Preference button;
 		
 		//reset data
-		button = (Preference)findPreference("pref_reset_data");
+		button = findPreference("pref_reset_data");
 		if (null != button) {
 			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				
@@ -54,7 +103,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		}
 		
 		//local backup
-		button = (Preference)findPreference("pref_local_backup");
+		button = findPreference("pref_local_backup");
 		if (null != button) {
 			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
 				@Override
@@ -71,7 +120,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		}
 		
 		//local restore
-		button = (Preference)findPreference("pref_local_restore");
+		button = findPreference("pref_local_restore");
 		if (null != button) {
 			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {		
 				@Override
@@ -79,32 +128,22 @@ public class SettingsFragment extends PreferenceFragment implements
 	    			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(null, R.string.question_are_you_sure);
 	    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
 	    			deleteDialog.show(getActivity().getFragmentManager(), null);
-					
 					return false;
 				};
 				
 			    private AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
 					@Override
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
-						int res = new DBStorageHelper(getActivity()).restoreLocalXmlBackup();
-						if (res != 0) {
-							Toast.makeText(getActivity(), String.format(getResources().getString(R.string.error_load_local_backup), res), Toast.LENGTH_LONG).show();
-						} else {
-							Toast.makeText(getActivity(), getResources().getString(R.string.info_load_local_backup), Toast.LENGTH_SHORT).show();							
-						}
+                        new RestoreLocalXmlTask().execute();
 					}
 				};		
 			});
 		}
 	}
-	
-	
+
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
-		final String localBackupFileName = new DBStorageHelper(getActivity()).createLocalBackup();
-		if (null != localBackupFileName) {
-			Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_LONG).show();
-		}
+        new CreateLocalBackupTask().execute();
 		return false;
 	}
 	
