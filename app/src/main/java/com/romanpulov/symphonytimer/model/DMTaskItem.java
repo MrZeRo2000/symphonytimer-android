@@ -116,4 +116,11 @@ public class DMTaskItem implements Parcelable {
 			}
 		}
 	}
+
+	public int getExecutionPercent() {
+        if (mCompletedFlag)
+            return 100;
+        else
+            return (int)((System.currentTimeMillis() - mStartTime) * 100 / (mMaxTimeSec * 1000));
+    }
 }

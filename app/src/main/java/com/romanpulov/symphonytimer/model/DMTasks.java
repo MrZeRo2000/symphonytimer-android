@@ -67,6 +67,9 @@ public class DMTasks implements Parcelable {
 		for (DMTaskItem taskItem : dataItems) {
 			sb.append(delimiter);
 			sb.append(taskItem.getTitle());
+            sb.append("(");
+            sb.append(taskItem.getExecutionPercent());
+            sb.append("%)");
 			delimiter = ",";
 		}
 		return sb.toString();
