@@ -458,7 +458,7 @@ public class MainActivity extends ActionBarActivity {
                     .setOngoing(true)
         			.setContentTitle(this.getTitle())
         			.setContentText(dmTasks.getTaskTitles())
-        			.setContentIntent(contentIntent);        		
+        			.setContentIntent(contentIntent);
 		notificationManager.notify(0, mBuilder.build());		
     }
     

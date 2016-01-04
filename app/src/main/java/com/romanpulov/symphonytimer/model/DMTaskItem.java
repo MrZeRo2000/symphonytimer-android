@@ -115,14 +115,5 @@ public class DMTaskItem implements Parcelable {
 				}
 			}
 		}
-	}	
-	
-	public void resetProcess() {
-		mStartTime = mCurrentTime = 0;
-		mCompletedFlag = false;
-	}
-	
-	public boolean isCompleted() {
-		return mCompletedFlag;
 	}
 }
