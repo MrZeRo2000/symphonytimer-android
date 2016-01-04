@@ -11,9 +11,9 @@ import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
 /**
  * Created by rpulov on 04.01.2016.
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
+public class SymphonyApplicationTest extends ApplicationTestCase<Application> {
     private final static String TAG = "ApplicationTest";
-    public ApplicationTest() {
+    public SymphonyApplicationTest() {
         super(Application.class);
     }
 
