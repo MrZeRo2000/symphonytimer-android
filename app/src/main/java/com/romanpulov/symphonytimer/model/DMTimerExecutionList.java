@@ -1,9 +1,10 @@
 package com.romanpulov.symphonytimer.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class DMTimerExecutionList {
+public class DMTimerExecutionList implements Iterable<DMTimerExecutionRec> {
 		
 	private static final long serialVersionUID = 4191447399203845533L;
 
@@ -42,5 +43,10 @@ public class DMTimerExecutionList {
 	
 	public long getMaxExecPerc() {
         return mMaxExecPercent;
+	}
+
+	@Override
+	public Iterator<DMTimerExecutionRec> iterator() {
+		return dataItems.iterator();
 	}
 }

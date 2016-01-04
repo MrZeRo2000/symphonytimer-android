@@ -328,13 +328,14 @@ public class DBHelper {
 
 	public DMTimerExecutionList[] getHistList(int filterId, int histCount) {
         DMTimerExecutionList[] res = new DMTimerExecutionList[histCount];
-		Cursor c = null;
+		Cursor c;
         long timeOffset = DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId];
 
         long startTimeFilter = System.currentTimeMillis() - histCount * timeOffset;
         long endTimeFilter = startTimeFilter + timeOffset;
 
         for (int i = 0; i < histCount; i++) {
+            c = null;
             DMTimerExecutionList dmList = new DMTimerExecutionList();
 
             try {
