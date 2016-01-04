@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryListFragment extends HistoryFragment {
-	private List<DMTimerHistRec> mDMimerHistList = new ArrayList<>();
+	private List<DMTimerHistRec> mDMTimerHistList = new ArrayList<>();
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_history_list, container, false);
-		mAdapter = new HistoryArrayAdapter(this.getActivity(), mDMimerHistList, mDMTimers);
+		mAdapter = new HistoryArrayAdapter(this.getActivity(), mDMTimerHistList, mDMTimers);
 		((ListView)rootView.findViewById(R.id.history_list_view)).setAdapter(mAdapter);
         return rootView;
 	}	
@@ -29,7 +29,7 @@ public class HistoryListFragment extends HistoryFragment {
 	@Override
 	public void setHistoryFilterId(int historyFilterId) {
 		super.setHistoryFilterId(historyFilterId);
-		DBHelper.getInstance(this.getActivity()).fillHistList(mDMimerHistList, historyFilterId);
+		DBHelper.getInstance(this.getActivity()).fillHistList(mDMTimerHistList, historyFilterId);
 		if (null != mAdapter) {
 			mAdapter.notifyDataSetChanged();
 		}

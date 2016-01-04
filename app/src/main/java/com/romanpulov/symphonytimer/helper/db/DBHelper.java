@@ -263,7 +263,10 @@ public class DBHelper {
 						DBOpenHelper.TIMER_HISTORY_TABLE_NAME, 
 						DBOpenHelper.TIMER_HISTORY_TABLE_COLS, 
 						DBOpenHelper.TIMER_HISTORY_SELECTION_CRITERIA, 
-						new String[] {String.valueOf(System.currentTimeMillis()), DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId]}, 
+						new String[] {
+                                String.valueOf(System.currentTimeMillis()),
+                                String.valueOf(DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId])
+                        },
 						null, 
 						null, 
 						"start_time DESC");
@@ -293,23 +296,26 @@ public class DBHelper {
 		}
 	}	
 	
-	public void fillHistTopList(DMTimerExecutionList dmList, int filterId) {
-		dmList.clear();
+	public DMTimerExecutionList getHistTopList(int filterId) {
+        DMTimerExecutionList res = new DMTimerExecutionList();
 		Cursor c = null;
 		
 		try {
 			if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
 				c = mDB.rawQuery(
-						DBOpenHelper.TIMER_HISTORY_TOP_QUERY_FILTER, 
-						new String[] {String.valueOf(System.currentTimeMillis()), DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId]});
+                        DBOpenHelper.TIMER_HISTORY_TOP_QUERY_FILTER,
+                        new String[]{
+                                String.valueOf(System.currentTimeMillis()),
+                                String.valueOf(DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId])
+                        });
 			else
 				c = mDB.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
 
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
                 DMTimerExecutionRec dmRec = new DMTimerExecutionRec();
 				dmRec.mTimerId = c.getLong(0);
-				dmRec.mExecCnt = c.getLong(1);								
-				dmList.add(dmRec);
+				dmRec.mExecCnt = c.getLong(1);
+                res.add(dmRec);
 			};
 
 		} finally {
@@ -317,8 +323,51 @@ public class DBHelper {
 				c.close();
 			}
 		}
+        return res;
 	}
-	
+
+	public DMTimerExecutionList[] getHistList(int filterId, int histCount) {
+        DMTimerExecutionList[] res = new DMTimerExecutionList[histCount];
+		Cursor c = null;
+        long timeOffset = DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId];
+
+        long startTimeFilter = System.currentTimeMillis() - histCount * timeOffset;
+        long endTimeFilter = startTimeFilter + timeOffset;
+
+        for (int i = 0; i < histCount; i++) {
+            DMTimerExecutionList dmList = new DMTimerExecutionList();
+
+            try {
+                if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
+                    c = mDB.rawQuery(
+                            DBOpenHelper.TIMER_HISTORY_QUERY_FILTER,
+                            new String[]{
+                                    String.valueOf(startTimeFilter),
+                                    String.valueOf(endTimeFilter)
+                            });
+                else
+                    c = mDB.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
+
+                for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+                    DMTimerExecutionRec dmRec = new DMTimerExecutionRec();
+                    dmRec.mTimerId = c.getLong(0);
+                    dmRec.mExecCnt = c.getLong(1);
+                    dmList.add(dmRec);
+                }
+                ;
+
+            } finally {
+                if (null != c && !c.isClosed()) {
+                    c.close();
+                }
+            }
+            res[i] = dmList;
+            startTimeFilter += timeOffset;
+            endTimeFilter += timeOffset;
+        }
+        return res;
+	}
+
 	public List<RawRecItem> getBackupTable(String tableName) {
 		List<RawRecItem> res = new ArrayList<>();
 		Cursor c = null;

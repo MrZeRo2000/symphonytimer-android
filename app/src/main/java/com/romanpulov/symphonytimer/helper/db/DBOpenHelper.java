@@ -28,10 +28,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     	"end_time" 
     };
     public static final String TIMER_HISTORY_SELECTION_CRITERIA = "start_time>? - ?";
-    public static final String[] TIMER_HISTORY_SELECTION_VALUES = new String[] {
-    	"2592000000", //"1000 * 60 * 60 * 24 * 30",
-    	"7776000000", //"1000 * 60 * 60 * 24 * 30 * 3",
-    	"31536000000" //1000 * 60 * 60 * 24 * 365",    	
+    public static final Long[] TIMER_HISTORY_SELECTION_VALUES = new Long[] {
+    	2592000000L, //"1000 * 60 * 60 * 24 * 30",
+    	7776000000L, //"1000 * 60 * 60 * 24 * 30 * 3",
+    	31536000000L //1000 * 60 * 60 * 24 * 365",
     };
     
     public static final String MAX_ORDER_ID_COL = "max_order_id";
@@ -47,6 +47,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     		"WHERE start_time>? - ?" +		
     		"GROUP BY timer_id " +
     		"ORDER BY 2 DESC";
+
+	public static final String TIMER_HISTORY_QUERY_FILTER =
+			"SELECT timer_id, COUNT(timer_id) exec_cnt " +
+					"FROM timer_history " +
+					"WHERE start_time>? " +
+                    "  AND end_time<?" +
+					"GROUP BY timer_id " +
+					"ORDER BY 2 DESC";
     
     public static final String TIMER_BACKUP_GET_QUERY = 
     		"SELECT _id, title, time_sec, order_id FROM " + TIMER_TABLE_NAME;

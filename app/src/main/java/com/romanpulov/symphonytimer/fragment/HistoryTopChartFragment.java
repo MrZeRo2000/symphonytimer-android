@@ -9,8 +9,8 @@ public class HistoryTopChartFragment extends HistoryChartFragment {
     @Override
     protected void updateSeries() {
         //calc data
-        DMTimerExecutionList timerExecutionList = new DMTimerExecutionList();
-        DBHelper.getInstance(this.getActivity()).fillHistTopList(timerExecutionList, mHistoryFilterId);
+        DMTimerExecutionList timerExecutionList =
+            DBHelper.getInstance(this.getActivity()).getHistTopList(mHistoryFilterId);
         timerExecutionList.calcPercent();
         //update data
         BarChart.Series series = getBarChart().addSeries();
