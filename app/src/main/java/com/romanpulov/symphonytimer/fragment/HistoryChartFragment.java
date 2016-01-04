@@ -8,9 +8,6 @@ import android.widget.Button;
 
 import com.romanpulov.library.view.BarChart;
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.model.DMTimerHistTopList;
-import com.romanpulov.symphonytimer.model.DMTimerHistTopRec;
 
 /**
  * Created on 04.01.2016.

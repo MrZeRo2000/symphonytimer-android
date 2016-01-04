@@ -12,8 +12,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
-import com.romanpulov.symphonytimer.model.DMTimerHistTopList;
-import com.romanpulov.symphonytimer.model.DMTimerHistTopRec;
+import com.romanpulov.symphonytimer.model.DMTimerExecutionList;
+import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
@@ -293,7 +293,7 @@ public class DBHelper {
 		}
 	}	
 	
-	public void fillHistTopList(DMTimerHistTopList dmList, int filterId) {
+	public void fillHistTopList(DMTimerExecutionList dmList, int filterId) {
 		dmList.clear();
 		Cursor c = null;
 		
@@ -306,7 +306,7 @@ public class DBHelper {
 				c = mDB.rawQuery(DBOpenHelper.TIMER_HISTORY_TOP_QUERY, null);
 
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
-                DMTimerHistTopRec dmRec = new DMTimerHistTopRec();
+                DMTimerExecutionRec dmRec = new DMTimerExecutionRec();
 				dmRec.mTimerId = c.getLong(0);
 				dmRec.mExecCnt = c.getLong(1);								
 				dmList.add(dmRec);
