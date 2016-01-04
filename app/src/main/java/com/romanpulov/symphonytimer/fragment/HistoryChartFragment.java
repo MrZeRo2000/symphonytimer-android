@@ -1,0 +1,75 @@
+package com.romanpulov.symphonytimer.fragment;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+
+import com.romanpulov.library.view.BarChart;
+import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.helper.db.DBHelper;
+import com.romanpulov.symphonytimer.model.DMTimerHistTopList;
+import com.romanpulov.symphonytimer.model.DMTimerHistTopRec;
+
+/**
+ * Created on 04.01.2016.
+ */
+public abstract class HistoryChartFragment extends HistoryFragment {
+    private BarChart mBarChart;
+
+    protected BarChart getBarChart() {
+        return mBarChart;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_history_top_chart, container, false);
+        mBarChart = (BarChart)rootView.findViewById(R.id.history_top_bar_chart);
+        updateBarChart();
+
+        final Button scaleUpButton = (Button) rootView.findViewById(R.id.scaleUpButton);
+        final Button scaleDownButton = (Button) rootView.findViewById(R.id.scaleDownButton);
+        Button.OnClickListener buttonClickListener = new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                int barChartWidth = mBarChart.getBarItemWidth();
+                int barChartDelta = v == scaleUpButton ? barChartWidth / 10 : -barChartWidth / 10;
+                mBarChart.setBarItemWidth(barChartWidth + barChartDelta);
+                mBarChart.updateChartLayout();
+                mBarChart.requestLayout();
+                mBarChart.invalidate();
+            }
+        };
+        scaleUpButton.setOnClickListener(buttonClickListener);
+        scaleDownButton.setOnClickListener(buttonClickListener);
+
+        return rootView;
+    }
+
+    private void updateBarChart() {
+        //clear old data
+        mBarChart.clearSeries();
+
+        updateSeries();
+
+        //update control
+        mBarChart.updateSeriesListValueBounds();
+        mBarChart.updateChartLayout();
+        mBarChart.requestLayout();
+        mBarChart.invalidate();
+    }
+
+    // to override for data retrieval
+    abstract protected void updateSeries();
+
+    @Override
+    public void setHistoryFilterId(int historyFilterId) {
+        super.setHistoryFilterId(historyFilterId);
+        if (mBarChart != null) {
+            updateBarChart();
+        }
+    }
+}
