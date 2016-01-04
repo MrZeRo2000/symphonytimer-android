@@ -78,6 +78,26 @@ public class DMTasks implements Parcelable {
         }
     }
 
+	public int getExecutionPercent() {
+        long currentTime = System.currentTimeMillis();
+        long minStartTime = currentTime;
+        long maxEndTime = minStartTime;
+
+        for (DMTaskItem taskItem : dataItems) {
+            long startTime = taskItem.getStartTime();
+            if (startTime < minStartTime)
+                minStartTime = startTime;
+            long endTime = taskItem.getTriggerAtTime();
+            if (endTime > maxEndTime)
+                maxEndTime = endTime;
+        }
+        long timeRange = maxEndTime - minStartTime;
+        if (timeRange == 0)
+            return 0;
+        else
+            return (int)((currentTime - minStartTime) * 100/timeRange);
+    }
+
     public DMTasks() {
         dataItems = new ArrayList<>();
     }

@@ -342,6 +342,7 @@ public class MainActivity extends ActionBarActivity {
     private void updateTimers() {    	
     	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)getTimersListView().getAdapter();
     	adapter.notifyDataSetChanged();
+        updateNotification();
     	checkTimerSelection();
     }
     
@@ -454,11 +455,12 @@ public class MainActivity extends ActionBarActivity {
 		Notification.Builder mBuilder =
 				new Notification.Builder(this)
         			.setSmallIcon(R.drawable.wait_notification)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
-        			.setContentTitle(this.getTitle())
-        			.setContentText(dmTasks.getTaskTitles())
-        			.setContentIntent(contentIntent);
+                        .setAutoCancel(false)
+                        .setOngoing(true)
+                        .setContentTitle(this.getTitle())
+                        .setContentText(dmTasks.getTaskTitles())
+                        .setProgress(100, dmTasks.getExecutionPercent(), false)
+                        .setContentIntent(contentIntent);
 		notificationManager.notify(0, mBuilder.build());		
     }
     
