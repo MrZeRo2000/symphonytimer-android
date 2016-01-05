@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 
+import com.romanpulov.symphonytimer.fragment.HistoryDynamicsChartFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryListFragment;
 import com.romanpulov.symphonytimer.fragment.HistoryTopChartFragment;
@@ -25,7 +26,12 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
     public static String TIMERS_NAME = "timers";
     private static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";
     //underlying fragments for creation
-    private static List<Class<? extends HistoryFragment>> HISTORY_FRAGMENT_CLASS_LIST = Arrays.asList(HistoryListFragment.class, HistoryTopChartFragment.class);
+    private static List<Class<? extends HistoryFragment>> HISTORY_FRAGMENT_CLASS_LIST =
+            Arrays.asList(
+                    HistoryListFragment.class,
+                    HistoryTopChartFragment.class,
+                    HistoryDynamicsChartFragment.class
+            );
 
     private DMTimers mDMTimers;
     private ActionBar mActionBar;
@@ -60,6 +66,8 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
                     return getResources().getString(R.string.tab_history_list);
                 case 1:
                     return getResources().getString(R.string.tab_history_top);
+                case 2:
+                    return getResources().getString(R.string.tab_history_dynamics);
             default:
                 return null;
             }
