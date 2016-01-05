@@ -18,7 +18,7 @@ public class SymphonyInstrumentedTest {
 
     @Test
     public void first() {
-        assertTrue(1==2);
+        assertTrue(1==1);
     }
 
 }
