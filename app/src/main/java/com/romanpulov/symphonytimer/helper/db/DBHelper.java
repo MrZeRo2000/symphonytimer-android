@@ -2,6 +2,7 @@ package com.romanpulov.symphonytimer.helper.db;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -326,20 +327,27 @@ public class DBHelper {
         return res;
 	}
 
-	public DMTimerExecutionList[] getHistList(int filterId, int histCount) {
-        DMTimerExecutionList[] res = new DMTimerExecutionList[histCount];
+	public List<LinkedHashMap<Long, Long>> getHistList(int filterId, int histCount) {
+
+        List<LinkedHashMap<Long, Long>> executions = new ArrayList<>(histCount);
+
 		Cursor c;
-        long timeOffset = DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId];
+		long timeOffset;
+		if (filterId < DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length)
+        	timeOffset = DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES[filterId];
+		else
+			timeOffset = System.currentTimeMillis();
 
         long startTimeFilter = System.currentTimeMillis() - histCount * timeOffset;
         long endTimeFilter = startTimeFilter + timeOffset;
+        boolean isHist = filterId < DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length;
 
         for (int i = 0; i < histCount; i++) {
             c = null;
-            DMTimerExecutionList dmList = new DMTimerExecutionList();
+            LinkedHashMap<Long, Long> executionItem = new LinkedHashMap<>();
 
             try {
-                if (filterId < (DBOpenHelper.TIMER_HISTORY_SELECTION_VALUES.length - 1))
+                if (isHist)
                     c = mDB.rawQuery(
                             DBOpenHelper.TIMER_HISTORY_QUERY_FILTER,
                             new String[]{
@@ -353,7 +361,7 @@ public class DBHelper {
                     DMTimerExecutionRec dmRec = new DMTimerExecutionRec();
                     dmRec.mTimerId = c.getLong(0);
                     dmRec.mExecCnt = c.getLong(1);
-                    dmList.add(dmRec);
+                    executionItem.put(c.getLong(0), c.getLong(1));
                 }
                 ;
 
@@ -362,11 +370,14 @@ public class DBHelper {
                     c.close();
                 }
             }
-            res[i] = dmList;
+            executions.add(executionItem);
             startTimeFilter += timeOffset;
             endTimeFilter += timeOffset;
+
+            if (!isHist)
+                break;
         }
-        return res;
+        return executions;
 	}
 
 	public List<RawRecItem> getBackupTable(String tableName) {

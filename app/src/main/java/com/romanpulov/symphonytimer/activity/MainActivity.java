@@ -342,7 +342,8 @@ public class MainActivity extends ActionBarActivity {
     private void updateTimers() {    	
     	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)getTimersListView().getAdapter();
     	adapter.notifyDataSetChanged();
-        updateNotification();
+		if (0 != dmTasks.size())
+        	updateNotification();
     	checkTimerSelection();
     }
     

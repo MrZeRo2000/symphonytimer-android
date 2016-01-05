@@ -42,8 +42,8 @@
                 android:layout_height="fill_parent"
                 app:axisColor="#FFAAAAAA"
                 app:textColor="#FFCCCCCC"
-                app:defaultGradientColor0="#FF4B6CB7"
-                app:defaultGradientColor="#FF182848"
+                app:defaultGradientColor0="@color/chart_gradient_0"
+                app:defaultGradientColor="@color/chart_gradient"
                 app:showLabelOnClick="true"
                 />
         </LinearLayout>
