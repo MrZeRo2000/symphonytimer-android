@@ -75,6 +75,7 @@ public class MainActivity extends ActionBarActivity {
 						updateTimers();
 					} else {
 						dmTasks.updateProcess();
+                        updateNotificationProgress();
 					}						
 				}
 			});			
@@ -338,12 +339,17 @@ public class MainActivity extends ActionBarActivity {
     		}    		
     	}
     }
-    
+
+    private void updateNotificationProgress() {
+        if (0 != dmTasks.size())
+            updateNotification();
+    }
+
+
     private void updateTimers() {    	
     	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)getTimersListView().getAdapter();
     	adapter.notifyDataSetChanged();
-		if (0 != dmTasks.size())
-        	updateNotification();
+        updateNotificationProgress();
     	checkTimerSelection();
     }
     
