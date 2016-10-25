@@ -170,6 +170,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
     	DBHelper.getInstance(this).closeDB();
     	MediaPlayerHelper.getInstance(this).release();
+        cancelNotification();
     	scheduleExecutor.shutdown();  
     	super.onDestroy();
     }
@@ -470,6 +471,12 @@ public class MainActivity extends ActionBarActivity {
                         .setContentIntent(contentIntent);
 		notificationManager.notify(0, mBuilder.build());		
     }
+
+	private void cancelNotification() {
+		NotificationManager notificationManager =
+				(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		notificationManager.cancel(0);
+	}
     
     private void performTimerAction(DMTimerRec dmTimerRec) {
     	
@@ -515,9 +522,7 @@ public class MainActivity extends ActionBarActivity {
     			mScheduleHelper.stopScheduler();
 
     			// cancel notifications
-    			NotificationManager notificationManager = 
-    					  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-    			notificationManager.cancel(0);    			
+    			cancelNotification();
     		} else {
     			// update notification if any active timers still exist
     			updateNotification();
