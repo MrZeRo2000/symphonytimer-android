@@ -51,6 +51,8 @@ public class MainActivity extends ActionBarActivity {
 	public static final int CONTEXT_MENU_DELETE = Menu.FIRST + 3;
 	public static final int CONTEXT_MENU_MOVE_UP = Menu.FIRST + 4;
 	public static final int CONTEXT_MENU_MOVE_DOWN = Menu.FIRST + 5;
+
+    private static final long LIST_CLICK_DELAY = 1000;
 	
 	private boolean activityVisible = false;
 	
@@ -61,6 +63,7 @@ public class MainActivity extends ActionBarActivity {
 	private AlarmManagerBroadcastReceiver mAlarm;
 	
 	private ListView mLV = null;
+    private long mLastClickTime;
 	
 	private final ScheduleHelper mScheduleHelper = new ScheduleHelper();
 	
@@ -148,7 +151,12 @@ public class MainActivity extends ActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 				//action
-				performTimerAction((DMTimerRec)parent.getItemAtPosition(position));
+                long clickTime = System.currentTimeMillis();
+                if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
+                    mLastClickTime = clickTime;
+                    VibratorHelper.getInstance(MainActivity.this).shortVibrate();
+                    performTimerAction((DMTimerRec) parent.getItemAtPosition(position));
+                }
 			}			
 		});
 		
