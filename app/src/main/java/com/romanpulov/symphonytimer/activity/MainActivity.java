@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
+import com.romanpulov.symphonytimer.service.TaskService;
 import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
 import com.romanpulov.symphonytimer.R;
@@ -97,18 +98,22 @@ public class MainActivity extends ActionBarActivity {
 		
 		private ScheduledFuture<?> scheduleExecutorTask;
 		
-		public void startScheduler() {
+		void startScheduler() {
 			if (null == scheduleExecutorTask) {
 				scheduleExecutorTask = scheduleExecutor.scheduleWithFixedDelay(taskRunnable, 0, 1, TimeUnit.SECONDS);
-			}			
+			}
+			Intent serviceIntent = new Intent(getApplicationContext(), TaskService.class);
+            startService(serviceIntent);
 		}
 		
-		public void stopScheduler() {
+		void stopScheduler() {
 			if (null != scheduleExecutorTask) {
 				scheduleExecutorTask.cancel(false);
 				scheduleExecutorTask = null;
 			}
-			
+            Intent serviceIntent = new Intent(getApplicationContext(), TaskService.class);
+            stopService(serviceIntent);
+
 		}
 	}
 	

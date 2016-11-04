@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.romanpulov.symphonytimer"
     android:versionCode="1"
-    android:versionName="0.4.11" >
+    android:versionName="0.4.11">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -13,52 +13,60 @@
         android:allowBackup="true"
         android:icon="@drawable/tuba"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.CompatTransparent" >
+            android:theme="@style/Theme.CompatTransparent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.AddItemActivity"
-            android:theme="@style/Theme.AppCompat"  
             android:label="@string/title_activity_add_item"
-            android:parentActivityName=".activity.MainActivity" >
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/Theme.AppCompat">
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
-	        <meta-data
-	            android:name="android.support.PARENT_ACTIVITY"
-	            android:value=".activity.MainActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
         </activity>
         <activity
             android:name=".activity.SettingsActivity"
-            android:theme="@style/Theme.CompatTransparentWhite" 
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity" >
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/Theme.CompatTransparentWhite">
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
-	        <meta-data
-	            android:name="android.support.PARENT_ACTIVITY"
-	            android:value=".activity.MainActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
         </activity>
 
         <!-- Broadcast receiver -->
-        <receiver android:name=".utils.AlarmManagerBroadcastReceiver" >
-        </receiver>
+        <receiver android:name=".utils.AlarmManagerBroadcastReceiver"></receiver>
 
         <activity
             android:name=".activity.HistoryActivity"
             android:label="@string/title_activity_history"
-            android:theme="@style/Theme.CompatTransparentWhite"  
-            android:parentActivityName=".activity.MainActivity" >
-	        <!-- Parent activity meta-data to support 4.0 and lower -->
-	        <meta-data
-	            android:name="android.support.PARENT_ACTIVITY"
-	            android:value=".activity.MainActivity" />
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/Theme.CompatTransparentWhite">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
         </activity>
+
+        <service
+            android:name=".service.TaskService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
