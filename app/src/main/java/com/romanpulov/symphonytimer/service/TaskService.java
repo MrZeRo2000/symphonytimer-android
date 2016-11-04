@@ -5,7 +5,12 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.romanpulov.symphonytimer.model.DMTasks;
+
 public class TaskService extends Service {
+
+    private DMTasks mDMTasks;
+
     public TaskService() {
     }
 
@@ -17,8 +22,11 @@ public class TaskService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        return super.onStartCommand(intent, flags, startId);
+        if (intent.getExtras() != null) {
+            mDMTasks = intent.getExtras().getParcelable(DMTasks.class.toString());
+            Toast.makeText(this, "service starting : " + mDMTasks, Toast.LENGTH_SHORT).show();
+        }
+        return START_STICKY;
     }
 
     @Override

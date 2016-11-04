@@ -57,8 +57,8 @@ public class MainActivity extends ActionBarActivity {
 	
 	private boolean activityVisible = false;
 	
-	private DMTimers dmTimers = new DMTimers();
-	private DMTasks dmTasks = new DMTasks();
+	private DMTimers mDMTimers = new DMTimers();
+	private DMTasks mDMTasks = new DMTasks();
 	private ScheduledThreadPoolExecutor scheduleExecutor = new ScheduledThreadPoolExecutor(2);
 	
 	private AlarmManagerBroadcastReceiver mAlarm;
@@ -78,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
 					if (activityVisible) {
 						updateTimers();
 					} else {
-						dmTasks.updateProcess();
+						mDMTasks.updateProcess();
                         updateNotificationProgress();
 					}						
 				}
@@ -102,8 +102,6 @@ public class MainActivity extends ActionBarActivity {
 			if (null == scheduleExecutorTask) {
 				scheduleExecutorTask = scheduleExecutor.scheduleWithFixedDelay(taskRunnable, 0, 1, TimeUnit.SECONDS);
 			}
-			Intent serviceIntent = new Intent(getApplicationContext(), TaskService.class);
-            startService(serviceIntent);
 		}
 		
 		void stopScheduler() {
@@ -111,9 +109,6 @@ public class MainActivity extends ActionBarActivity {
 				scheduleExecutorTask.cancel(false);
 				scheduleExecutorTask = null;
 			}
-            Intent serviceIntent = new Intent(getApplicationContext(), TaskService.class);
-            stopService(serviceIntent);
-
 		}
 	}
 	
@@ -148,7 +143,7 @@ public class MainActivity extends ActionBarActivity {
         layout.setBackgroundDrawable(wallpaperDrawable);
         */       
         
-		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, dmTimers, dmTasks);
+		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, mDMTimers, mDMTasks);
 		
 		getTimersListView().setAdapter(adapter);
 		getTimersListView().setOnItemClickListener(new OnItemClickListener() {
@@ -174,7 +169,7 @@ public class MainActivity extends ActionBarActivity {
     
     @Override
     public void onBackPressed() {
-    	if (0 == dmTasks.size()) {
+    	if (0 == mDMTasks.size()) {
     		super.onBackPressed();
     	}
     }
@@ -192,12 +187,21 @@ public class MainActivity extends ActionBarActivity {
     protected void onPause() {
     	super.onPause();
     	activityVisible = false;
+
+        //start service to handle tasks in background
+        Intent serviceIntent = new Intent(this, TaskService.class);
+        serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks);
+        startService(serviceIntent);
     }
     
     @Override
     protected void onResume() {
     	super.onResume();
     	activityVisible = true;
+
+        //stop service - tasks will be handled in foreground
+        Intent serviceIntent = new Intent(this, TaskService.class);
+        stopService(serviceIntent);
     	
     	if (DBHelper.getInstance(this).getDBDataChanged()) {
     		loadTimers();
@@ -209,7 +213,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
     	super.onSaveInstanceState(outState);
-        outState.putParcelable(dmTasks.getClass().toString(), dmTasks);
+        outState.putParcelable(mDMTasks.getClass().toString(), mDMTasks);
     }
     
     @Override
@@ -217,18 +221,18 @@ public class MainActivity extends ActionBarActivity {
     	super.onRestoreInstanceState(savedInstanceState);
 
         //restore tasks
-        dmTasks = savedInstanceState.getParcelable(dmTasks.getClass().toString());
+        mDMTasks = savedInstanceState.getParcelable(mDMTasks.getClass().toString());
 
         //restore code references
-        ((SymphonyArrayAdapter)getTimersListView().getAdapter()).setTasks(dmTasks);
-        dmTasks.setTasksCompleted(mTaskItemCompleted);
+        ((SymphonyArrayAdapter)getTimersListView().getAdapter()).setTasks(mDMTasks);
+        mDMTasks.setTasksCompleted(mTaskItemCompleted);
 
         //update UI
-		dmTasks.updateProcess();
+		mDMTasks.updateProcess();
 		updateTimers();
 
 		//update scheduler
-		if (dmTasks.size() > 0) {
+		if (mDMTasks.size() > 0) {
             mScheduleHelper.startScheduler();
         }
     }
@@ -246,7 +250,7 @@ public class MainActivity extends ActionBarActivity {
     		startAddItemActivity(new DMTimerRec());
     		return true;
     	case R.id.action_preferences:
-        	if (0 != dmTasks.size()) {
+        	if (0 != mDMTasks.size()) {
         		Toast.makeText(getApplicationContext(), this.getString(R.string.action_not_allowed), Toast.LENGTH_SHORT).show();
         		return super.onOptionsItemSelected(item);
         	}    		
@@ -283,7 +287,7 @@ public class MainActivity extends ActionBarActivity {
    
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-    	if (0 != dmTasks.size()) {
+    	if (0 != mDMTasks.size()) {
     		Toast.makeText(getApplicationContext(), this.getString(R.string.action_not_allowed), Toast.LENGTH_SHORT).show();
     		return super.onContextItemSelected(item);
     	}
@@ -323,7 +327,7 @@ public class MainActivity extends ActionBarActivity {
     
     private void startHistoryActivity() {
     	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
-    	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, dmTimers);
+    	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, mDMTimers);
         startActivity(startHistoryIntent);
     }
 
@@ -338,15 +342,15 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void loadTimers() {
-    	 DBHelper.getInstance(this).fillTimers(dmTimers);    	
+    	 DBHelper.getInstance(this).fillTimers(mDMTimers);
     }
     
     private void checkTimerSelection() {
-    	DMTaskItem taskItem = dmTasks.getFirstTaskItemCompleted();
+    	DMTaskItem taskItem = mDMTasks.getFirstTaskItemCompleted();
     	if (null != taskItem) {
-    		DMTimerRec timerRec = dmTimers.getItemById(taskItem.getId());
+    		DMTimerRec timerRec = mDMTimers.getItemById(taskItem.getId());
     		if (null != timerRec) {
-    			int index = dmTimers.indexOf(timerRec);
+    			int index = mDMTimers.indexOf(timerRec);
     			if ( (index<getTimersListView().getFirstVisiblePosition()) || (index>getTimersListView().getLastVisiblePosition()) ) {
     				getTimersListView().setSelection(index);
     			}
@@ -355,7 +359,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateNotificationProgress() {
-        if (0 != dmTasks.size())
+        if (0 != mDMTasks.size())
             updateNotification();
     }
 
@@ -479,8 +483,8 @@ public class MainActivity extends ActionBarActivity {
                         .setAutoCancel(false)
                         .setOngoing(true)
                         .setContentTitle(this.getTitle())
-                        .setContentText(dmTasks.getTaskTitles())
-                        .setProgress(100, dmTasks.getExecutionPercent(), false)
+                        .setContentText(mDMTasks.getTaskTitles())
+                        .setProgress(100, mDMTasks.getExecutionPercent(), false)
                         .setContentIntent(contentIntent);
 		notificationManager.notify(0, mBuilder.build());		
     }
@@ -493,14 +497,14 @@ public class MainActivity extends ActionBarActivity {
     
     private void performTimerAction(DMTimerRec dmTimerRec) {
     	
-    	DMTaskItem taskItem = dmTasks.getTaskItemById(dmTimerRec.mId);
+    	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.mId);
     	
     	if (null == taskItem) {
-    		DMTaskItem newTaskItem = dmTasks.addTaskItem(dmTimerRec);//new DMTaskItem(dmTimerRec.id, dmTimerRec.time_sec);
+    		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);//new DMTaskItem(dmTimerRec.id, dmTimerRec.time_sec);
     		newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		
-    		dmTasks.add(newTaskItem);    		
+    		mDMTasks.add(newTaskItem);
     		
     		updateNotification();
 
@@ -517,10 +521,10 @@ public class MainActivity extends ActionBarActivity {
     		}
     		updateTimers();
     		
-    		dmTasks.remove(taskItem);
+    		mDMTasks.remove(taskItem);
     		
     		// inactive timer or no timers
-    		if (null == dmTasks.getFirstTaskItemCompleted()) {
+    		if (null == mDMTasks.getFirstTaskItemCompleted()) {
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
         		//stop vibrating
@@ -530,7 +534,7 @@ public class MainActivity extends ActionBarActivity {
     		}
     		
     		// no timers
-    		if (0 == dmTasks.size()) {		
+    		if (0 == mDMTasks.size()) {
     			//cancel scheduler  			
     			mScheduleHelper.stopScheduler();
 
