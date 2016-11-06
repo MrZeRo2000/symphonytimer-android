@@ -30,7 +30,7 @@ public class TaskService extends Service implements Runnable {
 
     public static final int MSG_UPDATE_DM_TASKS = 1;
     public static final int MSG_UPDATE_DM_PROGRESS = 2;
-    public static final int MSG_START_ACTIVITY = 3;
+    public static final int MSG_TASK_COMPLETED = 3;
 
     private Messenger mClientMessenger;
 
@@ -45,11 +45,10 @@ public class TaskService extends Service implements Runnable {
                     mDMTasks = msg.getData().getParcelable(DMTasks.class.toString());
                     mClientMessenger = msg.replyTo;
                     break;
-                case MSG_START_ACTIVITY:
+                case MSG_TASK_COMPLETED:
                     Intent activityIntent = new Intent(TaskService.this, MainActivity.class);
                     activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(activityIntent);
-
                     break;
                 default:
                     super.handleMessage(msg);
@@ -126,7 +125,7 @@ public class TaskService extends Service implements Runnable {
             }
 
             if (mDMTasks.getFirstTaskItemCompleted() != null) {
-                Message msg = Message.obtain(null, TaskService.MSG_START_ACTIVITY, 0, 0);
+                Message msg = Message.obtain(null, TaskService.MSG_TASK_COMPLETED, 0, 0);
                 try {
                     mMessenger.send(msg);
                 } catch (RemoteException e) {

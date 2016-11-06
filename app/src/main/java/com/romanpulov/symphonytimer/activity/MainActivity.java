@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcel;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
@@ -433,6 +434,12 @@ public class MainActivity extends ActionBarActivity {
     	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
     	startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, mDMTimers);
         startActivity(startHistoryIntent);
+    }
+
+    @Override
+    protected void onStart() {
+        log("start");
+        super.onStart();
     }
 
     @Override
