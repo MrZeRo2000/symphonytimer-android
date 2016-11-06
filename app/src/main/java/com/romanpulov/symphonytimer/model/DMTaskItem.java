@@ -50,7 +50,6 @@ public class DMTaskItem implements Parcelable {
 		mMaxTimeSec = in.readLong();
 		mStartTime = in.readLong();
 		mSoundFile = in.readString();
-		updateProcess();
 	}	
 	
 	public static final Parcelable.Creator<DMTaskItem> CREATOR = new Parcelable.Creator<DMTaskItem>() {

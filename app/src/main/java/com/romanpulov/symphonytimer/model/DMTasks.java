@@ -10,7 +10,7 @@ public class DMTasks implements Parcelable {
 
 	private static final long serialVersionUID = -7435677773769357006L;
 
-    private List<DMTaskItem> dataItems;
+    private List<DMTaskItem> dataItems = new ArrayList<>();
 
     public boolean add(DMTaskItem item) {
         return dataItems.add(item);
@@ -102,12 +102,12 @@ public class DMTasks implements Parcelable {
     }
 
     public DMTasks() {
-        dataItems = new ArrayList<>();
+
     }
 
-    @SuppressWarnings("unchecked")
     private DMTasks(Parcel in) {
-        dataItems = in.readArrayList(DMTaskItem.class.getClassLoader());
+        in.readTypedList(dataItems, DMTaskItem.CREATOR);
+        //dataItems = in.readArrayList(DMTaskItem.class.getClassLoader());
     }
 
     @Override
@@ -117,7 +117,8 @@ public class DMTasks implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeList(dataItems);
+        dest.writeTypedList(dataItems);
+        //dest.writeList(dataItems);
     }
 
     public static final Parcelable.Creator<DMTasks> CREATOR = new Parcelable.Creator<DMTasks>() {

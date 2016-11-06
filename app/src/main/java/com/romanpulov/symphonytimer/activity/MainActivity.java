@@ -8,13 +8,21 @@ import java.util.concurrent.TimeUnit;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.app.Notification;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -44,6 +52,10 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 
 
 public class MainActivity extends ActionBarActivity {
+    private static void log(String message) {
+        Log.d("MainActivity", message);
+    }
+
 	public static final int ADD_ITEM_RESULT_CODE = 1;
 	public static final int EDIT_ITEM_RESULT_CODE = 2;
 	
@@ -111,6 +123,103 @@ public class MainActivity extends ActionBarActivity {
 			}
 		}
 	}
+
+    private void updateServiceDMTasks() {
+        Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
+        msg.replyTo = mMessenger;
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(DMTasks.class.toString(), mDMTasks);
+        msg.setData(bundle);
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Messenger for communicating with the service. */
+    Messenger mService = null;
+
+    /** Flag indicating whether we have called bind on the service. */
+    boolean mBound;
+
+    /**
+     * Class for interacting with the main interface of the service.
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the object we can use to
+            // interact with the service.  We are communicating with the
+            // service using a Messenger, so here we get a client-side
+            // representation of that from the raw IBinder object.
+            mService = new Messenger(service);
+            mBound = true;
+
+            log ("onServiceConnected");
+
+            updateServiceDMTasks();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            mService = null;
+            mBound = false;
+
+            log ("onServiceDisconnected");
+        }
+    };
+
+    /**
+     * Handler of incoming messages from service.
+     */
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case TaskService.MSG_UPDATE_DM_PROGRESS:
+                    if (activityVisible) {
+                        updateTimers();
+                    } else {
+                        mDMTasks.updateProcess();
+                    }
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    /**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+
+    private void updateServiceTasks() {
+        Intent serviceIntent = new Intent(this, TaskService.class);
+
+        if (mBound && mDMTasks.size() == 0) {
+            if (mConnection != null)
+                unbindService(mConnection);
+            mBound = false;
+            stopService(serviceIntent);
+            return;
+        }
+
+        if ((!mBound) && mDMTasks.size() > 0) {
+            serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks);
+            startService(serviceIntent);
+            bindService(new Intent(this, TaskService.class), mConnection,
+                    Context.BIND_AUTO_CREATE);
+            return;
+        }
+
+        if (mBound && mDMTasks.size() > 0) {
+            updateServiceDMTasks();
+        }
+    }
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,7 +288,9 @@ public class MainActivity extends ActionBarActivity {
     	DBHelper.getInstance(this).closeDB();
     	MediaPlayerHelper.getInstance(this).release();
         cancelNotification();
-    	scheduleExecutor.shutdown();  
+    	scheduleExecutor.shutdown();
+        if (mBound)
+            unbindService(mConnection);
     	super.onDestroy();
     }
     
@@ -187,11 +298,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onPause() {
     	super.onPause();
     	activityVisible = false;
-
-        //start service to handle tasks in background
-        Intent serviceIntent = new Intent(this, TaskService.class);
-        serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks);
-        startService(serviceIntent);
     }
     
     @Override
@@ -199,15 +305,13 @@ public class MainActivity extends ActionBarActivity {
     	super.onResume();
     	activityVisible = true;
 
-        //stop service - tasks will be handled in foreground
-        Intent serviceIntent = new Intent(this, TaskService.class);
-        stopService(serviceIntent);
-    	
     	if (DBHelper.getInstance(this).getDBDataChanged()) {
     		loadTimers();
     		DBHelper.getInstance(this).resetDBDataChanged();
     	}
+
     	updateTimers();
+        updateServiceTasks();
     }
     
     @Override
@@ -233,7 +337,7 @@ public class MainActivity extends ActionBarActivity {
 
 		//update scheduler
 		if (mDMTasks.size() > 0) {
-            mScheduleHelper.startScheduler();
+            //mScheduleHelper.startScheduler();
         }
     }
     
@@ -458,7 +562,7 @@ public class MainActivity extends ActionBarActivity {
     	
     	//prevent from sleeping while not turned off
     	getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    	
+
     	//save history
     	DBHelper.getInstance(this).insertTimerHistory(dmTaskItem);
 
@@ -472,6 +576,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateNotification() {
+		/*
     	NotificationManager notificationManager = 
 				  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -486,13 +591,16 @@ public class MainActivity extends ActionBarActivity {
                         .setContentText(mDMTasks.getTaskTitles())
                         .setProgress(100, mDMTasks.getExecutionPercent(), false)
                         .setContentIntent(contentIntent);
-		notificationManager.notify(0, mBuilder.build());		
+		notificationManager.notify(0, mBuilder.build());
+				*/
     }
 
 	private void cancelNotification() {
+        /*
 		NotificationManager notificationManager =
 				(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		notificationManager.cancel(0);
+		*/
 	}
     
     private void performTimerAction(DMTimerRec dmTimerRec) {
@@ -508,12 +616,20 @@ public class MainActivity extends ActionBarActivity {
     		
     		updateNotification();
 
-            mScheduleHelper.startScheduler();
+            //mScheduleHelper.startScheduler();
 
     		if (null == mAlarm) {
     			mAlarm = new AlarmManagerBroadcastReceiver();
     		}
     		mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
+
+
+            /*
+            Intent serviceIntent = new Intent(this, TaskService.class);
+            serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks);
+            startService(serviceIntent);
+            */
+
     	} else {
     		//finalize
     		if (null != mAlarm) {
@@ -536,7 +652,7 @@ public class MainActivity extends ActionBarActivity {
     		// no timers
     		if (0 == mDMTasks.size()) {
     			//cancel scheduler  			
-    			mScheduleHelper.stopScheduler();
+    			//mScheduleHelper.stopScheduler();
 
     			// cancel notifications
     			cancelNotification();
@@ -544,7 +660,12 @@ public class MainActivity extends ActionBarActivity {
     			// update notification if any active timers still exist
     			updateNotification();
     		}
+
+
+
     	}
+
+        updateServiceTasks();
     }
     
     protected void onActivityResult (int requestCode, int resultCode, Intent data) {
