@@ -1,12 +1,7 @@
 package com.romanpulov.symphonytimer.activity;
 
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +11,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.Parcel;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
-import android.app.Notification;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -38,7 +31,6 @@ import android.widget.Toast;
 
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.service.TaskService;
-import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
@@ -69,13 +61,14 @@ public class MainActivity extends ActionBarActivity {
     private static final long LIST_CLICK_DELAY = 1000;
 	private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
 	
-	private boolean activityVisible = false;
-	
+	//data
 	private DMTimers mDMTimers = new DMTimers();
 	private DMTasks mDMTasks = new DMTasks();
 
-	private ListView mLV = null;
+    //UI
+	private ListView mTimersListView = null;
     private long mLastClickTime;
+    private boolean activityVisible = false;
 	
 	private DMTaskItem.OnTaskItemCompleted mTaskItemCompleted = new DMTaskItem.OnTaskItemCompleted() {
 		@Override
@@ -102,7 +95,7 @@ public class MainActivity extends ActionBarActivity {
     Messenger mService = null;
 
     /** Flag indicating whether we have called bind on the service. */
-    boolean mBound;
+    boolean mServiceBound;
 
     /**
      * Class for interacting with the main interface of the service.
@@ -115,7 +108,7 @@ public class MainActivity extends ActionBarActivity {
             // service using a Messenger, so here we get a client-side
             // representation of that from the raw IBinder object.
             mService = new Messenger(service);
-            mBound = true;
+            mServiceBound = true;
 
             log ("onServiceConnected");
 
@@ -126,7 +119,7 @@ public class MainActivity extends ActionBarActivity {
             // This is called when the connection with the service has been
             // unexpectedly disconnected -- that is, its process crashed.
             mService = null;
-            mBound = false;
+            mServiceBound = false;
 
             log ("onServiceDisconnected");
         }
@@ -162,16 +155,16 @@ public class MainActivity extends ActionBarActivity {
         Intent serviceIntent = new Intent(this, TaskService.class);
 
         //no more tasks
-        if (mBound && mDMTasks.size() == 0) {
+        if (mServiceBound && mDMTasks.size() == 0) {
             if (mConnection != null)
                 unbindService(mConnection);
-            mBound = false;
+            mServiceBound = false;
             stopService(serviceIntent);
             return;
         }
 
         //tasks, not bound
-        if ((!mBound) && mDMTasks.size() > 0) {
+        if ((!mServiceBound) && mDMTasks.size() > 0) {
             serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
             startService(serviceIntent);
             bindService(new Intent(this, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -179,7 +172,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         //tasks, bound
-        if (mBound && mDMTasks.size() > 0) {
+        if (mServiceBound && mDMTasks.size() > 0) {
             updateServiceDMTasks();
         }
     }
@@ -248,9 +241,9 @@ public class MainActivity extends ActionBarActivity {
     
     @Override
     protected void onDestroy() {
-    	DBHelper.getInstance(this).closeDB();
+    	DBHelper.clearInstance();
     	MediaPlayerHelper.getInstance(this).release();
-        if (mBound)
+        if (mServiceBound)
             unbindService(mConnection);
     	super.onDestroy();
     }
@@ -295,11 +288,6 @@ public class MainActivity extends ActionBarActivity {
         //update UI
 		mDMTasks.updateProcess();
 		updateTimers();
-
-		//update scheduler
-		if (mDMTasks.size() > 0) {
-            //mScheduleHelper.startScheduler();
-        }
     }
     
     @Override
@@ -436,10 +424,10 @@ public class MainActivity extends ActionBarActivity {
     }
     
     private ListView getTimersListView () {
-    	if (null == mLV) {
-    		mLV = (ListView)findViewById(R.id.main_list_view);
+    	if (null == mTimersListView) {
+    		mTimersListView = (ListView)findViewById(R.id.main_list_view);
     	}
-    	return mLV;
+    	return mTimersListView;
     }    
     
     private void performMediaCleanup() {
