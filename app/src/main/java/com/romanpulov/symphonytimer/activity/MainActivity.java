@@ -384,22 +384,6 @@ public class MainActivity extends ActionBarActivity {
         startActivity(startHistoryIntent);
     }
 
-    @Override
-    protected void onStart() {
-        log("start");
-        super.onStart();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     private void loadTimers() {
     	 DBHelper.getInstance(this).fillTimers(mDMTimers);
     }
