@@ -186,6 +186,9 @@ public class MainActivity extends ActionBarActivity {
                         mDMTasks.updateProcess();
                     }
                     break;
+                case TaskService.MSG_TASK_COMPLETED:
+
+                    break;
                 default:
                     super.handleMessage(msg);
             }

@@ -43,6 +43,7 @@ public class TaskService extends Service implements Runnable {
             switch (msg.what) {
                 case MSG_UPDATE_DM_TASKS:
                     mDMTasks = msg.getData().getParcelable(DMTasks.class.toString());
+                    mDMTasksStatus = mDMTasks.getStatus();
                     mClientMessenger = msg.replyTo;
                     break;
                 case MSG_TASK_COMPLETED:
@@ -62,6 +63,7 @@ public class TaskService extends Service implements Runnable {
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
     private DMTasks mDMTasks;
+    private int mDMTasksStatus;
 
     private ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(2);
     private ScheduledFuture<?> mScheduleExecutorTask;
@@ -81,6 +83,7 @@ public class TaskService extends Service implements Runnable {
         log("startCommand");
         if (intent.getExtras() != null) {
             mDMTasks = intent.getExtras().getParcelable(DMTasks.class.toString());
+            mDMTasksStatus = mDMTasks.getStatus();
 
             startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
@@ -117,20 +120,17 @@ public class TaskService extends Service implements Runnable {
         log("run");
 
         try {
+            NotificationHelper.getInstance(this).notify(mDMTasks);
 
-            try {
-                NotificationHelper.getInstance(this).notify(mDMTasks);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            if (mDMTasks.getFirstTaskItemCompleted() != null) {
+            int newDMTasksStatus = mDMTasks.getStatus();
+            if ((mDMTasksStatus != DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED)) {
                 Message msg = Message.obtain(null, TaskService.MSG_TASK_COMPLETED, 0, 0);
                 try {
                     mMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
+                mDMTasksStatus = newDMTasksStatus;
             }
 
             if (mClientMessenger != null) {

@@ -7,25 +7,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DMTasks implements Parcelable {
+    public static final int STATUS_IDLE = 0;
+    public static final int STATUS_PROCESSING = 1;
+    public static final int STATUS_COMPLETED = 2;
 
 	private static final long serialVersionUID = -7435677773769357006L;
 
-    private List<DMTaskItem> dataItems = new ArrayList<>();
+    private List<DMTaskItem> mDataItems = new ArrayList<>();
 
     public boolean add(DMTaskItem item) {
-        return dataItems.add(item);
+        return mDataItems.add(item);
     }
 
     public boolean remove(DMTaskItem item) {
-        return dataItems.remove(item);
+        return mDataItems.remove(item);
     }
 
     public int size() {
-        return dataItems.size();
+        return mDataItems.size();
     }
 
 	public DMTaskItem getTaskItemById(long id) {
-		for (DMTaskItem taskItem : dataItems) {
+		for (DMTaskItem taskItem : mDataItems) {
 			if (id == taskItem.getId()) {
 				return taskItem;
 			}
@@ -43,7 +46,7 @@ public class DMTasks implements Parcelable {
 	}
 
 	public DMTaskItem getFirstTaskItemCompleted() {
-		for (DMTaskItem taskItem : dataItems) {
+		for (DMTaskItem taskItem : mDataItems) {
 			if (taskItem.getCompleted()) {
 				return taskItem;
 			}
@@ -52,7 +55,7 @@ public class DMTasks implements Parcelable {
 	}
 	
 	public void updateProcess() {
-		for (DMTaskItem dmTaskItem : dataItems) {
+		for (DMTaskItem dmTaskItem : mDataItems) {
 			dmTaskItem.updateProcess();
 		}
 	}
@@ -64,7 +67,7 @@ public class DMTasks implements Parcelable {
 	public String getTaskTitles() {
 		StringBuilder sb = new StringBuilder();
 		String delimiter = "";
-		for (DMTaskItem taskItem : dataItems) {
+		for (DMTaskItem taskItem : mDataItems) {
 			sb.append(delimiter);
 			sb.append(taskItem.getTitle());
             sb.append("(");
@@ -76,7 +79,7 @@ public class DMTasks implements Parcelable {
 	}
 
     public void setTasksCompleted(DMTaskItem.OnTaskItemCompleted taskItemCompletedListener) {
-        for (DMTaskItem item : dataItems) {
+        for (DMTaskItem item : mDataItems) {
             item.setTaskItemCompleted(taskItemCompletedListener);
         }
     }
@@ -86,7 +89,7 @@ public class DMTasks implements Parcelable {
         long minStartTime = currentTime;
         long maxEndTime = minStartTime;
 
-        for (DMTaskItem taskItem : dataItems) {
+        for (DMTaskItem taskItem : mDataItems) {
             long startTime = taskItem.getStartTime();
             if (startTime < minStartTime)
                 minStartTime = startTime;
@@ -101,13 +104,26 @@ public class DMTasks implements Parcelable {
             return (int)((currentTime - minStartTime) * 100/timeRange);
     }
 
+    /**
+     * Get items execution status
+     * @return Idle, Processing or Completed status
+     */
+    public int getStatus() {
+        if (size() == 0)
+            return STATUS_IDLE;
+        else if (getFirstTaskItemCompleted() == null)
+            return STATUS_PROCESSING;
+        else
+            return STATUS_COMPLETED;
+    }
+
     public DMTasks() {
 
     }
 
     private DMTasks(Parcel in) {
-        in.readTypedList(dataItems, DMTaskItem.CREATOR);
-        //dataItems = in.readArrayList(DMTaskItem.class.getClassLoader());
+        in.readTypedList(mDataItems, DMTaskItem.CREATOR);
+        //mDataItems = in.readArrayList(DMTaskItem.class.getClassLoader());
     }
 
     @Override
@@ -117,8 +133,8 @@ public class DMTasks implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(dataItems);
-        //dest.writeList(dataItems);
+        dest.writeTypedList(mDataItems);
+        //dest.writeList(mDataItems);
     }
 
     public static final Parcelable.Creator<DMTasks> CREATOR = new Parcelable.Creator<DMTasks>() {
