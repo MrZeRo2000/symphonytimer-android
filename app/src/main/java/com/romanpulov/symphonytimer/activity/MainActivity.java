@@ -67,37 +67,15 @@ public class MainActivity extends ActionBarActivity {
 	public static final int CONTEXT_MENU_MOVE_DOWN = Menu.FIRST + 5;
 
     private static final long LIST_CLICK_DELAY = 1000;
+	private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
 	
 	private boolean activityVisible = false;
 	
 	private DMTimers mDMTimers = new DMTimers();
 	private DMTasks mDMTasks = new DMTasks();
-	private ScheduledThreadPoolExecutor scheduleExecutor = new ScheduledThreadPoolExecutor(2);
-	
-	private AlarmManagerBroadcastReceiver mAlarm;
-	
+
 	private ListView mLV = null;
     private long mLastClickTime;
-	
-	private final ScheduleHelper mScheduleHelper = new ScheduleHelper();
-	
-	private Runnable taskRunnable = new Runnable () {
-		@Override
-		public void run() {
-			//updateTimers();
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if (activityVisible) {
-						updateTimers();
-					} else {
-						mDMTasks.updateProcess();
-                        updateNotificationProgress();
-					}						
-				}
-			});			
-		}
-	};
 	
 	private DMTaskItem.OnTaskItemCompleted mTaskItemCompleted = new DMTaskItem.OnTaskItemCompleted() {
 		@Override
@@ -107,29 +85,11 @@ public class MainActivity extends ActionBarActivity {
 		}
 	};
 	
-	private class ScheduleHelper {
-		
-		private ScheduledFuture<?> scheduleExecutorTask;
-		
-		void startScheduler() {
-			if (null == scheduleExecutorTask) {
-				scheduleExecutorTask = scheduleExecutor.scheduleWithFixedDelay(taskRunnable, 0, 1, TimeUnit.SECONDS);
-			}
-		}
-		
-		void stopScheduler() {
-			if (null != scheduleExecutorTask) {
-				scheduleExecutorTask.cancel(false);
-				scheduleExecutorTask = null;
-			}
-		}
-	}
-
     private void updateServiceDMTasks() {
         Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
         msg.replyTo = mMessenger;
         Bundle bundle = new Bundle();
-        bundle.putParcelable(DMTasks.class.toString(), mDMTasks);
+        bundle.putParcelable(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
         msg.setData(bundle);
         try {
             mService.send(msg);
@@ -186,9 +146,6 @@ public class MainActivity extends ActionBarActivity {
                         mDMTasks.updateProcess();
                     }
                     break;
-                case TaskService.MSG_TASK_COMPLETED:
-
-                    break;
                 default:
                     super.handleMessage(msg);
             }
@@ -204,6 +161,7 @@ public class MainActivity extends ActionBarActivity {
     private void updateServiceTasks() {
         Intent serviceIntent = new Intent(this, TaskService.class);
 
+        //no more tasks
         if (mBound && mDMTasks.size() == 0) {
             if (mConnection != null)
                 unbindService(mConnection);
@@ -212,14 +170,15 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
+        //tasks, not bound
         if ((!mBound) && mDMTasks.size() > 0) {
-            serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks);
+            serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
             startService(serviceIntent);
-            bindService(new Intent(this, TaskService.class), mConnection,
-                    Context.BIND_AUTO_CREATE);
+            bindService(new Intent(this, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
             return;
         }
 
+        //tasks, bound
         if (mBound && mDMTasks.size() > 0) {
             updateServiceDMTasks();
         }
@@ -291,8 +250,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
     	DBHelper.getInstance(this).closeDB();
     	MediaPlayerHelper.getInstance(this).release();
-        cancelNotification();
-    	scheduleExecutor.shutdown();
         if (mBound)
             unbindService(mConnection);
     	super.onDestroy();
@@ -472,16 +429,9 @@ public class MainActivity extends ActionBarActivity {
     	}
     }
 
-    private void updateNotificationProgress() {
-        if (0 != mDMTasks.size())
-            updateNotification();
-    }
-
-
-    private void updateTimers() {    	
+    private void updateTimers() {
     	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)getTimersListView().getAdapter();
     	adapter.notifyDataSetChanged();
-        updateNotificationProgress();
     	checkTimerSelection();
     }
     
@@ -571,7 +521,7 @@ public class MainActivity extends ActionBarActivity {
     	}
     	
     	//prevent from sleeping while not turned off
-    	getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    	getWindow().addFlags(WINDOW_SCREEN_ON_FLAGS);
 
     	//save history
     	DBHelper.getInstance(this).insertTimerHistory(dmTaskItem);
@@ -585,94 +535,29 @@ public class MainActivity extends ActionBarActivity {
     		VibratorHelper.getInstance(this).vibrate();
     }
 
-    private void updateNotification() {
-		/*
-    	NotificationManager notificationManager = 
-				  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		Intent notificationIntent = new Intent(this, MainActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-			     notificationIntent, 0);    			
-		Notification.Builder mBuilder =
-				new Notification.Builder(this)
-        			.setSmallIcon(R.drawable.wait_notification)
-                        .setAutoCancel(false)
-                        .setOngoing(true)
-                        .setContentTitle(this.getTitle())
-                        .setContentText(mDMTasks.getTaskTitles())
-                        .setProgress(100, mDMTasks.getExecutionPercent(), false)
-                        .setContentIntent(contentIntent);
-		notificationManager.notify(0, mBuilder.build());
-				*/
-    }
-
-	private void cancelNotification() {
-        /*
-		NotificationManager notificationManager =
-				(NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		notificationManager.cancel(0);
-		*/
-	}
-    
     private void performTimerAction(DMTimerRec dmTimerRec) {
-    	
     	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.mId);
     	
     	if (null == taskItem) {
-    		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);//new DMTaskItem(dmTimerRec.id, dmTimerRec.time_sec);
+    		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);
     		newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		
     		mDMTasks.add(newTaskItem);
-    		
-    		updateNotification();
-
-            //mScheduleHelper.startScheduler();
-
-    		if (null == mAlarm) {
-    			mAlarm = new AlarmManagerBroadcastReceiver();
-    		}
-    		mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
-
-
-            /*
-            Intent serviceIntent = new Intent(this, TaskService.class);
-            serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks);
-            startService(serviceIntent);
-            */
-
     	} else {
-    		//finalize
-    		if (null != mAlarm) {
-    			mAlarm.cancelAlarm(getApplicationContext(), taskItem.getId());
-    		}
     		updateTimers();
     		
     		mDMTasks.remove(taskItem);
     		
     		// inactive timer or no timers
-    		if (null == mDMTasks.getFirstTaskItemCompleted()) {
+    		if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
         		//stop vibrating
         		VibratorHelper.getInstance(this).cancel();
     			//enable screen fading
-    			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        		
+    			getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
     		}
-    		
-    		// no timers
-    		if (0 == mDMTasks.size()) {
-    			//cancel scheduler  			
-    			//mScheduleHelper.stopScheduler();
-
-    			// cancel notifications
-    			cancelNotification();
-    		} else {
-    			// update notification if any active timers still exist
-    			updateNotification();
-    		}
-
-
-
     	}
 
         updateServiceTasks();

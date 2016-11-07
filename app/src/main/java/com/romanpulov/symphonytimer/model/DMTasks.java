@@ -13,7 +13,7 @@ public class DMTasks implements Parcelable {
 
 	private static final long serialVersionUID = -7435677773769357006L;
 
-    private List<DMTaskItem> mDataItems = new ArrayList<>();
+    private final List<DMTaskItem> mDataItems = new ArrayList<>();
 
     public boolean add(DMTaskItem item) {
         return mDataItems.add(item);
@@ -36,15 +36,6 @@ public class DMTasks implements Parcelable {
 		return null;
 	}
 	
-	public long getTaskItemProgress(long id){
-		DMTaskItem taskItem = getTaskItemById(id);
-		if(null != taskItem) {
-			return taskItem.getProgressInSec();		
-		} else {
-			return 0;
-		}
-	}
-
 	public DMTaskItem getFirstTaskItemCompleted() {
 		for (DMTaskItem taskItem : mDataItems) {
 			if (taskItem.getCompleted()) {
@@ -121,9 +112,23 @@ public class DMTasks implements Parcelable {
 
     }
 
+    /**
+     * Creates a copy via Parcelable mechanism
+     * @return new object cloned via Parcel
+     */
+    public DMTasks createParcelableCopy() {
+        Parcel parcel = Parcel.obtain();
+        try {
+            writeToParcel(parcel, 0);
+            parcel.setDataPosition(0);
+            return CREATOR.createFromParcel(parcel);
+        } finally {
+            parcel.recycle();
+        }
+    }
+
     private DMTasks(Parcel in) {
         in.readTypedList(mDataItems, DMTaskItem.CREATOR);
-        //mDataItems = in.readArrayList(DMTaskItem.class.getClassLoader());
     }
 
     @Override
@@ -134,7 +139,6 @@ public class DMTasks implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(mDataItems);
-        //dest.writeList(mDataItems);
     }
 
     public static final Parcelable.Creator<DMTasks> CREATOR = new Parcelable.Creator<DMTasks>() {

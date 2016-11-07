@@ -49,7 +49,7 @@
         </activity>
 
         <!-- Broadcast receiver -->
-        <receiver android:name=".utils.AlarmManagerBroadcastReceiver"></receiver>
+        <receiver android:name=".utils.AlarmManagerBroadcastReceiver" />
 
         <activity
             android:name=".activity.HistoryActivity"

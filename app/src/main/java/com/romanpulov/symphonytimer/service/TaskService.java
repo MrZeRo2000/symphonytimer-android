@@ -1,26 +1,24 @@
 package com.romanpulov.symphonytimer.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
-import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
+import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import static com.romanpulov.symphonytimer.helper.NotificationHelper.ONGOING_NOTIFICATION_ID;
 
 public class TaskService extends Service implements Runnable {
 
@@ -43,13 +41,12 @@ public class TaskService extends Service implements Runnable {
             switch (msg.what) {
                 case MSG_UPDATE_DM_TASKS:
                     mDMTasks = msg.getData().getParcelable(DMTasks.class.toString());
-                    mDMTasksStatus = mDMTasks.getStatus();
+                    if (mDMTasks != null)
+                        mDMTasksStatus = mDMTasks.getStatus();
                     mClientMessenger = msg.replyTo;
                     break;
                 case MSG_TASK_COMPLETED:
-                    Intent activityIntent = new Intent(TaskService.this, MainActivity.class);
-                    activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(activityIntent);
+                    wakeAndStartActivity(MainActivity.class);
                     break;
                 default:
                     super.handleMessage(msg);
@@ -68,6 +65,30 @@ public class TaskService extends Service implements Runnable {
     private ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(2);
     private ScheduledFuture<?> mScheduleExecutorTask;
 
+    /**
+     * Wakes up the device and starts activity
+     * @param activityClass activity to start
+     */
+    private void wakeAndStartActivity(Class<?> activityClass) {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+
+        @SuppressWarnings("deprecation")
+        PowerManager.WakeLock wl = pm.newWakeLock(
+                PowerManager.FULL_WAKE_LOCK |
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                        PowerManager.ON_AFTER_RELEASE, AlarmManagerBroadcastReceiver.WAKE_LOG_TAG);
+
+        wl.acquire();
+
+        try {
+            Intent activityIntent = new Intent(this, MainActivity.class);
+            activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(activityIntent);
+        } finally {
+            wl.release();
+        }
+    }
+
     public TaskService() {
     }
 
@@ -79,17 +100,18 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         log("startCommand");
         if (intent.getExtras() != null) {
             mDMTasks = intent.getExtras().getParcelable(DMTasks.class.toString());
-            mDMTasksStatus = mDMTasks.getStatus();
+            if (mDMTasks != null) {
+                mDMTasksStatus = mDMTasks.getStatus();
 
-            startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
+                startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
-            log("startScheduler");
-            if (mScheduleExecutorTask == null)
-                mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+                log("startScheduler");
+                if (mScheduleExecutorTask == null)
+                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+            }
         }
 
         return START_STICKY;
@@ -103,8 +125,6 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "service stopping", Toast.LENGTH_SHORT).show();
-
         stopForeground(true);
         if (mScheduleExecutorTask != null) {
             log("stopScheduler");
@@ -117,13 +137,14 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void run() {
-        log("run");
+        log("run, tasks: " + mDMTasks.size());
 
         try {
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
             int newDMTasksStatus = mDMTasks.getStatus();
             if ((mDMTasksStatus != DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED)) {
+                log("run, completed");
                 Message msg = Message.obtain(null, TaskService.MSG_TASK_COMPLETED, 0, 0);
                 try {
                     mMessenger.send(msg);
@@ -136,6 +157,7 @@ public class TaskService extends Service implements Runnable {
             if (mClientMessenger != null) {
                 Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_PROGRESS, 0, 0);
                 try {
+                    log("run, updating client");
                     mClientMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();
