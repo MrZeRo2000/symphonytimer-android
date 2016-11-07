@@ -30,7 +30,7 @@ public class AlertOkCancelDialogFragment extends DialogFragment {
         }
         newDialog.setArguments(data);
         newDialog.setMessage(message);
-        newDialog.setRetainInstance(false);
+        newDialog.setRetainInstance(true);
         return newDialog;
     }
 

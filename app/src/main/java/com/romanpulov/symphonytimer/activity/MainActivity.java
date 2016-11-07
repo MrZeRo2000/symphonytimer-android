@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
 			performTaskCompleted(dmTaskItem);
 		}
 	};
-	
+
     private void updateServiceDMTasks() {
         Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
         msg.replyTo = mMessenger;
@@ -303,14 +303,13 @@ public class MainActivity extends ActionBarActivity {
     		startAddItemActivity(new DMTimerRec());
     		return true;
     	case R.id.action_preferences:
-        	if (0 != mDMTasks.size()) {
-        		Toast.makeText(getApplicationContext(), this.getString(R.string.action_not_allowed), Toast.LENGTH_SHORT).show();
-        		return super.onOptionsItemSelected(item);
-        	}    		
-    		Intent perferencesIntent = new Intent(this, SettingsActivity.class);
-    		startActivity(perferencesIntent);
-    		return true;
-    	case R.id.action_history:
+        	if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
+                Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+                startActivity(preferencesIntent);
+                return true;
+        	} else
+                return super.onOptionsItemSelected(item);
+            case R.id.action_history:
     		startHistoryActivity();
     		return true;
     	default:
@@ -328,22 +327,10 @@ public class MainActivity extends ActionBarActivity {
     	super.onCreateContextMenu(menu, v, menuInfo);
     }
     
-    public AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
-		@Override
-		public void OnOkButtonClickEvent(DialogFragment dialog) {
-			DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
-			if (null != dmTimerRec) {
-				performDeleteTimer(dmTimerRec);
-			}
-		}
-	};		
-   
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-    	if (0 != mDMTasks.size()) {
-    		Toast.makeText(getApplicationContext(), this.getString(R.string.action_not_allowed), Toast.LENGTH_SHORT).show();
+    	if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
     		return super.onContextItemSelected(item);
-    	}
     	
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
     	DMTimerRec actionTimerRec = (DMTimerRec)getTimersListView().getAdapter().getItem(info.position);
@@ -353,7 +340,15 @@ public class MainActivity extends ActionBarActivity {
     			return true;    			
     		case (CONTEXT_MENU_DELETE):
     			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimerRec, R.string.question_are_you_sure);
-    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
+    			deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
+                    @Override
+                    public void OnOkButtonClickEvent(DialogFragment dialog) {
+                        DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+                        if (null != dmTimerRec) {
+                            performDeleteTimer(dmTimerRec);
+                        }
+                    }
+                });
     			deleteDialog.show(getFragmentManager(), null);
     			return true;
     		case (CONTEXT_MENU_MOVE_UP):
