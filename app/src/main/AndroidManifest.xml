@@ -29,7 +29,7 @@
             android:name=".activity.AddItemActivity"
             android:label="@string/title_activity_add_item"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:theme="@style/AppTheme">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
