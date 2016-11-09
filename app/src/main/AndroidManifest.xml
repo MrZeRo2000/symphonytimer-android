@@ -18,7 +18,7 @@
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.CompatTransparent">
+            android:theme="@style/ToolBarTheme.CompatTransparent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,8 +28,7 @@
         <activity
             android:name=".activity.AddItemActivity"
             android:label="@string/title_activity_add_item"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/AppTheme">
+            android:parentActivityName=".activity.MainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -39,8 +38,7 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.CompatTransparentWhite">
+            android:parentActivityName=".activity.MainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
@@ -55,7 +53,7 @@
             android:name=".activity.HistoryActivity"
             android:label="@string/title_activity_history"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.CompatTransparentWhite">
+            android:theme="@style/Theme.CompatTransparent">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data

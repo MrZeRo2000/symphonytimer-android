@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF666666</color>
-    <color name="colorPrimaryDark">#FF333333</color>
+    <color name="colorPrimary">#FF444444</color>
+    <color name="colorPrimaryDark">#FF111111</color>
+    <color name="colorWindowBackground">#FF111111</color>
     <color name="brightTextColor">#FFFFFFFF</color>
     <color name="chart_gradient_0">#FF4B6CB7</color>
     <color name="chart_gradient">#FF182848</color>

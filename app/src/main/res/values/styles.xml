@@ -5,17 +5,22 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
+        <!-- for Toolbar -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!-- Common window styles -->
+        <item name="android:windowBackground">@color/colorWindowBackground</item>
+        <item name="android:textColor">@color/brightTextColor</item>
     </style>
 
     <style name="Theme.CompatTransparent" parent="AppTheme" >
-        <item name ="android:textColor">@android:color/white</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
-    
-    <style name="Theme.CompatTransparentWhite" parent="Theme.CompatTransparent" >
 
+    <!-- Main activity theme -->
+    <style name="ToolBarTheme.CompatTransparent" parent="Theme.CompatTransparent">
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
-    
+
 </resources>

@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -195,9 +196,18 @@ public class MainActivity extends ActionBarActivity {
         activityVisible = true;
 
         //setup actionbar icon
+		/*
         ActionBar actionBar= this.getSupportActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
         actionBar.setIcon(R.drawable.tuba);
+        */
+
+		//setup toolbar
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		//toolbar.setTitle(mBasicNoteData.getNote().getTitle());
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setIcon(R.drawable.tuba);
+
         
         /*
         // Set background wallpaper
