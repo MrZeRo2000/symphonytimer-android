@@ -161,16 +161,30 @@
     	android:orientation="horizontal"
     	android:padding="0dp"
 	    >
-		<Button
-		    android:id="@+id/sound_file_button"
-			android:contentDescription="@string/sound"
-	    	android:layout_width="0dp"
-	    	android:layout_height="fill_parent"
-	    	android:layout_margin="@dimen/activity_input_margin"
-	    	android:layout_weight="1"	    
-	    	android:text="@string/default_sound"
-	    	android:onClick="onSoundFileButtonClick"
-	    	/>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <ImageButton
+                android:id="@+id/sound_file_button"
+                android:contentDescription="@string/sound"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/activity_input_margin"
+                android:text="@string/default_sound"
+                android:onClick="onSoundFileButtonClick"
+                />
+            <TextView
+                android:id="@+id/sound_file_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_centerInParent="true"
+                android:textAppearance="?android:attr/textAppearanceSmallInverse"
+                android:text="Text"
+                />
+        </RelativeLayout>
         <ImageButton
             android:id="@+id/preview_sound_file_button"
             android:contentDescription="@string/clear"

@@ -17,8 +17,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.content.Intent;
 import android.view.Menu;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.EditText;
 
@@ -42,7 +42,7 @@ public class AddItemActivity extends ActionBarActivity {
     private File mEditImageFile;
     private File mEditSoundFile;
 
-    private Button mSoundFileButton;
+    private TextView mSoundFileTextView;
     private ImageButton mImageFileButton;
 
     private class AddItemInputException extends Exception {
@@ -66,7 +66,7 @@ public class AddItemActivity extends ActionBarActivity {
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
         actionBar.setIcon(R.drawable.tuba);
 
-        mSoundFileButton = (Button)findViewById(R.id.sound_file_button);
+        mSoundFileTextView = (TextView) findViewById(R.id.sound_file_text);
         mImageFileButton = (ImageButton)findViewById(R.id.image_file_image_button);
 
         editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
@@ -91,13 +91,13 @@ public class AddItemActivity extends ActionBarActivity {
         if (null != soundFile) {
             mEditSoundFile = new File(soundFile);
             if (mEditSoundFile.exists())
-                mSoundFileButton.setText(getMediaFileTitle(mEditSoundFile));
+                mSoundFileTextView.setText(getMediaFileTitle(mEditSoundFile));
             else
                 mEditSoundFile = null;
         } else {
             mEditSoundFile = null;
         }
-        mSoundFileButton.setText(getMediaFileTitle(mEditSoundFile));
+        mSoundFileTextView.setText(getMediaFileTitle(mEditSoundFile));
 
         if (null != imageFile) {
             mEditImageFile = new File(imageFile);
@@ -184,7 +184,7 @@ public class AddItemActivity extends ActionBarActivity {
     public void onClearSoundFileButtonClick(View v){
         MediaPlayerHelper.getInstance(getApplicationContext()).stop();
         mEditSoundFile = null;
-        mSoundFileButton.setText(R.string.default_sound);
+        mSoundFileTextView.setText(R.string.default_sound);
     }
 
     public void onClearImageFileButtonClick(View v){
@@ -202,7 +202,7 @@ public class AddItemActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if ((requestCode == SOUND_REQ_CODE) && (resultCode == RESULT_OK)){
-            mSoundFileButton.setText(R.string.caption_loading);
+            mSoundFileTextView.setText(R.string.caption_loading);
 
             class ProcessSoundUri extends AsyncTask<Uri, Void, Pair<File, String>> {
                 @Override
@@ -216,7 +216,7 @@ public class AddItemActivity extends ActionBarActivity {
                 protected void onPostExecute(Pair<File, String> p) {
                     super.onPostExecute(p);
                     mEditSoundFile = p.first;
-                    mSoundFileButton.setText(p.second);
+                    mSoundFileTextView.setText(p.second);
                 }
             }
             new ProcessSoundUri().execute(data.getData());
@@ -238,9 +238,7 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     private String getMediaFileTitle(File file) {
-        if (file == null)
-            return getString(R.string.default_sound);
-        if (!file.exists())
+        if ((file == null) || (!file.exists()))
             return getString(R.string.default_sound);
 
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
