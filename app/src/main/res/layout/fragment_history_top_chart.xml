@@ -7,8 +7,8 @@
     <Button
         android:id="@+id/scaleUpButton"
         android:layout_alignParentLeft="true"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/chart_control_size"
+        android:layout_height="@dimen/chart_control_size"
         android:padding="0dip"
         android:gravity="center"
         android:text="@string/button_plus"
@@ -17,8 +17,8 @@
         android:id="@+id/scaleDownButton"
         android:layout_alignTop="@+id/scaleUpButton"
         android:layout_toRightOf="@+id/scaleUpButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/chart_control_size"
+        android:layout_height="@dimen/chart_control_size"
         android:padding="0dip"
         android:gravity="center"
         android:text="@string/button_minus"
@@ -29,9 +29,9 @@
         android:layout_height="fill_parent"
         android:layout_below="@+id/scaleUpButton"
         android:scrollbars="horizontal"
-        android:paddingTop="10dp"
+        android:paddingTop="@dimen/control_padding"
         android:scrollbarAlwaysDrawHorizontalTrack="true"
-        android:background="#99000000"
+        android:background="@color/chartScrollBackgroundColor"
         >
         <LinearLayout
             android:layout_width="wrap_content"
@@ -40,10 +40,10 @@
                 android:id="@+id/history_top_bar_chart"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                app:axisColor="#FFAAAAAA"
-                app:textColor="#FFCCCCCC"
-                app:defaultGradientColor0="@color/chart_gradient_0"
-                app:defaultGradientColor="@color/chart_gradient"
+                app:axisColor="@color/chartAxisColor"
+                app:textColor="@color/chartTextColor"
+                app:defaultGradientColor0="@color/chartGradient0Color"
+                app:defaultGradientColor="@color/chartGradientColor"
                 app:showLabelOnClick="true"
                 />
         </LinearLayout>

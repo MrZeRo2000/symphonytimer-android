@@ -83,14 +83,14 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/number_picker_size"
             android:layout_weight="1"
             android:gravity="center"
             >
 
             <com.romanpulov.library.view.SlideNumberPicker
                 android:id="@+id/hours_number_picker"
-                android:layout_width="50dp"
+                android:layout_width="@dimen/number_picker_size"
                 android:layout_height="fill_parent"
                 android:background="@android:color/transparent"
                 app:min="0"
@@ -105,14 +105,14 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/number_picker_size"
             android:layout_weight="1"
             android:gravity="center"
             >
 
             <com.romanpulov.library.view.SlideNumberPicker
                 android:id="@+id/minutes_number_picker"
-                android:layout_width="50dp"
+                android:layout_width="@dimen/number_picker_size"
                 android:layout_height="fill_parent"
                 android:background="@android:color/transparent"
                 app:min="0"
@@ -127,14 +127,14 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/number_picker_size"
             android:layout_weight="1"
             android:gravity="center"
             >
 
             <com.romanpulov.library.view.SlideNumberPicker
                 android:id="@+id/seconds_number_picker"
-                android:layout_width="50dp"
+                android:layout_width="@dimen/number_picker_size"
                 android:layout_height="fill_parent"
                 android:background="@android:color/transparent"
                 app:min="0"
@@ -163,6 +163,7 @@
 	    >
 		<Button
 		    android:id="@+id/sound_file_button"
+			android:contentDescription="@string/sound"
 	    	android:layout_width="0dp"
 	    	android:layout_height="fill_parent"
 	    	android:layout_margin="@dimen/activity_input_margin"
@@ -236,7 +237,7 @@
             android:background="?android:attr/dividerVertical"
             android:layout_alignParentTop="true"/>
         <View
-            android:id="@+id/ViewVerticalHelper"
+            android:id="@+id/view_vertical_helper"
             android:layout_width="1dip"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -251,7 +252,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@id/ViewVerticalHelper"
+            android:layout_toLeftOf="@id/view_vertical_helper"
             android:background="?android:attr/selectableItemBackground"
             android:text="@android:string/cancel"
             android:layout_alignParentBottom="true"
@@ -266,7 +267,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:text="@android:string/ok"
             android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/ViewVerticalHelper"
+            android:layout_toRightOf="@id/view_vertical_helper"
             android:onClick="onCommandClick"
             />
     </RelativeLayout>

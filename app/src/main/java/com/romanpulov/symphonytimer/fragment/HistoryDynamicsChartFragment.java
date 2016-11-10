@@ -3,8 +3,6 @@ package com.romanpulov.symphonytimer.fragment;
 import com.romanpulov.library.view.BarChart;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.model.DMTimerExecutionList;
-import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 
 import java.util.HashMap;
@@ -34,13 +32,13 @@ public class HistoryDynamicsChartFragment extends HistoryChartFragment {
             BarChart.Series series = getBarChart().addSeries();
             if (isHist)
                 series.setGradientColors(
-                        getResources().getColor(R.color.chart_gradient_hist_0),
-                        getResources().getColor(R.color.chart_gradient_hist)
+                        getResources().getColor(R.color.chartGradientHist0Color),
+                        getResources().getColor(R.color.chartGradientHistColor)
                 );
             else
                 series.setGradientColors(
-                        getResources().getColor(R.color.chart_gradient_0),
-                        getResources().getColor(R.color.chart_gradient)
+                        getResources().getColor(R.color.chartGradient0Color),
+                        getResources().getColor(R.color.chartGradientColor)
                 );
             int position = 1;
             for (Map.Entry<Long, Long> argumentItem : uList.entrySet()) {

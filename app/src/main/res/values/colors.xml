@@ -5,8 +5,11 @@
     <color name="colorWindowBackground">#FF111111</color>
     <color name="brightTextColor">#FFFFFFFF</color>
     <color name="stripBackgroundColor">#8833b5e5</color>
-    <color name="chart_gradient_0">#FF4B6CB7</color>
-    <color name="chart_gradient">#FF182848</color>
-    <color name="chart_gradient_hist_0">#267871</color>
-    <color name="chart_gradient_hist">#136a8a</color>
+    <color name="chartScrollBackgroundColor">#99000000</color>
+    <color name="chartAxisColor">#FFAAAAAA</color>
+    <color name="chartTextColor">#FFCCCCCC</color>
+    <color name="chartGradient0Color">#FF4B6CB7</color>
+    <color name="chartGradientColor">#FF182848</color>
+    <color name="chartGradientHist0Color">#267871</color>
+    <color name="chartGradientHistColor">#136a8a</color>
 </resources>
