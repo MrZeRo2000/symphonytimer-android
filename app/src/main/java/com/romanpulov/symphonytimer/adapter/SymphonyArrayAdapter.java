@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
 	
@@ -28,21 +29,37 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
     private int mItemHeight = 0;
     private int mItemWidth = 0;
 	
-	static class ViewHolder {
-		TextView mTitleTextView;
-		ImageView mImageView;
-		TextView mProgressTextView;
-		ProgressCircle mProgressCircle;
+	private static class ViewHolder implements View.OnLongClickListener, View.OnClickListener{
+        final View mView;
+        final TextView mTitleTextView;
+        final ImageView mImageView;
+        final TextView mProgressTextView;
+        final ProgressCircle mProgressCircle;
         Drawable mNormalDrawable;
         Drawable mFinalDrawable;
 		
-		public ViewHolder(View view) {
-			this.mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
-			this.mImageView = (ImageView)view.findViewById(R.id.image_image_view);
-			this.mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
-			this.mProgressCircle = (ProgressCircle)view.findViewById(R.id.progress_circle);
+		ViewHolder(View view) {
+            mView = view;
+			mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
+			mImageView = (ImageView)view.findViewById(R.id.image_image_view);
+			mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
+			mProgressCircle = (ProgressCircle)view.findViewById(R.id.progress_circle);
+
+            //mView.setOnClickListener(this);
+            //mView.setOnLongClickListener(this);
 		}
-	}
+
+        @Override
+        public boolean onLongClick(View v) {
+            Toast.makeText(mView.getContext(), "Long click", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(mView.getContext(), "Click", Toast.LENGTH_SHORT).show();
+        }
+    }
 	
 	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
 		super(context, R.layout.symphony_row_view);
@@ -165,7 +182,7 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		return rowView;
 	}
 
-    public boolean createBackgroundBuilder() {
+    private boolean createBackgroundBuilder() {
         if ((mItemWidth > 0) && (mItemHeight > 0)) {
             if (mBackgroundBuilder == null)
                 mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, mItemWidth, mItemHeight, 6);

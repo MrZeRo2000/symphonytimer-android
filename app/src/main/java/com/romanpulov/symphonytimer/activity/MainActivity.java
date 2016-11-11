@@ -221,6 +221,7 @@ public class MainActivity extends ActionBarActivity {
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, mDMTimers, mDMTasks);
 		
 		getTimersListView().setAdapter(adapter);
+
 		getTimersListView().setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,
@@ -234,7 +235,7 @@ public class MainActivity extends ActionBarActivity {
                 }
 			}			
 		});
-		
+
         // Update List
         loadTimers();
         updateTimers();
