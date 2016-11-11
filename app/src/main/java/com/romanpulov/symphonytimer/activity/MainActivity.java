@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -45,7 +46,7 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
     private static void log(String message) {
         Log.d("MainActivity", message);
     }
@@ -70,6 +71,30 @@ public class MainActivity extends ActionBarActivity {
 	private ListView mTimersListView = null;
     private long mLastClickTime;
     private boolean activityVisible = false;
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+
+    }
+
+    public interface OnDMTimerInteractionListener {
+        void onDMTimerInteraction(DMTimerRec item, int position);
+    }
 	
 	private DMTaskItem.OnTaskItemCompleted mTaskItemCompleted = new DMTaskItem.OnTaskItemCompleted() {
 		@Override
@@ -218,23 +243,19 @@ public class MainActivity extends ActionBarActivity {
         layout.setBackgroundDrawable(wallpaperDrawable);
         */       
         
-		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, mDMTimers, mDMTasks);
-		
-		getTimersListView().setAdapter(adapter);
-
-		getTimersListView().setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				//action
+		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, new OnDMTimerInteractionListener() {
+            @Override
+            public void onDMTimerInteraction(DMTimerRec item, int position) {
                 long clickTime = System.currentTimeMillis();
                 if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
                     mLastClickTime = clickTime;
                     VibratorHelper.getInstance(MainActivity.this).shortVibrate();
-                    performTimerAction((DMTimerRec) parent.getItemAtPosition(position));
+                    performTimerAction(item);
                 }
-			}			
-		});
+            }
+        });
+		
+		getTimersListView().setAdapter(adapter);
 
         // Update List
         loadTimers();

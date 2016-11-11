@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.adapter;
 
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
 import com.romanpulov.library.view.ProgressCircle;
@@ -9,44 +10,50 @@ import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec>{
-	
-	private final Context mContext;
+public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
+    private final ActionMode.Callback mActionModeCallback;
 	private final DMTimers mValues;
 	private DMTasks mTasks;
+    private final MainActivity.OnDMTimerInteractionListener mListener;
+    private final ListViewSelector mListViewSelector;
+
 	private RoundedBitmapBackgroundBuilder mBackgroundBuilder;
     private int mItemHeight = 0;
     private int mItemWidth = 0;
-	
-	private static class ViewHolder implements View.OnLongClickListener, View.OnClickListener{
+
+	private class ViewHolder implements View.OnLongClickListener, View.OnClickListener{
         final View mView;
+        final DMTimerRec mItem;
         final TextView mTitleTextView;
         final ImageView mImageView;
         final TextView mProgressTextView;
         final ProgressCircle mProgressCircle;
+
         Drawable mNormalDrawable;
         Drawable mFinalDrawable;
 		
-		ViewHolder(View view) {
+		ViewHolder(View view, DMTimerRec item) {
             mView = view;
+            mItem = item;
 			mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
 			mImageView = (ImageView)view.findViewById(R.id.image_image_view);
 			mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
 			mProgressCircle = (ProgressCircle)view.findViewById(R.id.progress_circle);
 
-            //mView.setOnClickListener(this);
-            //mView.setOnLongClickListener(this);
+            mView.setOnClickListener(this);
+            mView.setOnLongClickListener(this);
 		}
 
         @Override
@@ -57,15 +64,20 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(mView.getContext(), "Click", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mView.getContext(), "Click", Toast.LENGTH_SHORT).show();
+            if (mListener != null) {
+                mListener.onDMTimerInteraction(mItem, -1);
+            }
         }
     }
 	
-	public SymphonyArrayAdapter(Context context, DMTimers values, DMTasks tasks) {
+	public SymphonyArrayAdapter(Context context, ActionMode.Callback actionModeCallback, DMTimers values, DMTasks tasks, MainActivity.OnDMTimerInteractionListener listener) {
 		super(context, R.layout.symphony_row_view);
-		this.mContext = context;
-		this.mValues = values;
-		this.mTasks = tasks;
+        mActionModeCallback = actionModeCallback;
+		mValues = values;
+		mTasks = tasks;
+        mListener = listener;
+        mListViewSelector = new ListViewSelector(this, actionModeCallback);
 	}
 	
 	public void setTasks(DMTasks tasks) {
@@ -84,26 +96,27 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final DMTimerRec dmTimerRec = mValues.get(position);
+		final DMTimerRec item = mValues.get(position);
 		
 		//calculate progress
-        DMTaskItem taskItem = mTasks.getTaskItemById(dmTimerRec.mId);
+        DMTaskItem taskItem = mTasks.getTaskItemById(item.mId);
 		int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
-		final long displayProgress = dmTimerRec.mTimeSec - timerProgress;
+		final long displayProgress = item.mTimeSec - timerProgress;
 
 		//background drawer
-		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
+		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_bitmap_background", false);
 		
 		View rowView;
 		ViewHolder viewHolder;
 		
 		if (convertView == null) {
 			//inflate from layout
-			LayoutInflater inflater = ((Activity)mContext).getLayoutInflater();
+
+			LayoutInflater inflater = LayoutInflater.from(getContext());
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
 			
 			//setup holder
-			viewHolder = new ViewHolder(rowView);
+			viewHolder = new ViewHolder(rowView, item);
             //store holder
             rowView.setTag(viewHolder);
             //create and store backgrounds for better performance
@@ -143,21 +156,21 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
 		
 		// create viewHolder(just in case)
 		if (null == viewHolder) {
-			viewHolder = new ViewHolder(rowView);
+			viewHolder = new ViewHolder(rowView, item);
 			rowView.setTag(viewHolder);
 		}
 
-		viewHolder.mTitleTextView.setText(dmTimerRec.mTitle);
+		viewHolder.mTitleTextView.setText(item.mTitle);
 
 		//display image
 		viewHolder.mImageView.setImageURI(
-                null != dmTimerRec.mImageName ? UriHelper.fileNameToUri(getContext(), dmTimerRec.mImageName) : null);
+                null != item.mImageName ? UriHelper.fileNameToUri(getContext(), item.mImageName) : null);
 
 		//display text
 		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display circle bar
-		viewHolder.mProgressCircle.setMax((int) dmTimerRec.mTimeSec);
+		viewHolder.mProgressCircle.setMax((int) item.mTimeSec);
 		viewHolder.mProgressCircle.setProgress(timerProgress);
         //ensure minimum progress for active item
         viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
@@ -185,7 +198,7 @@ public class SymphonyArrayAdapter extends android.widget.ArrayAdapter<DMTimerRec
     private boolean createBackgroundBuilder() {
         if ((mItemWidth > 0) && (mItemHeight > 0)) {
             if (mBackgroundBuilder == null)
-                mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(mContext, mItemWidth, mItemHeight, 6);
+                mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(getContext(), mItemWidth, mItemHeight, 6);
         };
         return (mBackgroundBuilder != null);
     }
