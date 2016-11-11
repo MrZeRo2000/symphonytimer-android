@@ -35,6 +35,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 
 	private class ViewHolder implements View.OnLongClickListener, View.OnClickListener{
         final View mView;
+        int mPosition;
         final DMTimerRec mItem;
         final TextView mTitleTextView;
         final ImageView mImageView;
@@ -44,8 +45,9 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         Drawable mNormalDrawable;
         Drawable mFinalDrawable;
 		
-		ViewHolder(View view, DMTimerRec item) {
+		ViewHolder(View view, DMTimerRec item, int position) {
             mView = view;
+            mPosition = position;
             mItem = item;
 			mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
 			mImageView = (ImageView)view.findViewById(R.id.image_image_view);
@@ -58,8 +60,8 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 
         @Override
         public boolean onLongClick(View v) {
-            Toast.makeText(mView.getContext(), "Long click", Toast.LENGTH_SHORT).show();
-            return false;
+            mListViewSelector.startActionMode(v, mPosition);
+            return true;
         }
 
         @Override
@@ -116,7 +118,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
 			
 			//setup holder
-			viewHolder = new ViewHolder(rowView, item);
+			viewHolder = new ViewHolder(rowView, item, position);
             //store holder
             rowView.setTag(viewHolder);
             //create and store backgrounds for better performance
@@ -156,9 +158,11 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 		
 		// create viewHolder(just in case)
 		if (null == viewHolder) {
-			viewHolder = new ViewHolder(rowView, item);
+			viewHolder = new ViewHolder(rowView, item, position);
 			rowView.setTag(viewHolder);
-		}
+		} else
+            //update position
+            viewHolder.mPosition = position;
 
 		viewHolder.mTitleTextView.setText(item.mTitle);
 

@@ -74,6 +74,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        Toast.makeText(this, "Creating action mode", Toast.LENGTH_SHORT).show();
         return false;
     }
 
@@ -216,7 +217,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                         WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 		
         // Register context menu
-        registerForContextMenu(getTimersListView());
+        //registerForContextMenu(getTimersListView());
         
         activityVisible = true;
 
