@@ -22,12 +22,18 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
     private final ActionMode.Callback mActionModeCallback;
 	private final DMTimers mValues;
 	private DMTasks mTasks;
     private final MainActivity.OnDMTimerInteractionListener mListener;
     private final ListViewSelector mListViewSelector;
+
+    public ListViewSelector getListViewSelector() {
+        return mListViewSelector;
+    }
 
 	private RoundedBitmapBackgroundBuilder mBackgroundBuilder;
     private int mItemHeight = 0;
@@ -58,6 +64,13 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
             mView.setOnLongClickListener(this);
 		}
 
+        private void updateSelectedTitle() {
+            ActionMode actionMode;
+            if ((mListViewSelector != null) && ((actionMode = mListViewSelector.getActionMode()) != null) && (mListViewSelector.getSelectedItemPos() == mPosition))
+                actionMode.setTitle(mItem.mTitle);
+        }
+
+
         @Override
         public boolean onLongClick(View v) {
             mListViewSelector.startActionMode(v, mPosition);
@@ -66,10 +79,13 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 
         @Override
         public void onClick(View v) {
-            //Toast.makeText(mView.getContext(), "Click", Toast.LENGTH_SHORT).show();
-            if (mListener != null) {
-                mListener.onDMTimerInteraction(mItem, -1);
-            }
+            if (mListViewSelector.getSelectedItemPos() == -1) {
+                if (mListener != null) {
+                    mListener.onDMTimerInteraction(mItem, -1);
+                }
+            } else
+                mListViewSelector.setSelectedView(mPosition);
+            updateSelectedTitle();
         }
     }
 	
@@ -156,7 +172,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 			viewHolder = (ViewHolder)rowView.getTag();
 		}
 		
-		// create viewHolder(just in case)
+		// create viewHolder(just in case) and ensure update position (important!!!)
 		if (null == viewHolder) {
 			viewHolder = new ViewHolder(rowView, item, position);
 			rowView.setTag(viewHolder);
@@ -171,7 +187,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
                 null != item.mImageName ? UriHelper.fileNameToUri(getContext(), item.mImageName) : null);
 
 		//display text
-		viewHolder.mProgressTextView.setText(String.format("%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
+		viewHolder.mProgressTextView.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display circle bar
 		viewHolder.mProgressCircle.setMax((int) item.mTimeSec);
@@ -179,7 +195,8 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         //ensure minimum progress for active item
         viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
 
-        //background change
+        //background change depending on selection
+        int selectedItem = mListViewSelector.getSelectedItemPos();
         if (isBitmapBackground ) {
             if ((viewHolder.mNormalDrawable == null) || (viewHolder.mFinalDrawable == null)) {
                 if (createBackgroundBuilder()) {
@@ -188,12 +205,26 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
                 }
             }
             //update bitmap background
-            rowView.setBackground((0 == displayProgress ) ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable);
+            Drawable bgDrawable;
+            if (selectedItem == -1)
+                bgDrawable = 0 == displayProgress  ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
+            else if (viewHolder.mPosition == selectedItem) {
+                bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
+            } else
+                bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
+
+            rowView.setBackground(bgDrawable);
         } else {
             //update solid background
-            rowView.setBackgroundResource(
-                    0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector
-            );
+            int bgResId;
+            if (selectedItem == -1)
+                bgResId =  0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector;
+            else if (viewHolder.mPosition == selectedItem) {
+                bgResId = R.drawable.main_list_shape_selected;
+            } else
+                bgResId = R.drawable.main_list_shape;
+
+            rowView.setBackgroundResource(bgResId);
         }
 
 		return rowView;

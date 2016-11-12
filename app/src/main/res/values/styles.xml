@@ -19,8 +19,13 @@
 
     <!-- Main activity theme -->
     <style name="ToolBarTheme.CompatTransparent" parent="Theme.CompatTransparent">
+        <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+
+        <item name="actionModeBackground">@color/colorAction</item>
+        <item name="android:actionModeBackground">@color/colorAction</item>
+
     </style>
 
     <style name="TextAppearance.ExtraLarge" parent="@style/TextAppearance.AppCompat">

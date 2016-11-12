@@ -16,7 +16,9 @@ public class RoundedBitmapBackgroundBuilder {
 
     final public static int BG_NORMAL = 0;
     final public static int BG_FINAL = 1;
-    final private static float BRIGHTENING_FACTOR = 100f;
+    final public static int BG_NORMAL_ONLY = 2;
+    final public static int BG_PRESSED_ONLY = 3;
+    final private static float BRIGHTENING_FACTOR = 50f;
 
     private Context mContext;
     private int mWidth;
@@ -27,7 +29,7 @@ public class RoundedBitmapBackgroundBuilder {
 
     private Bitmap mScaledBg;
 
-    private final ColorFilter mBrightBgColorFilter = new ColorMatrixColorFilter(
+    private final static ColorFilter BRIGHT_BG_COLOR_FILTER = new ColorMatrixColorFilter(
             new float[]{
                     1f, 0f, 0f, 0f, BRIGHTENING_FACTOR,
                     0f, 1f, 0f, 0f, BRIGHTENING_FACTOR,
@@ -35,7 +37,7 @@ public class RoundedBitmapBackgroundBuilder {
                     0f, 0f, 0f, 1f, BRIGHTENING_FACTOR
             }
     );
-    private final ColorFilter mFinalBgColorFilter = new ColorMatrixColorFilter(
+    private final static ColorFilter FINAL_BG_COLOR_FILTER = new ColorMatrixColorFilter(
             new float[]{
                     0f, 0f, 1f, 0f, 0f,
                     0f, 1f, 0f, 0f, 0f,
@@ -43,7 +45,7 @@ public class RoundedBitmapBackgroundBuilder {
                     0f, 0f, 0f, 1f, 0f
             }
     );
-    private final ColorFilter mFinalBrightBgColorFilter = new ColorMatrixColorFilter(
+    private final static ColorFilter FINAL_BRIGHT_BG_COLOR_FILTER = new ColorMatrixColorFilter(
             new float[]{
                     0f, 0f, 1f, 0f, BRIGHTENING_FACTOR,
                     0f, 1f, 0f, 0f, BRIGHTENING_FACTOR,
@@ -77,14 +79,20 @@ public class RoundedBitmapBackgroundBuilder {
             case BG_NORMAL:
                 normalDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
                 pressedDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-                pressedDrawable.setStreamColorFilter(mBrightBgColorFilter);
+                pressedDrawable.setStreamColorFilter(BRIGHT_BG_COLOR_FILTER);
                 break;
             case BG_FINAL:
                 normalDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-                normalDrawable.setStreamColorFilter(mFinalBgColorFilter);
+                normalDrawable.setStreamColorFilter(FINAL_BG_COLOR_FILTER);
                 pressedDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
-                pressedDrawable.setStreamColorFilter(mFinalBrightBgColorFilter);
+                pressedDrawable.setStreamColorFilter(FINAL_BRIGHT_BG_COLOR_FILTER);
                 break;
+            case BG_NORMAL_ONLY:
+                return new StreamDrawable(mScaledBg, mCornerRadius, 0);
+            case BG_PRESSED_ONLY:
+                pressedDrawable = new StreamDrawable(mScaledBg, mCornerRadius, 0);
+                pressedDrawable.setStreamColorFilter(BRIGHT_BG_COLOR_FILTER);
+                return pressedDrawable;
             default:
                 return null;
         }

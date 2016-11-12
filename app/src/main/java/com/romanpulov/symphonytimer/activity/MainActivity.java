@@ -14,7 +14,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
@@ -25,12 +24,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.service.TaskService;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
@@ -68,14 +66,23 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 	private DMTasks mDMTasks = new DMTasks();
 
     //UI
-	private ListView mTimersListView = null;
+	private ListView mTimersListView;
+    private ListViewSelector mListViewSelector;
     private long mLastClickTime;
     private boolean activityVisible = false;
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        Toast.makeText(this, "Creating action mode", Toast.LENGTH_SHORT).show();
-        return false;
+        if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
+            return false;
+        else {
+            actionMode.getMenuInflater().inflate(R.menu.main_actions, menu);
+            int pos;
+            if ((mListViewSelector != null) && ((pos = mListViewSelector.getSelectedItemPos()) != -1)) {
+                actionMode.setTitle(mDMTimers.get(pos).mTitle);
+            }
+            return true;
+        }
     }
 
     @Override
@@ -85,12 +92,14 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
     @Override
     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+        int selectedItemPos = mListViewSelector.getSelectedItemPos();
         return false;
     }
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
-
+        if (mListViewSelector != null)
+            mListViewSelector.destroyActionMode();
     }
 
     public interface OnDMTimerInteractionListener {
@@ -255,8 +264,10 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 }
             }
         });
-		
-		getTimersListView().setAdapter(adapter);
+        mListViewSelector = adapter.getListViewSelector();
+
+        mTimersListView = (ListView)findViewById(R.id.main_list_view);
+        mTimersListView.setAdapter(adapter);
 
         // Update List
         loadTimers();
@@ -315,7 +326,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         mDMTasks = savedInstanceState.getParcelable(mDMTasks.getClass().toString());
 
         //restore code references
-        ((SymphonyArrayAdapter)getTimersListView().getAdapter()).setTasks(mDMTasks);
+        ((SymphonyArrayAdapter)mTimersListView.getAdapter()).setTasks(mDMTasks);
         mDMTasks.setTasksCompleted(mTaskItemCompleted);
 
         //update UI
@@ -325,7 +336,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_activity_actions, menu);
+        getMenuInflater().inflate(R.menu.main_options, menu);
     	return super.onCreateOptionsMenu(menu);
     }
     
@@ -366,7 +377,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		return super.onContextItemSelected(item);
     	
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    	DMTimerRec actionTimerRec = (DMTimerRec)getTimersListView().getAdapter().getItem(info.position);
+    	DMTimerRec actionTimerRec = (DMTimerRec)mTimersListView.getAdapter().getItem(info.position);
     	switch (item.getItemId()) {
     		case (CONTEXT_MENU_EDIT):
     			editTimer(actionTimerRec);
@@ -422,25 +433,18 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		DMTimerRec timerRec = mDMTimers.getItemById(taskItem.getId());
     		if (null != timerRec) {
     			int index = mDMTimers.indexOf(timerRec);
-    			if ( (index<getTimersListView().getFirstVisiblePosition()) || (index>getTimersListView().getLastVisiblePosition()) ) {
-    				getTimersListView().setSelection(index);
+    			if ( (index<mTimersListView.getFirstVisiblePosition()) || (index>mTimersListView.getLastVisiblePosition()) ) {
+                    mTimersListView.setSelection(index);
     			}
     		}    		
     	}
     }
 
     private void updateTimers() {
-    	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)getTimersListView().getAdapter();
+    	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)mTimersListView.getAdapter();
     	adapter.notifyDataSetChanged();
     	checkTimerSelection();
     }
-    
-    private ListView getTimersListView () {
-    	if (null == mTimersListView) {
-    		mTimersListView = (ListView)findViewById(R.id.main_list_view);
-    	}
-    	return mTimersListView;
-    }    
     
     private void performMediaCleanup() {
         List<String> mediaNameList = DBHelper.getInstance(getApplicationContext()).getMediaFileNameList();
