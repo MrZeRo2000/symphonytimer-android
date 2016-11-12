@@ -31,14 +31,17 @@ public class ListViewSelector {
 
     public void startActionMode(View v, int position) {
         if (mSelectedItemPos == -1) {
+            // for title to show correctly
+            mSelectedItemPos = position;
             ActionBarActivity activity = (ActionBarActivity) v.getContext();
             mActionMode = activity.startSupportActionMode(mActionModeCallback);
 
             if (mActionMode != null) {
                 setSelectedView(position);
-                mSelectedItemPos = position;
                 mAdapter.notifyDataSetChanged();
-            }
+            } else
+                //rejected creation
+                mSelectedItemPos = - 1;
 
         } else
             setSelectedView(position);
