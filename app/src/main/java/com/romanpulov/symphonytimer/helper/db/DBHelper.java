@@ -167,7 +167,7 @@ public class DBHelper {
 	}
 	
 	private long getNextOrderId(long orderId) {
-		String sql = "SELECT MAX(order_id) FROM " + DBOpenHelper.TIMER_TABLE_NAME + " WHERE order_id>" + String.valueOf(orderId);
+		String sql = "SELECT MIN(order_id) FROM " + DBOpenHelper.TIMER_TABLE_NAME + " WHERE order_id>" + String.valueOf(orderId);
 		return getLongSQL(sql);
 	}
 	
