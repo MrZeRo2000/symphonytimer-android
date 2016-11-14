@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Vibrator;
 
 public class VibratorHelper {
-	private static long VIBRATE_SHORT_TIME = 500;
+	private static long VIBRATE_SHORT_TIME = 200;
 	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
 	
 	private static VibratorHelper mVibratorHelperInstance = null;

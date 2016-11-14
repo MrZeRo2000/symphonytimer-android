@@ -42,7 +42,6 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 	private class ViewHolder implements View.OnLongClickListener, View.OnClickListener{
         final View mView;
         int mPosition;
-        final DMTimerRec mItem;
         final TextView mTitleTextView;
         final ImageView mImageView;
         final TextView mProgressTextView;
@@ -54,7 +53,6 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 		ViewHolder(View view, DMTimerRec item, int position) {
             mView = view;
             mPosition = position;
-            mItem = item;
 			mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
 			mImageView = (ImageView)view.findViewById(R.id.image_image_view);
 			mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
@@ -83,7 +81,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         public void onClick(View v) {
             if (mListViewSelector.getSelectedItemPos() == -1) {
                 if (mListener != null) {
-                    mListener.onDMTimerInteraction(mItem, -1);
+                    mListener.onDMTimerInteraction(null, mPosition);
                 }
             } else
                 mListViewSelector.setSelectedView(mPosition);

@@ -287,7 +287,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
                     mLastClickTime = clickTime;
                     VibratorHelper.getInstance(MainActivity.this).shortVibrate();
-                    performTimerAction(item);
+                    performTimerAction(mDMTimers.get(position));
                 }
             }
         });
