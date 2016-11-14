@@ -66,8 +66,10 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 
         private void updateSelectedTitle() {
             ActionMode actionMode;
-            if ((mListViewSelector != null) && ((actionMode = mListViewSelector.getActionMode()) != null) && (mListViewSelector.getSelectedItemPos() == mPosition))
-                actionMode.setTitle(mItem.mTitle);
+            DMTimerRec selectedItem;
+
+            if ((mListViewSelector != null) && ((actionMode = mListViewSelector.getActionMode()) != null) && ((selectedItem = getItem(mListViewSelector.getSelectedItemPos())) != null))
+                actionMode.setTitle(selectedItem.mTitle);
         }
 
 
@@ -196,7 +198,8 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
 
         //background change depending on selection
-        int selectedItem = mListViewSelector.getSelectedItemPos();
+        int selectedItemPos = mListViewSelector.getSelectedItemPos();
+
         if (isBitmapBackground ) {
             if ((viewHolder.mNormalDrawable == null) || (viewHolder.mFinalDrawable == null)) {
                 if (createBackgroundBuilder()) {
@@ -206,9 +209,9 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
             }
             //update bitmap background
             Drawable bgDrawable;
-            if (selectedItem == -1)
+            if (selectedItemPos == -1)
                 bgDrawable = 0 == displayProgress  ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
-            else if (viewHolder.mPosition == selectedItem) {
+            else if (viewHolder.mPosition == selectedItemPos) {
                 bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
             } else
                 bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
@@ -217,9 +220,9 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         } else {
             //update solid background
             int bgResId;
-            if (selectedItem == -1)
+            if (selectedItemPos == -1)
                 bgResId =  0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector;
-            else if (viewHolder.mPosition == selectedItem) {
+            else if (viewHolder.mPosition == selectedItemPos) {
                 bgResId = R.drawable.main_list_shape_selected;
             } else
                 bgResId = R.drawable.main_list_shape;

@@ -91,8 +91,35 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+    public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
         int selectedItemPos = mListViewSelector.getSelectedItemPos();
+        DMTimerRec actionTimer = (DMTimerRec)mTimersListView.getAdapter().getItem(selectedItemPos);
+
+        switch (menuItem.getItemId()) {
+            case R.id.action_edit:
+                performEditTimer(actionTimer);
+                return true;
+            case R.id.action_delete:
+                AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
+                deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
+                    @Override
+                    public void OnOkButtonClickEvent(DialogFragment dialog) {
+                        DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+                        if (null != dmTimerRec) {
+                            performDeleteTimer(dmTimerRec);
+                            actionMode.finish();
+                        }
+                    }
+                });
+                deleteDialog.show(getFragmentManager(), null);
+                return true;
+            case R.id.action_move_up:
+                performMoveUpTimer(actionTimer);
+                return true;
+            case R.id.action_move_down:
+                performMoveDownTimer(actionTimer);
+                return true;
+        }
         return false;
     }
 
@@ -380,7 +407,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	DMTimerRec actionTimerRec = (DMTimerRec)mTimersListView.getAdapter().getItem(info.position);
     	switch (item.getItemId()) {
     		case (CONTEXT_MENU_EDIT):
-    			editTimer(actionTimerRec);
+    			performEditTimer(actionTimerRec);
     			return true;    			
     		case (CONTEXT_MENU_DELETE):
     			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimerRec, R.string.question_are_you_sure);
@@ -406,7 +433,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	}
     }
     
-    private void editTimer(DMTimerRec dmTimerRec) {
+    private void performEditTimer(DMTimerRec dmTimerRec) {
     	startAddItemActivity(dmTimerRec);
     }
     
@@ -482,8 +509,16 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 			boolean retVal = DBHelper.getInstance(this).moveTimerUp(dmTimerRec.mOrderId);
 			if (retVal) {
 				loadTimers();
-				updateTimers();  
-			}
+				updateTimers();
+
+                int pos = mDMTimers.getPosById(dmTimerRec.mId);
+                if (pos != -1) {
+                    mListViewSelector.setSelectedView(pos);
+                    mTimersListView.smoothScrollToPositionFromTop(pos, 0);
+                    //mTimersListView.setSelection(pos);
+                    //mTimersListView.smoothScrollToPosition(pos);
+                }
+            }
 		} catch (Exception e) {			
 			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
 		}
@@ -494,7 +529,14 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 			boolean retVal = DBHelper.getInstance(this).moveTimerDown(dmTimerRec.mOrderId);
 			if (retVal) {
 				loadTimers();
-				updateTimers();  
+				updateTimers();
+
+                int pos = mDMTimers.getPosById(dmTimerRec.mId);
+                if (pos != -1) {
+                    mListViewSelector.setSelectedView(pos);
+                    mTimersListView.smoothScrollToPositionFromTop(pos, 0);
+                    //mTimersListView.setSelection(pos);
+                }
 			}
 		} catch (Exception e) {			
 			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();

@@ -41,6 +41,15 @@ public class DMTimers implements Parcelable {
 		return null;
 	}
 
+    public int getPosById(long id) {
+        for (DMTimerRec timerRec : dataItems) {
+            if (timerRec.mId == id) {
+                return dataItems.indexOf(timerRec);
+            }
+        }
+        return -1;
+    }
+
     public DMTimers() {
         dataItems = new ArrayList<>();
     }
