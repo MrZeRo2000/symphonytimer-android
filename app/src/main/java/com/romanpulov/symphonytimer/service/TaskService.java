@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -29,6 +30,7 @@ public class TaskService extends Service implements Runnable {
     public static final int MSG_UPDATE_DM_TASKS = 1;
     public static final int MSG_UPDATE_DM_PROGRESS = 2;
     public static final int MSG_TASK_COMPLETED = 3;
+    public static final int MSG_QUERY_DM_TASKS = 4;
 
     private Messenger mClientMessenger;
 
@@ -40,13 +42,27 @@ public class TaskService extends Service implements Runnable {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_UPDATE_DM_TASKS:
-                    mDMTasks = msg.getData().getParcelable(DMTasks.class.toString());
-                    if (mDMTasks != null)
-                        mDMTasksStatus = mDMTasks.getStatus();
+                    updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
                     mClientMessenger = msg.replyTo;
                     break;
                 case MSG_TASK_COMPLETED:
                     wakeAndStartActivity(MainActivity.class);
+                    break;
+                case MSG_QUERY_DM_TASKS:
+                    log("Received MSG_QUERY_DM_TASKS");
+                    mClientMessenger = msg.replyTo;
+                    if (mClientMessenger != null) {
+                        Message outMsg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
+                        outMsg.setData(bundle);
+                        try {
+                            log("sending dmtasks");
+                            mClientMessenger.send(outMsg);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     break;
                 default:
                     super.handleMessage(msg);
@@ -61,6 +77,11 @@ public class TaskService extends Service implements Runnable {
 
     private DMTasks mDMTasks;
     private int mDMTasksStatus;
+
+    private void updateDMTasks(DMTasks value) {
+        mDMTasks = value;
+        mDMTasksStatus = mDMTasks.getStatus();
+    }
 
     private ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(2);
     private ScheduledFuture<?> mScheduleExecutorTask;
@@ -102,10 +123,8 @@ public class TaskService extends Service implements Runnable {
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("startCommand");
         if (intent.getExtras() != null) {
-            mDMTasks = intent.getExtras().getParcelable(DMTasks.class.toString());
+            updateDMTasks((DMTasks)intent.getExtras().getParcelable(DMTasks.class.toString()));
             if (mDMTasks != null) {
-                mDMTasksStatus = mDMTasks.getStatus();
-
                 startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
                 log("startScheduler");
@@ -120,6 +139,7 @@ public class TaskService extends Service implements Runnable {
     @Override
     public boolean onUnbind(Intent intent) {
         log("unBind");
+        mClientMessenger = null;
         return super.onUnbind(intent);
     }
 

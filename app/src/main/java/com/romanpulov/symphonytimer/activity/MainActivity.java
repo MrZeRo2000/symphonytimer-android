@@ -2,6 +2,8 @@ package com.romanpulov.symphonytimer.activity;
 
 import java.util.List;
 
+import android.app.ActivityManager;
+import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -154,6 +156,17 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         }
     }
 
+    private void queryServiceDMTasks() {
+        log("queryServiceDMTasks");
+        Message msg = Message.obtain(null, TaskService.MSG_QUERY_DM_TASKS, 0, 0);
+        msg.replyTo = mMessenger;
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     /** Messenger for communicating with the service. */
     Messenger mService = null;
 
@@ -163,7 +176,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     /**
      * Class for interacting with the main interface of the service.
      */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             // This is called when the connection with the service has been
             // established, giving us the object we can use to
@@ -175,7 +188,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
             log ("onServiceConnected");
 
-            updateServiceDMTasks();
+            queryServiceDMTasks();
+            //updateServiceDMTasks();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -202,6 +216,17 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                         mDMTasks.updateProcess();
                     }
                     break;
+                case TaskService.MSG_UPDATE_DM_TASKS:
+                    DMTasks newTasks = msg.getData().getParcelable(DMTasks.class.toString());
+                    if (newTasks != null) {
+                        log("IncomingHandler: obtaining service DM Tasks : " + newTasks.size());
+                        if (newTasks.size() > mDMTasks.size()) {
+                            log("IncomingHandler: refreshing tasks");
+                            mDMTasks.replaceTasks(newTasks);
+                            updateTimers();
+                        }
+                    }
+                    break;
                 default:
                     super.handleMessage(msg);
             }
@@ -219,8 +244,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
         //no more tasks
         if (mServiceBound && mDMTasks.size() == 0) {
-            if (mConnection != null)
-                unbindService(mConnection);
+            log ("updateServiceTasks: no more tasks");
+            unbindService(mConnection);
             mServiceBound = false;
             stopService(serviceIntent);
             return;
@@ -228,6 +253,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
         //tasks, not bound
         if ((!mServiceBound) && mDMTasks.size() > 0) {
+            log ("updateServiceTasks: tasks, not bound");
             serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
             startService(serviceIntent);
             bindService(new Intent(this, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -236,8 +262,30 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
         //tasks, bound
         if (mServiceBound && mDMTasks.size() > 0) {
+            log ("updateServiceTasks: tasks, bound");
             updateServiceDMTasks();
+            return;
         }
+
+        if (isServiceRunning(TaskService.class.getName())) {
+            log ("updateServiceTasks: service running");
+            startService(serviceIntent);
+            bindService(new Intent(this, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+            return;
+        }
+    }
+
+    public boolean isServiceRunning(String serviceClassName){
+        final ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+        for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
+            if (runningServiceInfo.service.getClassName().equals(serviceClassName)){
+                return true;
+            }
+        }
+        return false;
     }
 	
     @Override
@@ -301,13 +349,18 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         updateTimers();
 
         AssetsHelper.listAssets(this, "pre_inst_images");
+
+        updateServiceTasks();
     }
-    
+
     @Override
     public void onBackPressed() {
+        /*
     	if (0 == mDMTasks.size()) {
     		super.onBackPressed();
     	}
+    	*/
+        super.onBackPressed();
     }
     
     @Override
@@ -348,6 +401,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
     	super.onRestoreInstanceState(savedInstanceState);
+
+        log("onRestoreInstanceState: bundle=" + savedInstanceState);
 
         //restore tasks
         mDMTasks = savedInstanceState.getParcelable(mDMTasks.getClass().toString());

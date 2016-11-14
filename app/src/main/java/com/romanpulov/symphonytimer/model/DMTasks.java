@@ -127,6 +127,15 @@ public class DMTasks implements Parcelable {
         }
     }
 
+    /**
+     * Refreshes data items from external source preserving reference, for Adapter
+     * @param newTasks new data items
+     */
+    public void replaceTasks(DMTasks newTasks) {
+        mDataItems.clear();
+        mDataItems.addAll(newTasks.mDataItems);
+    }
+
     private DMTasks(Parcel in) {
         in.readTypedList(mDataItems, DMTaskItem.CREATOR);
     }

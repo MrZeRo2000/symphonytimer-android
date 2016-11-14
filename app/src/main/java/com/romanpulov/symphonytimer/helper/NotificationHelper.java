@@ -35,9 +35,9 @@ public class NotificationHelper {
 
     private NotificationHelper(Context context) {
         mContext = context;
-        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        mNotificationIntent = new Intent(context, MainActivity.class);
-        mContentIntent = PendingIntent.getActivity(context, 0, mNotificationIntent, 0);
+        mNotificationManager = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
+        mNotificationIntent = new Intent(mContext, MainActivity.class);
+        mContentIntent = PendingIntent.getActivity(mContext, 0, mNotificationIntent, 0);
     }
 
     public Notification getNotification(DMTasks dmTasks) {

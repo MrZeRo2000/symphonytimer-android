@@ -27,7 +27,6 @@ public class SymphonyApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testCase2() {
-        DBHelper.getInstance(getContext()).openDB();
 
         List<LinkedHashMap<Long, Long>> list = DBHelper.getInstance(getContext()).getHistList(0, 2);
         assertEquals(2, list.size());
@@ -61,7 +60,7 @@ public class SymphonyApplicationTest extends ApplicationTestCase<Application> {
             }
         }
         */
-        DBHelper.getInstance(getContext()).closeDB();
+        DBHelper.clearInstance();
     }
 
 }
