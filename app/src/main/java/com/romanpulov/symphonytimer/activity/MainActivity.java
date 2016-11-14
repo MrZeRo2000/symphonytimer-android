@@ -515,8 +515,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 if (pos != -1) {
                     mListViewSelector.setSelectedView(pos);
                     mTimersListView.smoothScrollToPositionFromTop(pos, 0);
-                    //mTimersListView.setSelection(pos);
-                    //mTimersListView.smoothScrollToPosition(pos);
                 }
             }
 		} catch (Exception e) {			
@@ -535,7 +533,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 if (pos != -1) {
                     mListViewSelector.setSelectedView(pos);
                     mTimersListView.smoothScrollToPositionFromTop(pos, 0);
-                    //mTimersListView.setSelection(pos);
                 }
 			}
 		} catch (Exception e) {			

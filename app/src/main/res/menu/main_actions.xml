@@ -4,11 +4,13 @@
     <item
         android:id="@+id/action_edit"
         android:title="@string/action_edit"
+        android:icon="@drawable/ic_action_edit"
         symphonytimer:showAsAction="ifRoom"
         />
     <item
         android:id="@+id/action_delete"
         android:title="@string/action_delete"
+        android:icon="@drawable/ic_action_trash"
         symphonytimer:showAsAction="ifRoom"
         />
     <item
