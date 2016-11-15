@@ -43,6 +43,7 @@ public class TaskService extends Service implements Runnable {
             switch (msg.what) {
                 case MSG_UPDATE_DM_TASKS:
                     updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
+                    log("received dmtasks:" + mDMTasks);
                     mClientMessenger = msg.replyTo;
                     break;
                 case MSG_TASK_COMPLETED:
@@ -57,7 +58,7 @@ public class TaskService extends Service implements Runnable {
                         bundle.putParcelable(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
                         outMsg.setData(bundle);
                         try {
-                            log("sending dmtasks");
+                            log("sending dmtasks:" + mDMTasks);
                             mClientMessenger.send(outMsg);
                         } catch (RemoteException e) {
                             e.printStackTrace();

@@ -143,64 +143,138 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 		}
 	};
 
-    private void updateServiceDMTasks() {
-        Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
-        msg.replyTo = mMessenger;
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
-        msg.setData(bundle);
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+    private static class TaskServiceManager {
+
+        /** Messenger for communicating with the service. */
+        private Messenger mService = null;
+
+        /** Flag indicating whether we have called bind on the service. */
+        private boolean mServiceBound;
+
+        /**
+         * Target we publish for clients to send messages to IncomingHandler.
+         */
+        final Messenger mMessenger;
+
+        final Context mContext;
+
+        /**
+         * Class for interacting with the main interface of the service.
+         */
+        private final ServiceConnection mConnection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName className, IBinder service) {
+                // This is called when the connection with the service has been
+                // established, giving us the object we can use to
+                // interact with the service.  We are communicating with the
+                // service using a Messenger, so here we get a client-side
+                // representation of that from the raw IBinder object.
+                mService = new Messenger(service);
+                mServiceBound = true;
+
+                log ("onServiceConnected");
+
+                queryServiceDMTasks();
+                //updateServiceDMTasks();
+            }
+
+            public void onServiceDisconnected(ComponentName className) {
+                // This is called when the connection with the service has been
+                // unexpectedly disconnected -- that is, its process crashed.
+                mService = null;
+                mServiceBound = false;
+
+                log ("onServiceDisconnected");
+            }
+        };
+
+        public TaskServiceManager (Context context, Handler messageHandler) {
+            mContext = context;
+            mMessenger =  new Messenger(messageHandler);
+        }
+
+        public void updateServiceDMTasks(DMTasks tasks) {
+            Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
+            msg.replyTo = mMessenger;
+            DMTasks newTasks = tasks.createParcelableCopy();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(DMTasks.class.toString(), newTasks);
+            msg.setData(bundle);
+            log("updateServiceDMTasks:" + newTasks);
+            try {
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void queryServiceDMTasks() {
+            log("queryServiceDMTasks");
+            Message msg = Message.obtain(null, TaskService.MSG_QUERY_DM_TASKS, 0, 0);
+            msg.replyTo = mMessenger;
+            try {
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void updateServiceTasks(DMTasks tasks) {
+            Intent serviceIntent = new Intent(mContext, TaskService.class);
+
+            //no more tasks
+            if (mServiceBound && tasks.size() == 0) {
+                log ("updateServiceTasks: no more tasks");
+                mContext.unbindService(mConnection);
+                mServiceBound = false;
+                mContext.stopService(serviceIntent);
+                return;
+            }
+
+            //tasks, not bound
+            if ((!mServiceBound) && tasks.size() > 0) {
+                DMTasks newTasks = tasks.createParcelableCopy();
+                serviceIntent.putExtra(DMTasks.class.toString(), newTasks);
+                log ("updateServiceTasks: tasks, not bound, sending tasks:" + newTasks);
+                mContext.startService(serviceIntent);
+                mContext.bindService(new Intent(mContext, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
+                return;
+            }
+
+            //tasks, bound
+            if (mServiceBound && tasks.size() > 0) {
+                log ("updateServiceTasks: tasks, bound");
+                updateServiceDMTasks(tasks);
+                return;
+            }
+
+            if (isServiceRunning(TaskService.class.getName())) {
+                log ("updateServiceTasks: service running");
+                mContext.startService(serviceIntent);
+                mContext.bindService(new Intent(mContext, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+                return;
+            }
+        }
+
+        public boolean isServiceRunning(String serviceClassName){
+            final ActivityManager activityManager = (ActivityManager) mContext.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+            final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+            for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
+                if (runningServiceInfo.service.getClassName().equals(serviceClassName)){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void unbindService() {
+            if (mServiceBound)
+                mContext.unbindService(mConnection);
         }
     }
 
-    private void queryServiceDMTasks() {
-        log("queryServiceDMTasks");
-        Message msg = Message.obtain(null, TaskService.MSG_QUERY_DM_TASKS, 0, 0);
-        msg.replyTo = mMessenger;
-        try {
-            mService.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /** Messenger for communicating with the service. */
-    Messenger mService = null;
-
-    /** Flag indicating whether we have called bind on the service. */
-    boolean mServiceBound;
-
-    /**
-     * Class for interacting with the main interface of the service.
-     */
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
-            mService = new Messenger(service);
-            mServiceBound = true;
-
-            log ("onServiceConnected");
-
-            queryServiceDMTasks();
-            //updateServiceDMTasks();
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            mService = null;
-            mServiceBound = false;
-
-            log ("onServiceDisconnected");
-        }
-    };
+    private TaskServiceManager mTaskServiceManager = new TaskServiceManager(this, new IncomingHandler());
 
     /**
      * Handler of incoming messages from service.
@@ -210,6 +284,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case TaskService.MSG_UPDATE_DM_PROGRESS:
+                    log("updating progress");
                     if (activityVisible) {
                         updateTimers();
                     } else {
@@ -221,7 +296,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                     if (newTasks != null) {
                         log("IncomingHandler: obtaining service DM Tasks : " + newTasks.size());
                         if (newTasks.size() > mDMTasks.size()) {
-                            log("IncomingHandler: refreshing tasks");
+                            log("IncomingHandler: refreshing tasks:" + newTasks);
                             mDMTasks.replaceTasks(newTasks);
                             updateTimers();
                         }
@@ -233,61 +308,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         }
     }
 
-    /**
-     * Target we publish for clients to send messages to IncomingHandler.
-     */
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
-
-
-    private void updateServiceTasks() {
-        Intent serviceIntent = new Intent(this, TaskService.class);
-
-        //no more tasks
-        if (mServiceBound && mDMTasks.size() == 0) {
-            log ("updateServiceTasks: no more tasks");
-            unbindService(mConnection);
-            mServiceBound = false;
-            stopService(serviceIntent);
-            return;
-        }
-
-        //tasks, not bound
-        if ((!mServiceBound) && mDMTasks.size() > 0) {
-            log ("updateServiceTasks: tasks, not bound");
-            serviceIntent.putExtra(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
-            startService(serviceIntent);
-            bindService(new Intent(this, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
-            return;
-        }
-
-        //tasks, bound
-        if (mServiceBound && mDMTasks.size() > 0) {
-            log ("updateServiceTasks: tasks, bound");
-            updateServiceDMTasks();
-            return;
-        }
-
-        if (isServiceRunning(TaskService.class.getName())) {
-            log ("updateServiceTasks: service running");
-            startService(serviceIntent);
-            bindService(new Intent(this, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
-
-            return;
-        }
-    }
-
-    public boolean isServiceRunning(String serviceClassName){
-        final ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
-
-        for (ActivityManager.RunningServiceInfo runningServiceInfo : services) {
-            if (runningServiceInfo.service.getClassName().equals(serviceClassName)){
-                return true;
-            }
-        }
-        return false;
-    }
-	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -299,10 +319,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                         //WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                         WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
-		
-        // Register context menu
-        //registerForContextMenu(getTimersListView());
-        
+
         activityVisible = true;
 
         //setup actionbar icon
@@ -318,16 +335,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setIcon(R.drawable.tuba);
 
-        
-        /*
-        // Set background wallpaper
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-        Drawable wallpaperDrawable = wallpaperManager.getDrawable();
-        
-        RelativeLayout layout = (RelativeLayout) findViewById (R.id.main_layout);        
-        layout.setBackgroundDrawable(wallpaperDrawable);
-        */       
-        
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, new OnDMTimerInteractionListener() {
             @Override
             public void onDMTimerInteraction(DMTimerRec item, int position) {
@@ -349,26 +356,15 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         updateTimers();
 
         AssetsHelper.listAssets(this, "pre_inst_images");
-
-        updateServiceTasks();
     }
 
-    @Override
-    public void onBackPressed() {
-        /*
-    	if (0 == mDMTasks.size()) {
-    		super.onBackPressed();
-    	}
-    	*/
-        super.onBackPressed();
-    }
-    
     @Override
     protected void onDestroy() {
     	DBHelper.clearInstance();
     	MediaPlayerHelper.getInstance(this).release();
-        if (mServiceBound)
-            unbindService(mConnection);
+        mTaskServiceManager.unbindService();
+        mTaskServiceManager = null;
+
     	super.onDestroy();
     }
     
@@ -389,7 +385,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	}
 
     	updateTimers();
-        updateServiceTasks();
+        mTaskServiceManager.updateServiceTasks(mDMTasks);
     }
     
     @Override
@@ -425,21 +421,21 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
-    	case R.id.action_add:
-    		startAddItemActivity(new DMTimerRec());
-    		return true;
-    	case R.id.action_preferences:
-        	if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
-                Intent preferencesIntent = new Intent(this, SettingsActivity.class);
-                startActivity(preferencesIntent);
+            case R.id.action_add:
+                startAddItemActivity(new DMTimerRec());
                 return true;
-        	} else
-                return super.onOptionsItemSelected(item);
+            case R.id.action_preferences:
+                if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
+                    Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+                    startActivity(preferencesIntent);
+                    return true;
+                } else
+                    return super.onOptionsItemSelected(item);
             case R.id.action_history:
-    		startHistoryActivity();
-    		return true;
-    	default:
-  			return super.onOptionsItemSelected(item);
+                startHistoryActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
     	}
     }
     
@@ -658,7 +654,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		}
     	}
 
-        updateServiceTasks();
+        mTaskServiceManager.updateServiceTasks(mDMTasks);
     }
     
     protected void onActivityResult (int requestCode, int resultCode, Intent data) {

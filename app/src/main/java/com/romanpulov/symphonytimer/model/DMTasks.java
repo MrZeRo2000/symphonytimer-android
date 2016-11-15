@@ -159,4 +159,16 @@ public class DMTasks implements Parcelable {
             return new DMTasks[size];
         }
     };
+
+    @Override
+    public String toString() {
+        String s = "";
+        int i = 0;
+        for (DMTaskItem item : mDataItems) {
+            s += "(i=" + i++;
+            s += item.toString();
+            s += ")";
+        }
+        return s;
+    }
 }

@@ -122,4 +122,14 @@ public class DMTaskItem implements Parcelable {
         else
             return (int)((System.currentTimeMillis() - mStartTime) * 100 / (mMaxTimeSec * 1000));
     }
+
+	@Override
+	public String toString() {
+		return "(id = " + mId + "," +
+				"title = " + mTitle + "," +
+                "maxTimeSec=" + mMaxTimeSec + "," +
+                "startTime=" + mStartTime + "," +
+                "currentTime=" + mCurrentTime + ")"
+				;
+	}
 }
