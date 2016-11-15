@@ -4,7 +4,6 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,15 +13,10 @@ import android.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -76,7 +70,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 	private ListView mTimersListView;
     private ListViewSelector mListViewSelector;
     private long mLastClickTime;
-    private boolean activityVisible = false;
+    private boolean mActivityVisible = false;
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -170,7 +164,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
     private void performUpdateDMProgress() {
         log("performUpdateDMProgress progress:" + mDMTasks);
-        if (activityVisible)
+        if (mActivityVisible)
             updateTimers();
         else
             mDMTasks.updateProcess();
@@ -200,7 +194,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                         //WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                         WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 
-        activityVisible = true;
+        mActivityVisible = true;
 
         //setup actionbar icon
 		/*
@@ -253,13 +247,13 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     @Override
     protected void onPause() {
     	super.onPause();
-    	activityVisible = false;
+    	mActivityVisible = false;
     }
     
     @Override
     protected void onResume() {
     	super.onResume();
-    	activityVisible = true;
+    	mActivityVisible = true;
 
     	if (DBHelper.getInstance(this).getDBDataChanged()) {
     		loadTimers();
@@ -418,12 +412,12 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
 		}
     }
-    
+
     
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
         log("performTaskCompleted");
     	//bring activity to front
-    	if (!activityVisible) {
+    	if (!mActivityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
     		intent.setComponent(new ComponentName(this.getPackageName(), this.getClass().getName()));
     		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    		
@@ -441,9 +435,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFile());
     	
     	//vibrate
-    	boolean preferencesVibrate = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_vibrate", false);
-    	if (preferencesVibrate)
-    		VibratorHelper.getInstance(this).vibrate();
+  		VibratorHelper.getInstance(this).vibrate();
     }
 
     private void performTimerAction(DMTimerRec dmTimerRec) {
