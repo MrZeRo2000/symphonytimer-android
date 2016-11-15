@@ -300,51 +300,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	}
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-    		ContextMenuInfo menuInfo) {
-    	menu.add(Menu.NONE, CONTEXT_MENU_EDIT, Menu.NONE, R.string.action_edit);
-    	menu.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.NONE, R.string.action_delete);
-        menu.add(Menu.NONE, CONTEXT_MENU_MOVE_UP, Menu.NONE, R.string.action_move_up);
-        menu.add(Menu.NONE, CONTEXT_MENU_MOVE_DOWN, Menu.NONE, R.string.action_move_down);
-    	super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-    	if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
-    		return super.onContextItemSelected(item);
-
-    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    	DMTimerRec actionTimerRec = (DMTimerRec)mTimersListView.getAdapter().getItem(info.position);
-    	switch (item.getItemId()) {
-    		case (CONTEXT_MENU_EDIT):
-    			performEditTimer(actionTimerRec);
-    			return true;    			
-    		case (CONTEXT_MENU_DELETE):
-    			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimerRec, R.string.question_are_you_sure);
-    			deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
-                    @Override
-                    public void OnOkButtonClickEvent(DialogFragment dialog) {
-                        DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
-                        if (null != dmTimerRec) {
-                            performDeleteTimer(dmTimerRec);
-                        }
-                    }
-                });
-    			deleteDialog.show(getFragmentManager(), null);
-    			return true;
-    		case (CONTEXT_MENU_MOVE_UP):
-    			performMoveUpTimer(actionTimerRec);
-    			return true;
-    		case (CONTEXT_MENU_MOVE_DOWN):
-    			performMoveDownTimer(actionTimerRec);
-    			return true;
-    		default:
-    			return super.onContextItemSelected(item);
-    	}
-    }
-
     private void performEditTimer(DMTimerRec dmTimerRec) {
     	startAddItemActivity(dmTimerRec);
     }
