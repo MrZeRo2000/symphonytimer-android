@@ -52,7 +52,9 @@ public class DMTasks implements Parcelable {
 	}
 		
 	public DMTaskItem addTaskItem(DMTimerRec dmTimerRec) {
-		return new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile);
+        DMTaskItem newItem = new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile);
+        newItem.setTaskItemCompleted(mTaskItemCompletedListener);
+		return newItem;
 	}
 	
 	public String getTaskTitles() {
@@ -69,10 +71,10 @@ public class DMTasks implements Parcelable {
 		return sb.toString();
 	}
 
+    private DMTaskItem.OnTaskItemCompleted mTaskItemCompletedListener;
+
     public void setTasksCompleted(DMTaskItem.OnTaskItemCompleted taskItemCompletedListener) {
-        for (DMTaskItem item : mDataItems) {
-            item.setTaskItemCompleted(taskItemCompletedListener);
-        }
+        mTaskItemCompletedListener = taskItemCompletedListener;
     }
 
 	public int getExecutionPercent() {
@@ -134,6 +136,10 @@ public class DMTasks implements Parcelable {
     public void replaceTasks(DMTasks newTasks) {
         mDataItems.clear();
         mDataItems.addAll(newTasks.mDataItems);
+        for (DMTaskItem item : mDataItems) {
+            item.setTaskItemCompleted(mTaskItemCompletedListener);
+        }
+
     }
 
     private DMTasks(Parcel in) {

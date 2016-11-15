@@ -1,8 +1,10 @@
 package com.romanpulov.symphonytimer.activity;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +14,7 @@ import android.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -58,8 +61,16 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 	private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
 	
 	//data
-	private DMTimers mDMTimers = new DMTimers();
-	private DMTasks mDMTasks = new DMTasks();
+	private final DMTimers mDMTimers = new DMTimers();
+	private final DMTasks mDMTasks = new DMTasks();
+    {
+        mDMTasks.setTasksCompleted(new DMTaskItem.OnTaskItemCompleted() {
+            @Override
+            public void OnTaskItemCompletedEvent(DMTaskItem dmTaskItem) {
+                performTaskCompleted(dmTaskItem);
+            }
+        });
+    }
 
     //UI
 	private ListView mTimersListView;
@@ -129,44 +140,50 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         void onDMTimerInteraction(DMTimerRec item, int position);
     }
 	
-	private DMTaskItem.OnTaskItemCompleted mTaskItemCompleted = new DMTaskItem.OnTaskItemCompleted() {
-		@Override
-		public void OnTaskItemCompletedEvent(
-				DMTaskItem dmTaskItem) {
-			performTaskCompleted(dmTaskItem);
-		}
-	};
-
-    private TaskServiceManager mTaskServiceManager = new TaskServiceManager(this, new IncomingHandler());
+    private TaskServiceManager mTaskServiceManager = new TaskServiceManager(this, new IncomingHandler(this));
 
     /**
      * Handler of incoming messages from service.
      */
-    class IncomingHandler extends Handler {
+    private static class IncomingHandler extends Handler {
+        private final WeakReference<MainActivity> mHost;
+
+        IncomingHandler(MainActivity host) {
+            mHost = new WeakReference<>(host);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case TaskService.MSG_UPDATE_DM_PROGRESS:
-                    log("updating progress");
-                    if (activityVisible) {
-                        updateTimers();
-                    } else {
-                        mDMTasks.updateProcess();
-                    }
+                    mHost.get().performUpdateDMProgress();
                     break;
                 case TaskService.MSG_UPDATE_DM_TASKS:
                     DMTasks newTasks = msg.getData().getParcelable(DMTasks.class.toString());
-                    if (newTasks != null) {
-                        log("IncomingHandler: obtaining service DM Tasks : " + newTasks.size());
-                        if (newTasks.size() > mDMTasks.size()) {
-                            log("IncomingHandler: refreshing tasks:" + newTasks);
-                            mDMTasks.replaceTasks(newTasks);
-                            updateTimers();
-                        }
-                    }
+                    mHost.get().performUpdateDMTasks(newTasks);
                     break;
                 default:
                     super.handleMessage(msg);
+            }
+        }
+    }
+
+    private void performUpdateDMProgress() {
+        log("performUpdateDMProgress progress:" + mDMTasks);
+        if (activityVisible)
+            updateTimers();
+        else
+            mDMTasks.updateProcess();
+    }
+
+    private void performUpdateDMTasks(DMTasks newTasks) {
+        if (newTasks != null) {
+            log("performUpdateDMTasks: obtaining service DM Tasks : " + newTasks.size());
+            if (newTasks.size() > mDMTasks.size()) {
+                log("performUpdateDMTasks: refreshing tasks:" + newTasks);
+                mDMTasks.replaceTasks(newTasks);
+                //mDMTasks.setTasksCompleted(mTaskItemCompleted);
+                updateTimers();
             }
         }
     }
@@ -201,12 +218,14 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, new OnDMTimerInteractionListener() {
             @Override
             public void onDMTimerInteraction(DMTimerRec item, int position) {
+                log("OnDMTimerInteractionListener: received event");
                 long clickTime = System.currentTimeMillis();
                 if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
                     mLastClickTime = clickTime;
                     VibratorHelper.getInstance(MainActivity.this).shortVibrate();
                     performTimerAction(mDMTimers.get(position));
-                }
+                } else
+                    log("OnDMTimerInteractionListener: skipped event");
             }
         });
         mListViewSelector = adapter.getListViewSelector();
@@ -249,32 +268,11 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
     	updateTimers();
         mTaskServiceManager.updateServiceTasks(mDMTasks);
+
+        //prevent immediate click after displaying
+        mLastClickTime = System.currentTimeMillis();
     }
-    
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-    	super.onSaveInstanceState(outState);
-        outState.putParcelable(mDMTasks.getClass().toString(), mDMTasks);
-    }
-    
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    	super.onRestoreInstanceState(savedInstanceState);
 
-        log("onRestoreInstanceState: bundle=" + savedInstanceState);
-
-        //restore tasks
-        mDMTasks = savedInstanceState.getParcelable(mDMTasks.getClass().toString());
-
-        //restore code references
-        ((SymphonyArrayAdapter)mTimersListView.getAdapter()).setTasks(mDMTasks);
-        mDMTasks.setTasksCompleted(mTaskItemCompleted);
-
-        //update UI
-		mDMTasks.updateProcess();
-		updateTimers();
-    }
-    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_options, menu);
@@ -301,7 +299,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 return super.onOptionsItemSelected(item);
     	}
     }
-    
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
     		ContextMenuInfo menuInfo) {
@@ -311,12 +309,12 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         menu.add(Menu.NONE, CONTEXT_MENU_MOVE_DOWN, Menu.NONE, R.string.action_move_down);
     	super.onCreateContextMenu(menu, v, menuInfo);
     }
-    
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
     		return super.onContextItemSelected(item);
-    	
+
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
     	DMTimerRec actionTimerRec = (DMTimerRec)mTimersListView.getAdapter().getItem(info.position);
     	switch (item.getItemId()) {
@@ -338,15 +336,15 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     			return true;
     		case (CONTEXT_MENU_MOVE_UP):
     			performMoveUpTimer(actionTimerRec);
-    			return true;    			
+    			return true;
     		case (CONTEXT_MENU_MOVE_DOWN):
     			performMoveDownTimer(actionTimerRec);
-    			return true; 			
+    			return true;
     		default:
     			return super.onContextItemSelected(item);
     	}
     }
-    
+
     private void performEditTimer(DMTimerRec dmTimerRec) {
     	startAddItemActivity(dmTimerRec);
     }
@@ -468,6 +466,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     
     
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
+        log("performTaskCompleted");
     	//bring activity to front
     	if (!activityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
@@ -494,10 +493,11 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
     private void performTimerAction(DMTimerRec dmTimerRec) {
     	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.mId);
+        log("performTimerAction");
     	
     	if (null == taskItem) {
     		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);
-    		newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
+    		//newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		
     		mDMTasks.add(newTaskItem);
@@ -507,7 +507,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		mDMTasks.remove(taskItem);
     		
     		// inactive timer or no timers
-    		if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
+    		if (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED) {
+                log("no more timter on inactive timer:" + mDMTasks);
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
         		//stop vibrating

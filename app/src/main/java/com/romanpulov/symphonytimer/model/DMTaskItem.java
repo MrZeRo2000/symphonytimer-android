@@ -19,14 +19,14 @@ public class DMTaskItem implements Parcelable {
 	private long mCurrentTime;
 	private boolean mCompletedFlag = false;
 	
-	public DMTaskItem(long id, String title, long timeSec, String soundFile) {
+	DMTaskItem(long id, String title, long timeSec, String soundFile) {
 		this.mId = id;
 		this.mTitle = title;
 		this.mMaxTimeSec = timeSec;		
 		this.mSoundFile = soundFile;
 	}
 	
-	public void setTaskItemCompleted(OnTaskItemCompleted taskItemCompletedListener) {
+	void setTaskItemCompleted(OnTaskItemCompleted taskItemCompletedListener) {
 		this.mTaskItemCompletedListener = taskItemCompletedListener;
 	}
 	
@@ -80,12 +80,12 @@ public class DMTaskItem implements Parcelable {
 		return (mCurrentTime - mStartTime) / 1000;
 	}
 	
-	public boolean getCompleted() {
+	boolean getCompleted() {
 		updateProcess();
 		return mCompletedFlag;
 	}
 	
-	public long getTriggerAtTime() {
+	long getTriggerAtTime() {
 		return mStartTime + mMaxTimeSec * 1000;
 	}
 	
@@ -102,7 +102,7 @@ public class DMTaskItem implements Parcelable {
 		mCompletedFlag = false;
 	}
 	
-	public void updateProcess() {
+	void updateProcess() {
 		if (!mCompletedFlag) {
 			mCurrentTime = System.currentTimeMillis();
 			long triggerAtTime = getTriggerAtTime();
@@ -116,7 +116,7 @@ public class DMTaskItem implements Parcelable {
 		}
 	}
 
-	public int getExecutionPercent() {
+	int getExecutionPercent() {
         if (mCompletedFlag)
             return 100;
         else
@@ -129,7 +129,8 @@ public class DMTaskItem implements Parcelable {
 				"title = " + mTitle + "," +
                 "maxTimeSec=" + mMaxTimeSec + "," +
                 "startTime=" + mStartTime + "," +
-                "currentTime=" + mCurrentTime + ")"
+                "currentTime=" + mCurrentTime + "," +
+				"mTaskItemCompletedListener=" + mTaskItemCompletedListener + ")"
 				;
 	}
 }
