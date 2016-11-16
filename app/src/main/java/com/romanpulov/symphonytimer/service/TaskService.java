@@ -17,6 +17,7 @@ import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -36,33 +37,43 @@ public class TaskService extends Service implements Runnable {
     /**
      * Handler of incoming messages from clients.
      */
-    class IncomingHandler extends Handler {
+    static class IncomingHandler extends Handler {
+        private final WeakReference<TaskService> mHostReference;
+
+        IncomingHandler(TaskService host) {
+            mHostReference = new WeakReference<>(host);
+        }
+
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_UPDATE_DM_TASKS:
-                    updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
-                    mClientMessenger = msg.replyTo;
-                    break;
-                case MSG_TASK_COMPLETED:
-                    wakeAndStartActivity(MainActivity.class);
-                    break;
-                case MSG_QUERY_DM_TASKS:
-                    mClientMessenger = msg.replyTo;
-                    if (mClientMessenger != null) {
-                        Message outMsg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
-                        outMsg.setData(bundle);
-                        try {
-                            mClientMessenger.send(outMsg);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
+            TaskService hostService = mHostReference.get();
+            if (hostService != null) {
+
+                switch (msg.what) {
+                    case MSG_UPDATE_DM_TASKS:
+                        hostService.updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
+                        hostService.mClientMessenger = msg.replyTo;
+                        break;
+                    case MSG_TASK_COMPLETED:
+                        hostService.wakeAndStartActivity(MainActivity.class);
+                        break;
+                    case MSG_QUERY_DM_TASKS:
+                        hostService.mClientMessenger = msg.replyTo;
+                        if (hostService.mClientMessenger != null) {
+                            Message outMsg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable(DMTasks.class.toString(), hostService.mDMTasks.createParcelableCopy());
+                            outMsg.setData(bundle);
+                            try {
+                                hostService.mClientMessenger.send(outMsg);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    break;
-                default:
-                    super.handleMessage(msg);
+                        break;
+                    default:
+                        super.handleMessage(msg);
+                }
             }
         }
     }
@@ -70,7 +81,7 @@ public class TaskService extends Service implements Runnable {
     /**
      * Target we publish for clients to send messages to IncomingHandler.
      */
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
+    final Messenger mMessenger = new Messenger(new IncomingHandler(this));
 
     private DMTasks mDMTasks;
     private int mDMTasksStatus;
