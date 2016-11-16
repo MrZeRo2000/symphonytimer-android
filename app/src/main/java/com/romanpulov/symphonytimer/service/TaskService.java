@@ -79,7 +79,7 @@ public class TaskService extends Service implements Runnable {
     private DMTasks mDMTasks;
     private int mDMTasksStatus;
 
-    private void updateDMTasks(DMTasks value) {
+    private synchronized void updateDMTasks(DMTasks value) {
         mDMTasks = value;
         mDMTasksStatus = mDMTasks.getStatus();
     }
