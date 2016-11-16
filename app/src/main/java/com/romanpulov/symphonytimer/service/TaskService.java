@@ -48,7 +48,6 @@ public class TaskService extends Service implements Runnable {
         public void handleMessage(Message msg) {
             TaskService hostService = mHostReference.get();
             if (hostService != null) {
-
                 switch (msg.what) {
                     case MSG_UPDATE_DM_TASKS:
                         hostService.updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
@@ -74,7 +73,8 @@ public class TaskService extends Service implements Runnable {
                     default:
                         super.handleMessage(msg);
                 }
-            }
+            } else
+                super.handleMessage(msg);
         }
     }
 

@@ -22,7 +22,7 @@ import java.util.List;
  * Used by main activity
  */
 public class TaskServiceManager {
-    private static void log(String message) {
+    private static void log1(String message) {
         Log.d("TaskServiceManager", message);
     }
 
@@ -35,6 +35,10 @@ public class TaskServiceManager {
      * Flag indicating whether we have called bind on the service.
      */
     private boolean mServiceBound;
+
+    public boolean isServiceBound() {
+        return mServiceBound;
+    }
 
     /**
      * Target we publish for clients to send messages to IncomingHandler.

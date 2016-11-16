@@ -43,7 +43,7 @@ import com.romanpulov.symphonytimer.service.TaskServiceManager;
 
 
 public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
-    private static void log(String message) {
+    private static void log1(String message) {
         Log.d("MainActivity", message);
     }
 
@@ -157,7 +157,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	updateTimers();
 
         //waiting for data if the service is available
-        if (mTaskServiceManager.isTaskServiceRunning())
+        if ((!mTaskServiceManager.isServiceBound()) && (mTaskServiceManager.isTaskServiceRunning()))
             mDMTasks.lock();
 
         mTaskServiceManager.updateServiceTasks(mDMTasks);
@@ -433,7 +433,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                     default:
                         super.handleMessage(msg);
                 }
-            }
+            } else
+                super.handleMessage(msg);
         }
     }
 
