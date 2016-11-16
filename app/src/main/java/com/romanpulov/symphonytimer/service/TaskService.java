@@ -134,7 +134,7 @@ public class TaskService extends Service implements Runnable {
                 startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
                 if (mScheduleExecutorTask == null)
-                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 100, TimeUnit.MILLISECONDS);
+                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
             }
         }
 
