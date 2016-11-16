@@ -110,10 +110,10 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
             public void onDMTimerInteraction(DMTimerRec item, int position) {
                 long clickTime = System.currentTimeMillis();
                 if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
-                    mLastClickTime = clickTime;
-                    VibratorHelper.getInstance(MainActivity.this).shortVibrate();
+                    VibratorHelper.shortVibrate(MainActivity.this);
                     performTimerAction(mDMTimers.get(position));
                 };
+                mLastClickTime = clickTime;
             }
         });
         mListViewSelector = adapter.getListViewSelector();
@@ -286,7 +286,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFile());
     	
     	//vibrate
-  		VibratorHelper.getInstance(this).vibrate();
+  		VibratorHelper.vibrate(this);
     }
 
     private void performTimerAction(DMTimerRec dmTimerRec) {
@@ -300,15 +300,17 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		mDMTasks.add(newTaskItem);
     	} else {
     		updateTimers();
-    		
+
+            int prevStatus = mDMTasks.getStatus();
+
     		mDMTasks.remove(taskItem);
     		
     		// inactive timer or no timers
-    		if (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED) {
+    		if ((prevStatus == DMTasks.STATUS_COMPLETED) && (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED)) {
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
         		//stop vibrating
-        		VibratorHelper.getInstance(this).cancel();
+        		VibratorHelper.cancel(this);
     			//enable screen fading
     			getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
     		}
