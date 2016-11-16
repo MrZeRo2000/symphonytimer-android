@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -20,6 +19,12 @@ import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.romanpulov.symphonytimer.activity.actions.TimerAction;
+import com.romanpulov.symphonytimer.activity.actions.TimerDeleteAction;
+import com.romanpulov.symphonytimer.activity.actions.TimerInsertAction;
+import com.romanpulov.symphonytimer.activity.actions.TimerMoveDown;
+import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
+import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.service.TaskService;
@@ -72,115 +77,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     private long mLastClickTime;
     private boolean mActivityVisible = false;
 
-    @Override
-    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
-            return false;
-        else {
-            actionMode.getMenuInflater().inflate(R.menu.main_actions, menu);
-            int pos;
-            if ((mListViewSelector != null) && ((pos = mListViewSelector.getSelectedItemPos()) != -1)) {
-                actionMode.setTitle(mDMTimers.get(pos).mTitle);
-            }
-            return true;
-        }
-    }
-
-    @Override
-    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-        return false;
-    }
-
-    @Override
-    public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
-        int selectedItemPos = mListViewSelector.getSelectedItemPos();
-        DMTimerRec actionTimer = (DMTimerRec)mTimersListView.getAdapter().getItem(selectedItemPos);
-
-        switch (menuItem.getItemId()) {
-            case R.id.action_edit:
-                performEditTimer(actionTimer);
-                return true;
-            case R.id.action_delete:
-                AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
-                deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
-                    @Override
-                    public void OnOkButtonClickEvent(DialogFragment dialog) {
-                        DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
-                        if (null != dmTimerRec) {
-                            performDeleteTimer(dmTimerRec);
-                            actionMode.finish();
-                        }
-                    }
-                });
-                deleteDialog.show(getFragmentManager(), null);
-                return true;
-            case R.id.action_move_up:
-                performMoveUpTimer(actionTimer);
-                return true;
-            case R.id.action_move_down:
-                performMoveDownTimer(actionTimer);
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode actionMode) {
-        if (mListViewSelector != null)
-            mListViewSelector.destroyActionMode();
-    }
-
-    public interface OnDMTimerInteractionListener {
-        void onDMTimerInteraction(DMTimerRec item, int position);
-    }
-	
-    private TaskServiceManager mTaskServiceManager = new TaskServiceManager(this, new IncomingHandler(this));
-
-    /**
-     * Handler of incoming messages from service.
-     */
-    private static class IncomingHandler extends Handler {
-        private final WeakReference<MainActivity> mHost;
-
-        IncomingHandler(MainActivity host) {
-            mHost = new WeakReference<>(host);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case TaskService.MSG_UPDATE_DM_PROGRESS:
-                    mHost.get().performUpdateDMProgress();
-                    break;
-                case TaskService.MSG_UPDATE_DM_TASKS:
-                    DMTasks newTasks = msg.getData().getParcelable(DMTasks.class.toString());
-                    mHost.get().performUpdateDMTasks(newTasks);
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
-    private void performUpdateDMProgress() {
-        log("performUpdateDMProgress progress:" + mDMTasks);
-        if (mActivityVisible)
-            updateTimers();
-        else
-            mDMTasks.updateProcess();
-    }
-
-    private void performUpdateDMTasks(DMTasks newTasks) {
-        if (newTasks != null) {
-            log("performUpdateDMTasks: obtaining service DM Tasks : " + newTasks.size());
-            if (newTasks.size() > mDMTasks.size()) {
-                log("performUpdateDMTasks: refreshing tasks:" + newTasks);
-                mDMTasks.replaceTasks(newTasks);
-                //mDMTasks.setTasksCompleted(mTaskItemCompleted);
-                updateTimers();
-            }
-        }
-    }
+    //Common activity events handling
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,21 +102,18 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
 		//setup toolbar
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		//toolbar.setTitle(mBasicNoteData.getNote().getTitle());
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setIcon(R.drawable.tuba);
 
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, new OnDMTimerInteractionListener() {
             @Override
             public void onDMTimerInteraction(DMTimerRec item, int position) {
-                log("OnDMTimerInteractionListener: received event");
                 long clickTime = System.currentTimeMillis();
-                if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
+                if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
                     mLastClickTime = clickTime;
                     VibratorHelper.getInstance(MainActivity.this).shortVibrate();
                     performTimerAction(mDMTimers.get(position));
-                } else
-                    log("OnDMTimerInteractionListener: skipped event");
+                };
             }
         });
         mListViewSelector = adapter.getListViewSelector();
@@ -261,10 +155,15 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	}
 
     	updateTimers();
+
+        //waiting for data if the service is available
+        if (mTaskServiceManager.isTaskServiceRunning())
+            mDMTasks.lock();
+
         mTaskServiceManager.updateServiceTasks(mDMTasks);
 
         //prevent immediate click after displaying
-        mLastClickTime = System.currentTimeMillis();
+        //mLastClickTime = System.currentTimeMillis();
     }
 
     @Override
@@ -281,8 +180,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 return true;
             case R.id.action_preferences:
                 if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
-                    Intent preferencesIntent = new Intent(this, SettingsActivity.class);
-                    startActivity(preferencesIntent);
+                    startSettingsActivity();
                     return true;
                 } else
                     return super.onOptionsItemSelected(item);
@@ -294,11 +192,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	}
     }
 
-    private void performEditTimer(DMTimerRec dmTimerRec) {
-    	startAddItemActivity(dmTimerRec);
-    }
-    
-    private void startAddItemActivity(DMTimerRec dmTimerRec) {    
+    private void startAddItemActivity(DMTimerRec dmTimerRec) {
     	Intent startItemIntent = new Intent(this, AddItemActivity.class);
     	startItemIntent.putExtra(AddItemActivity.EDIT_REC_NAME, dmTimerRec);    	
     	startActivityForResult(startItemIntent,
@@ -311,118 +205,75 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         startActivity(startHistoryIntent);
     }
 
+    private void startSettingsActivity() {
+        Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+        startActivity(preferencesIntent);
+    }
+
+    //Timers interaction
+
     private void loadTimers() {
     	 DBHelper.getInstance(this).fillTimers(mDMTimers);
     }
     
-    private void checkTimerSelection() {
-    	DMTaskItem taskItem = mDMTasks.getFirstTaskItemCompleted();
-    	if (null != taskItem) {
-    		DMTimerRec timerRec = mDMTimers.getItemById(taskItem.getId());
-    		if (null != timerRec) {
-    			int index = mDMTimers.indexOf(timerRec);
-    			if ( (index<mTimersListView.getFirstVisiblePosition()) || (index>mTimersListView.getLastVisiblePosition()) ) {
-                    mTimersListView.setSelection(index);
-    			}
-    		}    		
-    	}
-    }
-
     private void updateTimers() {
     	SymphonyArrayAdapter adapter = (SymphonyArrayAdapter)mTimersListView.getAdapter();
     	adapter.notifyDataSetChanged();
     	checkTimerSelection();
     }
-    
+
+    private void checkTimerSelection() {
+        DMTaskItem taskItem = mDMTasks.getFirstTaskItemCompleted();
+        if (null != taskItem) {
+            DMTimerRec timerRec = mDMTimers.getItemById(taskItem.getId());
+            if (null != timerRec) {
+                int index = mDMTimers.indexOf(timerRec);
+                if ( (index<mTimersListView.getFirstVisiblePosition()) || (index>mTimersListView.getLastVisiblePosition()) ) {
+                    mTimersListView.setSelection(index);
+                }
+            }
+        }
+    }
+
+    //Timer actions
+
     private void performMediaCleanup() {
         List<String> mediaNameList = DBHelper.getInstance(getApplicationContext()).getMediaFileNameList();
         MediaStorageHelper.getInstance(getApplicationContext()).cleanupMedia(mediaNameList);
     }
 
-    private void performInsertTimer(DMTimerRec dmTimerRec) {
-		try {
-			long retVal = DBHelper.getInstance(this).insertTimer(dmTimerRec);
-			if (retVal > 0) {
-                performMediaCleanup();
-				loadTimers();
-				updateTimers();  
-			}
-		} catch (Exception e) {			
-			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
-		}
-    }
-    
-    private void performDeleteTimer(DMTimerRec dmTimerRec) {    	
-		try {
-			long retVal = DBHelper.getInstance(this).deleteTimer(dmTimerRec.mId);
-			if (retVal > 0) {
-                performMediaCleanup();
-				loadTimers();
-				updateTimers();  
-			}
-		} catch (Exception e) {			
-			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
-		}
-    }
-    
-    private void performMoveUpTimer(DMTimerRec dmTimerRec) {
-		try {
-			boolean retVal = DBHelper.getInstance(this).moveTimerUp(dmTimerRec.mOrderId);
-			if (retVal) {
-				loadTimers();
-				updateTimers();
+    private void executeTimerAction(DMTimerRec dmTimerRec, TimerAction timerAction) {
+        try {
+            long retVal = timerAction.execute(this, dmTimerRec);
+            if (retVal > 0) {
+                if (timerAction.getChangeType() == TimerAction.CHANGE_TYPE_DATA)
+                    performMediaCleanup();
 
-                int pos = mDMTimers.getPosById(dmTimerRec.mId);
-                if (pos != -1) {
-                    mListViewSelector.setSelectedView(pos);
-                    mTimersListView.smoothScrollToPositionFromTop(pos, 0);
+                loadTimers();
+                updateTimers();
+
+                if (timerAction.getChangeType() == TimerAction.CHANGE_TYPE_POSITION) {
+                    int pos = mDMTimers.getPosById(dmTimerRec.mId);
+                    if (pos != -1) {
+                        mListViewSelector.setSelectedView(pos);
+                        mTimersListView.smoothScrollToPositionFromTop(pos, 0);
+                    }
                 }
             }
-		} catch (Exception e) {			
-			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
-		}
-    }
-    
-    private void performMoveDownTimer(DMTimerRec dmTimerRec) {
-		try {
-			boolean retVal = DBHelper.getInstance(this).moveTimerDown(dmTimerRec.mOrderId);
-			if (retVal) {
-				loadTimers();
-				updateTimers();
-
-                int pos = mDMTimers.getPosById(dmTimerRec.mId);
-                if (pos != -1) {
-                    mListViewSelector.setSelectedView(pos);
-                    mTimersListView.smoothScrollToPositionFromTop(pos, 0);
-                }
-			}
-		} catch (Exception e) {			
-			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
-		}
-    }
-    
-    private void performUpdateTimer(DMTimerRec dmTimerRec) {
-		try {
-			long retVal = DBHelper.getInstance(this).updateTimer(dmTimerRec);
-			if (retVal > 0) {
-				loadTimers();
-				updateTimers();  
-			}
-		} catch (Exception e) {    				
-			Toast.makeText(this, String.format(getResources().getString(R.string.error_saving_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
-		}
+        } catch (Exception e) {
+            Toast.makeText(this, String.format(getResources().getString(R.string.error_action_timer), e.getMessage()), Toast.LENGTH_SHORT).show();
+        }
     }
 
-    
+    //Timer events
+
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
-        log("performTaskCompleted");
     	//bring activity to front
     	if (!mActivityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
     		intent.setComponent(new ComponentName(this.getPackageName(), this.getClass().getName()));
     		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    		
     		getApplicationContext().startActivity(intent);   
-    		//Log.d("MainActivity", "Activity was not visible, bringing to front");
     	}
     	
     	//prevent from sleeping while not turned off
@@ -440,8 +291,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
     private void performTimerAction(DMTimerRec dmTimerRec) {
     	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.mId);
-        log("performTimerAction");
-    	
+
     	if (null == taskItem) {
     		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);
     		//newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
@@ -455,7 +305,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		
     		// inactive timer or no timers
     		if (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED) {
-                log("no more timter on inactive timer:" + mDMTasks);
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
         		//stop vibrating
@@ -476,13 +325,130 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     			//action
     			switch (requestCode) {
     				case (ADD_ITEM_RESULT_CODE):
-    					performInsertTimer(newTimer);
+    					//performInsertTimer(newTimer);
+                        executeTimerAction(newTimer, new TimerInsertAction());
     					break;
     				case (EDIT_ITEM_RESULT_CODE):
-    					performUpdateTimer(newTimer);
+    					//performUpdateTimer(newTimer);
+                        executeTimerAction(newTimer, new TimerUpdateAction());
     					break;    					
     			}
     		}
     	}
+    }
+
+    // Action mode support
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+        if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
+            return false;
+        else {
+            actionMode.getMenuInflater().inflate(R.menu.main_actions, menu);
+            int pos;
+            if ((mListViewSelector != null) && ((pos = mListViewSelector.getSelectedItemPos()) != -1)) {
+                actionMode.setTitle(mDMTimers.get(pos).mTitle);
+            }
+            return true;
+        }
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
+        int selectedItemPos = mListViewSelector.getSelectedItemPos();
+        DMTimerRec actionTimer = (DMTimerRec)mTimersListView.getAdapter().getItem(selectedItemPos);
+
+        switch (menuItem.getItemId()) {
+            case R.id.action_edit:
+                startAddItemActivity(actionTimer);
+                return true;
+            case R.id.action_delete:
+                AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
+                deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
+                    @Override
+                    public void OnOkButtonClickEvent(DialogFragment dialog) {
+                        DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+                        if (null != dmTimerRec) {
+                            executeTimerAction(dmTimerRec, new TimerDeleteAction());
+                            //performDeleteTimer(dmTimerRec);
+                            actionMode.finish();
+                        }
+                    }
+                });
+                deleteDialog.show(getFragmentManager(), null);
+                return true;
+            case R.id.action_move_up:
+                executeTimerAction(actionTimer, new TimerMoveUp());
+                return true;
+            case R.id.action_move_down:
+                executeTimerAction(actionTimer, new TimerMoveDown());
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode actionMode) {
+        if (mListViewSelector != null)
+            mListViewSelector.destroyActionMode();
+    }
+
+    public interface OnDMTimerInteractionListener {
+        void onDMTimerInteraction(DMTimerRec item, int position);
+    }
+
+    //Service interaction support
+
+    private TaskServiceManager mTaskServiceManager = new TaskServiceManager(this, new IncomingHandler(this));
+
+    /**
+     * Handler of incoming messages from service.
+     */
+    private static class IncomingHandler extends Handler {
+        private final WeakReference<MainActivity> mHostReference;
+
+        IncomingHandler(MainActivity host) {
+            mHostReference = new WeakReference<>(host);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity hostActivity = mHostReference.get();
+            if (hostActivity != null) {
+                switch (msg.what) {
+                    case TaskService.MSG_UPDATE_DM_PROGRESS:
+                        hostActivity.performUpdateDMProgress();
+                        break;
+                    case TaskService.MSG_UPDATE_DM_TASKS:
+                        DMTasks newTasks = msg.getData().getParcelable(DMTasks.class.toString());
+                        hostActivity.performUpdateDMTasks(newTasks);
+                        break;
+                    default:
+                        super.handleMessage(msg);
+                }
+            }
+        }
+    }
+
+    private void performUpdateDMProgress() {
+        if (mActivityVisible)
+            updateTimers();
+        else
+            mDMTasks.updateProcess();
+    }
+
+    private void performUpdateDMTasks(DMTasks newTasks) {
+        mDMTasks.unlock();
+        if (newTasks != null) {
+            if (newTasks.size() > mDMTasks.size()) {
+                mDMTasks.replaceTasks(newTasks);
+                updateTimers();
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@
     <string name="pref_restore">Restore</string>
     <string name="pref_summary_restore">Restore current data from local SD card</string>
     <string name="pref_cat_dropbox_backup">DropBox backup</string>
-    <string name="error_saving_timer">Error saving timer: %s</string>
+    <string name="error_action_timer">Error during timer action: %s</string>
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>
     <string name="error_playing_sound">Error playing sound : %s</string>

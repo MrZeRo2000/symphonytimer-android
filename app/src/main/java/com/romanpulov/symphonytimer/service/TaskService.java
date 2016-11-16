@@ -22,7 +22,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class TaskService extends Service implements Runnable {
-
     private void log(String message) {
         Log.d("TaskService", message);
     }
@@ -43,14 +42,12 @@ public class TaskService extends Service implements Runnable {
             switch (msg.what) {
                 case MSG_UPDATE_DM_TASKS:
                     updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
-                    log("received dmtasks:" + mDMTasks);
                     mClientMessenger = msg.replyTo;
                     break;
                 case MSG_TASK_COMPLETED:
                     wakeAndStartActivity(MainActivity.class);
                     break;
                 case MSG_QUERY_DM_TASKS:
-                    log("Received MSG_QUERY_DM_TASKS");
                     mClientMessenger = msg.replyTo;
                     if (mClientMessenger != null) {
                         Message outMsg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
@@ -58,7 +55,6 @@ public class TaskService extends Service implements Runnable {
                         bundle.putParcelable(DMTasks.class.toString(), mDMTasks.createParcelableCopy());
                         outMsg.setData(bundle);
                         try {
-                            log("sending dmtasks:" + mDMTasks);
                             mClientMessenger.send(outMsg);
                         } catch (RemoteException e) {
                             e.printStackTrace();
@@ -116,19 +112,16 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public IBinder onBind(Intent intent) {
-        log("Bind");
         return mMessenger.getBinder();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        log("startCommand");
         if (intent.getExtras() != null) {
             updateDMTasks((DMTasks)intent.getExtras().getParcelable(DMTasks.class.toString()));
             if (mDMTasks != null) {
                 startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
-                log("startScheduler");
                 if (mScheduleExecutorTask == null)
                     mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
             }
@@ -139,7 +132,6 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        log("unBind");
         mClientMessenger = null;
         return super.onUnbind(intent);
     }
@@ -148,7 +140,6 @@ public class TaskService extends Service implements Runnable {
     public void onDestroy() {
         stopForeground(true);
         if (mScheduleExecutorTask != null) {
-            log("stopScheduler");
             mScheduleExecutorTask.cancel(true);
             mScheduleExecutorTask = null;
         }
@@ -158,14 +149,11 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void run() {
-        log("run, tasks: " + mDMTasks.size());
-
         try {
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
             int newDMTasksStatus = mDMTasks.getStatus();
             if ((mDMTasksStatus != DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED)) {
-                log("run, completed");
                 Message msg = Message.obtain(null, TaskService.MSG_TASK_COMPLETED, 0, 0);
                 try {
                     mMessenger.send(msg);
@@ -178,7 +166,6 @@ public class TaskService extends Service implements Runnable {
             if (mClientMessenger != null) {
                 Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_PROGRESS, 0, 0);
                 try {
-                    log("run, updating client");
                     mClientMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();

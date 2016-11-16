@@ -27,6 +27,20 @@ public class DMTasks implements Parcelable {
         return mDataItems.size();
     }
 
+    private boolean mLocked = false;
+
+    public void lock() {
+        mLocked = true;
+    }
+
+    public void unlock() {
+        mLocked = false;
+    }
+
+    public boolean isLocked() {
+        return mLocked;
+    }
+
 	public DMTaskItem getTaskItemById(long id) {
 		for (DMTaskItem taskItem : mDataItems) {
 			if (id == taskItem.getId()) {

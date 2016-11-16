@@ -18,14 +18,13 @@ import com.romanpulov.symphonytimer.model.DMTasks;
 import java.util.List;
 
 /**
- * Created by romanpulov on 15.11.2016.
+ * Utility class for interaction with Service
+ * Used by main activity
  */
 public class TaskServiceManager {
-
     private static void log(String message) {
         Log.d("TaskServiceManager", message);
     }
-
 
     /**
      * Messenger for communicating with the service.
@@ -57,10 +56,7 @@ public class TaskServiceManager {
             mService = new Messenger(service);
             mServiceBound = true;
 
-            log("onServiceConnected");
-
             queryServiceDMTasks();
-            //updateServiceDMTasks();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -68,8 +64,6 @@ public class TaskServiceManager {
             // unexpectedly disconnected -- that is, its process crashed.
             mService = null;
             mServiceBound = false;
-
-            log("onServiceDisconnected");
         }
     };
 
@@ -85,7 +79,6 @@ public class TaskServiceManager {
         Bundle bundle = new Bundle();
         bundle.putParcelable(DMTasks.class.toString(), newTasks);
         msg.setData(bundle);
-        log("updateServiceDMTasks:" + newTasks);
         try {
             mService.send(msg);
         } catch (RemoteException e) {
@@ -94,7 +87,6 @@ public class TaskServiceManager {
     }
 
     private void queryServiceDMTasks() {
-        log("queryServiceDMTasks");
         Message msg = Message.obtain(null, TaskService.MSG_QUERY_DM_TASKS, 0, 0);
         msg.replyTo = mMessenger;
         try {
@@ -109,7 +101,6 @@ public class TaskServiceManager {
 
         //no more tasks
         if (mServiceBound && tasks.size() == 0) {
-            log("updateServiceTasks: no more tasks");
             mContext.unbindService(mConnection);
             mServiceBound = false;
             mContext.stopService(serviceIntent);
@@ -120,7 +111,6 @@ public class TaskServiceManager {
         if ((!mServiceBound) && tasks.size() > 0) {
             DMTasks newTasks = tasks.createParcelableCopy();
             serviceIntent.putExtra(DMTasks.class.toString(), newTasks);
-            log("updateServiceTasks: tasks, not bound, sending tasks:" + newTasks);
             mContext.startService(serviceIntent);
             mContext.bindService(new Intent(mContext, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
             return;
@@ -128,16 +118,18 @@ public class TaskServiceManager {
 
         //tasks, bound
         if (mServiceBound && tasks.size() > 0) {
-            log("updateServiceTasks: tasks, bound");
             updateServiceDMTasks(tasks);
             return;
         }
 
-        if (isServiceRunning(TaskService.class.getName())) {
-            log("updateServiceTasks: service running");
+        if (isTaskServiceRunning()) {
             mContext.startService(serviceIntent);
             mContext.bindService(new Intent(mContext, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
         }
+    }
+
+    public boolean isTaskServiceRunning () {
+        return isServiceRunning(TaskService.class.getName());
     }
 
     private boolean isServiceRunning(String serviceClassName) {
