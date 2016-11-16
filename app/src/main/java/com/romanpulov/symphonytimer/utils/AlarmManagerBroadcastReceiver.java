@@ -35,18 +35,18 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 	}
 
     public void cancelAlarm(Context context, long alarmId) {
-        Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
-        PendingIntent sender = PendingIntent.getBroadcast(context, (int)alarmId, intent, PendingIntent.FLAG_NO_CREATE);
+        Intent intent = new Intent(context.getApplicationContext(), AlarmManagerBroadcastReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(context.getApplicationContext(), (int)alarmId, intent, PendingIntent.FLAG_NO_CREATE);
         if (null != sender) {
-        	AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        	AlarmManager alarmManager = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         	alarmManager.cancel(sender);
         }
     }
     
     public void setOnetimeTimer(Context context, long alarmId, long triggerAt){
-    	AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int)alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    	AlarmManager am = (AlarmManager)context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context.getApplicationContext(), AlarmManagerBroadcastReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context.getApplicationContext(), (int)alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 }

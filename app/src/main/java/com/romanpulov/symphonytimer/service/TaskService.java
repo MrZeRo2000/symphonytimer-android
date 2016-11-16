@@ -38,15 +38,15 @@ public class TaskService extends Service implements Runnable {
      * Handler of incoming messages from clients.
      */
     static class IncomingHandler extends Handler {
-        private final WeakReference<TaskService> mHostReference;
+        private final TaskService mHostReference;
 
         IncomingHandler(TaskService host) {
-            mHostReference = new WeakReference<>(host);
+            mHostReference = host;
         }
 
         @Override
         public void handleMessage(Message msg) {
-            TaskService hostService = mHostReference.get();
+            TaskService hostService = mHostReference;
             if (hostService != null) {
                 switch (msg.what) {
                     case MSG_UPDATE_DM_TASKS:
@@ -54,7 +54,7 @@ public class TaskService extends Service implements Runnable {
                         hostService.mClientMessenger = msg.replyTo;
                         break;
                     case MSG_TASK_COMPLETED:
-                        hostService.wakeAndStartActivity(MainActivity.class);
+                        //hostService.wakeAndStartActivity(MainActivity.class);
                         break;
                     case MSG_QUERY_DM_TASKS:
                         hostService.mClientMessenger = msg.replyTo;
@@ -134,7 +134,7 @@ public class TaskService extends Service implements Runnable {
                 startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
                 if (mScheduleExecutorTask == null)
-                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 100, TimeUnit.MILLISECONDS);
             }
         }
 
@@ -161,10 +161,13 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void run() {
         try {
+            log("run");
+
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
             int newDMTasksStatus = mDMTasks.getStatus();
             if ((mDMTasksStatus != DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED)) {
+                log("completed");
                 Message msg = Message.obtain(null, TaskService.MSG_TASK_COMPLETED, 0, 0);
                 try {
                     mMessenger.send(msg);

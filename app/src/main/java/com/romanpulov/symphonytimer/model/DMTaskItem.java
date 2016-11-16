@@ -85,7 +85,7 @@ public class DMTaskItem implements Parcelable {
 		return mCompletedFlag;
 	}
 	
-	long getTriggerAtTime() {
+	public long getTriggerAtTime() {
 		return mStartTime + mMaxTimeSec * 1000;
 	}
 	

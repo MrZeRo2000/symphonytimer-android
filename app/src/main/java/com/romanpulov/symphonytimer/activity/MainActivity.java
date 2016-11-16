@@ -10,12 +10,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.internal.view.menu.ExpandedMenuView;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -40,10 +43,11 @@ import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 import com.romanpulov.symphonytimer.service.TaskServiceManager;
+import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
 
 public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
-    private static void log1(String message) {
+    private static void log(String message) {
         Log.d("MainActivity", message);
     }
 
@@ -76,6 +80,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     private ListViewSelector mListViewSelector;
     private long mLastClickTime;
     private boolean mActivityVisible = false;
+
+    private AlarmManagerBroadcastReceiver mAlarm;
 
     //Common activity events handling
 
@@ -120,6 +126,13 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
         mTimersListView = (ListView)findViewById(R.id.main_list_view);
         mTimersListView.setAdapter(adapter);
+
+        mTimersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                log("onClick");
+            }
+        });
 
         // Update List
         loadTimers();
@@ -268,6 +281,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     //Timer events
 
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
+        log("taskCompleted");
     	//bring activity to front
     	if (!mActivityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
@@ -298,7 +312,15 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		newTaskItem.startProcess();
     		
     		mDMTasks.add(newTaskItem);
+
+            if (null == mAlarm)
+                mAlarm = new AlarmManagerBroadcastReceiver();
+            mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
+
     	} else {
+            if (null != mAlarm)
+                mAlarm.cancelAlarm(getApplicationContext(), taskItem.getId());
+
     		updateTimers();
 
             int prevStatus = mDMTasks.getStatus();
@@ -307,10 +329,10 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		
     		// inactive timer or no timers
     		if ((prevStatus == DMTasks.STATUS_COMPLETED) && (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED)) {
+                //stop vibrating
+                VibratorHelper.cancel(this);
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
-        		//stop vibrating
-        		VibratorHelper.cancel(this);
     			//enable screen fading
     			getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
     		}
@@ -412,15 +434,15 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
      * Handler of incoming messages from service.
      */
     private static class IncomingHandler extends Handler {
-        private final WeakReference<MainActivity> mHostReference;
+        private final MainActivity mHostReference;
 
         IncomingHandler(MainActivity host) {
-            mHostReference = new WeakReference<>(host);
+            mHostReference = host;
         }
 
         @Override
         public void handleMessage(Message msg) {
-            MainActivity hostActivity = mHostReference.get();
+            MainActivity hostActivity = mHostReference;
             if (hostActivity != null) {
                 switch (msg.what) {
                     case TaskService.MSG_UPDATE_DM_PROGRESS:
