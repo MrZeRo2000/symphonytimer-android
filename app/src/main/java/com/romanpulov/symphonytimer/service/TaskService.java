@@ -13,24 +13,33 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.romanpulov.symphonytimer.activity.MainActivity;
+import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
+import com.romanpulov.symphonytimer.helper.VibratorHelper;
+import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
+import com.romanpulov.symphonytimer.model.DMTasksStatus;
 import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_TO_COMPLETED;
+import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_TO_NOT_COMPLETED;
+import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_UPDATE_COMPLETED;
+
 public class TaskService extends Service implements Runnable {
-    private void log(String message) {
+    private static void log(String message) {
         Log.d("TaskService", message);
     }
 
     public static final int MSG_UPDATE_DM_TASKS = 1;
     public static final int MSG_UPDATE_DM_PROGRESS = 2;
-    public static final int MSG_TASK_COMPLETED = 3;
-    public static final int MSG_QUERY_DM_TASKS = 4;
+    public static final int MSG_QUERY_DM_TASKS = 3;
+    public static final int MSG_TASK_TO_COMPLETED = 4;
+    public static final int MSG_TASK_UPDATE_COMPLETED = 5;
+    public static final int MSG_TASK_TO_NOT_COMPLETED = 6;
 
     private Messenger mClientMessenger;
 
@@ -50,11 +59,33 @@ public class TaskService extends Service implements Runnable {
             if (hostService != null) {
                 switch (msg.what) {
                     case MSG_UPDATE_DM_TASKS:
+                        log("handleMessage update dm tasks");
                         hostService.updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
                         hostService.mClientMessenger = msg.replyTo;
                         break;
-                    case MSG_TASK_COMPLETED:
+                    case MSG_TASK_TO_COMPLETED:
+                        log("handleMessage to completed");
                         //hostService.wakeAndStartActivity(MainActivity.class);
+
+                        //play sound
+                        MediaPlayerHelper.getInstance(mHostReference).startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+
+                        //vibrate
+                        VibratorHelper.vibrate(mHostReference);
+                        break;
+                    case MSG_TASK_UPDATE_COMPLETED:
+                        log("handleMessage update completed");
+                        //stop sound
+                        MediaPlayerHelper.getInstance(mHostReference).stop();
+                        //play sound
+                        MediaPlayerHelper.getInstance(mHostReference).startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+                        break;
+                    case MSG_TASK_TO_NOT_COMPLETED:
+                        log("handleMessage to not completed");
+                        //stop vibrating
+                        VibratorHelper.cancel(mHostReference);
+                        //stop sound
+                        MediaPlayerHelper.getInstance(mHostReference).stop();
                         break;
                     case MSG_QUERY_DM_TASKS:
                         hostService.mClientMessenger = msg.replyTo;
@@ -83,12 +114,56 @@ public class TaskService extends Service implements Runnable {
      */
     final Messenger mMessenger = new Messenger(new IncomingHandler(this));
 
+    final AlarmManagerBroadcastReceiver mAlarm = new AlarmManagerBroadcastReceiver();
+
     private DMTasks mDMTasks;
-    private int mDMTasksStatus;
+    private DMTasksStatus mDMTasksStatus;
 
     private synchronized void updateDMTasks(DMTasks value) {
+        //cancel old alarm
+        mAlarm.cancelAlarm(this, 0);
+
         mDMTasks = value;
-        mDMTasksStatus = mDMTasks.getStatus();
+        if (mDMTasksStatus == null)
+            mDMTasksStatus = new DMTasksStatus(mDMTasks);
+        else
+            processStatusChangeEvent(mDMTasksStatus.getStatusChangeEvent(mDMTasks));
+
+        //set new alarm
+        if (mDMTasks.size() > 0) {
+            long triggerTime = mDMTasks.getFirstTriggerAtTime();
+            log("firstTriggerAtTime = " + triggerTime);
+            if (triggerTime < Long.MAX_VALUE) {
+                log("setting new alarm to " + triggerTime);
+                mAlarm.setOnetimeTimer(this, 0, triggerTime);
+            }
+        }
+    }
+
+    private void processStatusChangeEvent(int event) {
+        int messageId;
+        switch (event) {
+            case STATUS_EVENT_TO_COMPLETED:
+                messageId = MSG_TASK_TO_COMPLETED;
+                break;
+            case STATUS_EVENT_UPDATE_COMPLETED:
+                messageId = MSG_TASK_UPDATE_COMPLETED;
+                break;
+            case STATUS_EVENT_TO_NOT_COMPLETED:
+                messageId = MSG_TASK_TO_NOT_COMPLETED;
+                break;
+            default:
+                messageId = 0;
+        }
+
+        if (messageId != 0) {
+            Message msg = Message.obtain(null, messageId, 0, 0);
+            try {
+                mMessenger.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(2);
@@ -149,6 +224,7 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void onDestroy() {
+        MediaPlayerHelper.getInstance(this).release();
         stopForeground(true);
         if (mScheduleExecutorTask != null) {
             mScheduleExecutorTask.cancel(true);
@@ -161,21 +237,44 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void run() {
         try {
-            log("run");
+            log("run " + System.currentTimeMillis());
 
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
+            processStatusChangeEvent(mDMTasksStatus.getStatusChangeEvent(mDMTasks));
+
+            /*
             int newDMTasksStatus = mDMTasks.getStatus();
+            DMTaskItem newDMTasksItemCompleted = mDMTasks.getFirstTaskItemCompleted();
+            log ("newDMTasksItemCompleted = " + newDMTasksItemCompleted);
+
+            //detect message to generate
+            Message msg = null;
             if ((mDMTasksStatus != DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED)) {
-                log("completed");
-                Message msg = Message.obtain(null, TaskService.MSG_TASK_COMPLETED, 0, 0);
+                log("run to completed");
+                // to completed
+                msg = Message.obtain(null, TaskService.MSG_TASK_TO_COMPLETED, 0, 0);
+            } else if ((mDMTasksStatus == DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED) && (newDMTasksItemCompleted.getId() != mDMTasks.getFirstTaskItemCompleted().getId())) {
+                log("run update completed");
+                //update completed
+                msg = Message.obtain(null, TaskService.MSG_TASK_UPDATE_COMPLETED, 0, 0);
+            } else if ((mDMTasksStatus == DMTasks.STATUS_COMPLETED) && (newDMTasksStatus != DMTasks.STATUS_COMPLETED)) {
+                log("run to not completed");
+                //to not completed
+                msg = Message.obtain(null, TaskService.MSG_TASK_TO_NOT_COMPLETED, 0, 0);
+            }
+
+            if (msg != null) {
                 try {
                     mMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-                mDMTasksStatus = newDMTasksStatus;
             }
+
+            mDMTasksStatus = newDMTasksStatus;
+            mDMTasksFirstItemCompleted = newDMTasksItemCompleted;
+            */
 
             if (mClientMessenger != null) {
                 Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_PROGRESS, 0, 0);

@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.internal.view.menu.ExpandedMenuView;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,13 +29,12 @@ import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
 import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
+import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.service.TaskService;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.helper.AssetsHelper;
-import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
-import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
@@ -144,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     @Override
     protected void onDestroy() {
     	DBHelper.clearInstance();
-    	MediaPlayerHelper.getInstance(this).release();
+
         mTaskServiceManager.unbindService();
         mTaskServiceManager = null;
 
@@ -296,11 +294,13 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	//save history
     	DBHelper.getInstance(this).insertTimerHistory(dmTaskItem);
 
+        /*
     	//play sound
     	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFile());
     	
     	//vibrate
   		VibratorHelper.vibrate(this);
+  		*/
     }
 
     private void performTimerAction(DMTimerRec dmTimerRec) {
@@ -313,13 +313,17 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		
     		mDMTasks.add(newTaskItem);
 
+            /*
             if (null == mAlarm)
                 mAlarm = new AlarmManagerBroadcastReceiver();
             mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
+            */
 
     	} else {
+            /*
             if (null != mAlarm)
                 mAlarm.cancelAlarm(getApplicationContext(), taskItem.getId());
+                */
 
     		updateTimers();
 
@@ -329,10 +333,12 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     		
     		// inactive timer or no timers
     		if ((prevStatus == DMTasks.STATUS_COMPLETED) && (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED)) {
+                /*
                 //stop vibrating
                 VibratorHelper.cancel(this);
     			//stop sound
         		MediaPlayerHelper.getInstance(this).stop();
+        		*/
     			//enable screen fading
     			getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
     		}

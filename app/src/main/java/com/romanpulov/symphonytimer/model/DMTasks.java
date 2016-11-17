@@ -51,12 +51,17 @@ public class DMTasks implements Parcelable {
 	}
 	
 	public DMTaskItem getFirstTaskItemCompleted() {
+        DMTaskItem result = null;
+
 		for (DMTaskItem taskItem : mDataItems) {
 			if (taskItem.getCompleted()) {
-				return taskItem;
+                if (result == null)
+                    result = taskItem;
+				else if (taskItem.getTriggerAtTime() > result.getTriggerAtTime())
+                    result = taskItem;
 			}
 		}
-		return null;
+		return result;
 	}
 	
 	public void updateProcess() {
@@ -109,6 +114,20 @@ public class DMTasks implements Parcelable {
             return 0;
         else
             return (int)((currentTime - minStartTime) * 100/timeRange);
+    }
+
+    /**
+     * Scans items and returns earliest trigger time
+     * for uncompleted items
+     * @return time
+     */
+    public long getFirstTriggerAtTime() {
+        long result = Long.MAX_VALUE;
+        for (DMTaskItem item : mDataItems) {
+            if ((!item.getCompleted()) && (item.getTriggerAtTime() < result))
+                result = item.getTriggerAtTime();
+        }
+        return result;
     }
 
     /**

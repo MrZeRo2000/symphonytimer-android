@@ -4,10 +4,15 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.util.Log;
 
 import com.romanpulov.symphonytimer.R;
 
 public class MediaPlayerHelper {
+	private static void log(String message) {
+		Log.d("MediaPlayerHelper", message);
+	}
+
 	private static MediaPlayerHelper mMediaPlayerHelperInstance = null;
 	private Context mContext;
 	private MediaPlayer mMediaPlayer;
@@ -27,6 +32,7 @@ public class MediaPlayerHelper {
 	}	
 	
 	public void stop() {
+        log("stop");
 		if (null != mMediaPlayer) {
 			if (mMediaPlayer.isPlaying()) {
 				mMediaPlayer.stop();				
@@ -39,6 +45,7 @@ public class MediaPlayerHelper {
 	}
 	
 	public void release() {
+        log("release");
 		if (null != mMediaPlayer) {
 			mMediaPlayer.release();
 			mMediaPlayer = null;
@@ -54,6 +61,7 @@ public class MediaPlayerHelper {
 
 	public void startSoundFile(String soundFile) {
 		stop();
+        log("startSoundFile");
 		if (null == soundFile) {
 			mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
 		} else {

@@ -7,6 +7,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class VibratorHelper {
+    private static void log(String message) {
+        Log.d("VibratorHelper", message);
+    }
+
 	private static long VIBRATE_SHORT_TIME = 200;
 	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
 	
@@ -20,17 +24,22 @@ public class VibratorHelper {
 	
 	public static void vibrate(Context context) {
 		if (allowedVibrate(context)) {
+            log("vibrate");
             getVibrator(context).vibrate(VIBRATE_PATTERN, 0);
-		}
+		} else
+            log("vibrate not allowed");
 	}
 
 	public static void shortVibrate(Context context) {
 		if (allowedVibrate(context)) {
+            log("shortVibrate");
             getVibrator(context).vibrate(VIBRATE_SHORT_TIME);
-		}
+		} else
+            log("vibrate not allowed");
     }
 	
 	public static void cancel(Context context) {
+        log("cancel");
 		getVibrator(context).cancel();
 	}
 }
