@@ -46,7 +46,7 @@
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>
     <string name="error_playing_sound">Error playing sound : %s</string>
-    <string name="error_load_local_backup">Error loading local backup, code = %s</string>
+    <string name="error_load_local_backup">Error loading local backup, code = %d</string>
     <string name="info_load_local_backup">Local backup has been restored successfully</string>
     <string name="action_not_allowed">This operation is not allowed</string>
     <string name="question_are_you_sure">Are you sure?</string>

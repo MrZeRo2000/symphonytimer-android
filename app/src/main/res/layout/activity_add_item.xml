@@ -182,7 +182,6 @@
                 android:gravity="center_vertical"
                 android:layout_centerInParent="true"
                 android:textAppearance="?android:attr/textAppearanceSmallInverse"
-                android:text="Text"
                 />
         </RelativeLayout>
         <ImageButton
