@@ -42,6 +42,7 @@ public class TaskService extends Service implements Runnable {
     public static final int MSG_TASK_TO_NOT_COMPLETED = 6;
 
     private Messenger mClientMessenger;
+    private MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
 
     /**
      * Handler of incoming messages from clients.
@@ -68,7 +69,7 @@ public class TaskService extends Service implements Runnable {
                         //hostService.wakeAndStartActivity(MainActivity.class);
 
                         //play sound
-                        MediaPlayerHelper.getInstance(mHostReference).startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+                        mHostReference.mMediaPlayerHelper.startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
 
                         //vibrate
                         VibratorHelper.vibrate(mHostReference);
@@ -76,16 +77,16 @@ public class TaskService extends Service implements Runnable {
                     case MSG_TASK_UPDATE_COMPLETED:
                         log("handleMessage update completed");
                         //stop sound
-                        MediaPlayerHelper.getInstance(mHostReference).stop();
+                        mHostReference.mMediaPlayerHelper.stop();
                         //play sound
-                        MediaPlayerHelper.getInstance(mHostReference).startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+                        mHostReference.mMediaPlayerHelper.startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
                         break;
                     case MSG_TASK_TO_NOT_COMPLETED:
                         log("handleMessage to not completed");
                         //stop vibrating
                         VibratorHelper.cancel(mHostReference);
                         //stop sound
-                        MediaPlayerHelper.getInstance(mHostReference).stop();
+                        mHostReference.mMediaPlayerHelper.stop();
                         break;
                     case MSG_QUERY_DM_TASKS:
                         hostService.mClientMessenger = msg.replyTo;
@@ -224,7 +225,7 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void onDestroy() {
-        MediaPlayerHelper.getInstance(this).release();
+        mMediaPlayerHelper.release();
         stopForeground(true);
         if (mScheduleExecutorTask != null) {
             mScheduleExecutorTask.cancel(true);

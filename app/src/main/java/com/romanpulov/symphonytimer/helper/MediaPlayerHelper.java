@@ -13,23 +13,20 @@ public class MediaPlayerHelper {
 		Log.d("MediaPlayerHelper", message);
 	}
 
-	private static MediaPlayerHelper mMediaPlayerHelperInstance = null;
 	private Context mContext;
 	private MediaPlayer mMediaPlayer;
 	private int mOriginalVolume;
 	private AudioManager mAudioManager;
+
+    private AudioManager getAudioManager() {
+        if (mAudioManager == null)
+            mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        return mAudioManager;
+    }
 	
-	private MediaPlayerHelper(Context context){
-		this.mContext = context;
+	public MediaPlayerHelper(Context context){
+		mContext = context;
 	}
-	
-	public static MediaPlayerHelper getInstance(Context context) {
-		if (null == mMediaPlayerHelperInstance) {
-			mMediaPlayerHelperInstance = new MediaPlayerHelper(context);
-			mMediaPlayerHelperInstance.mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-		}		
-		return mMediaPlayerHelperInstance;
-	}	
 	
 	public void stop() {
         log("stop");
@@ -40,7 +37,7 @@ public class MediaPlayerHelper {
 			mMediaPlayer.reset();
             mMediaPlayer.release();
 			mMediaPlayer = null;
-			mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mOriginalVolume, 0);
+			getAudioManager().setStreamVolume(AudioManager.STREAM_MUSIC, mOriginalVolume, 0);
 		}
 	}
 	
@@ -80,8 +77,8 @@ public class MediaPlayerHelper {
             }
 		}
 		
-		mOriginalVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-		mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+		mOriginalVolume = getAudioManager().getStreamVolume(AudioManager.STREAM_MUSIC);
+		getAudioManager().setStreamVolume(AudioManager.STREAM_MUSIC, getAudioManager().getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 		
 		mMediaPlayer.setLooping(true);
 		mMediaPlayer.start();

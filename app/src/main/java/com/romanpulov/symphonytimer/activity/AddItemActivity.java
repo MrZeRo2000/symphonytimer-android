@@ -45,6 +45,8 @@ public class AddItemActivity extends ActionBarActivity {
     private TextView mSoundFileTextView;
     private ImageButton mImageFileButton;
 
+    private MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
+
     private class AddItemInputException extends Exception {
 
         private static final long serialVersionUID = -6523044324262630252L;
@@ -146,7 +148,7 @@ public class AddItemActivity extends ActionBarActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
+        mMediaPlayerHelper.stop();
     }
 
     @Override
@@ -170,7 +172,7 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     public void onSoundFileButtonClick(View v){
-        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
+        mMediaPlayerHelper.stop();
         Intent soundIntent = new Intent();
         soundIntent.setType("audio/*");
         soundIntent.setAction(Intent.ACTION_GET_CONTENT);
@@ -178,11 +180,11 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     public void onPreviewSoundFileButtonClick(View v){
-        MediaPlayerHelper.getInstance(getApplicationContext()).toggleSound(mEditSoundFile == null ? null : mEditSoundFile.getPath());
+        mMediaPlayerHelper.toggleSound(mEditSoundFile == null ? null : mEditSoundFile.getPath());
     }
 
     public void onClearSoundFileButtonClick(View v){
-        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
+        mMediaPlayerHelper.stop();
         mEditSoundFile = null;
         mSoundFileTextView.setText(R.string.default_sound);
     }
@@ -265,7 +267,7 @@ public class AddItemActivity extends ActionBarActivity {
             setResult(RESULT_OK, resultIntent);
         } else if (findViewById(R.id.cancel_button) == v)
             setResult(RESULT_CANCELED);
-        MediaPlayerHelper.getInstance(getApplicationContext()).stop();
+        mMediaPlayerHelper.stop();
         finish();
     }
 }
