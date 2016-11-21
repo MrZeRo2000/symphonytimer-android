@@ -22,7 +22,7 @@ import java.util.List;
  * Used by main activity
  */
 public class TaskServiceManager {
-    private static void log1(String message) {
+    private static void log(String message) {
         Log.d("TaskServiceManager", message);
     }
 
@@ -105,6 +105,7 @@ public class TaskServiceManager {
 
         //no more tasks
         if (mServiceBound && tasks.size() == 0) {
+            log("updateServiceTasks: no more tasks");
             mContext.unbindService(mConnection);
             mServiceBound = false;
             mContext.stopService(serviceIntent);
@@ -113,6 +114,7 @@ public class TaskServiceManager {
 
         //tasks, not bound
         if ((!mServiceBound) && tasks.size() > 0) {
+            log("updateServiceTasks: tasks, not bound");
             DMTasks newTasks = tasks.createParcelableCopy();
             serviceIntent.putExtra(DMTasks.class.toString(), newTasks);
             mContext.startService(serviceIntent);
@@ -122,11 +124,13 @@ public class TaskServiceManager {
 
         //tasks, bound
         if (mServiceBound && tasks.size() > 0) {
+            log("updateServiceTasks: tasks, bound");
             updateServiceDMTasks(tasks);
             return;
         }
 
         if (isTaskServiceRunning()) {
+            log("updateServiceTasks: TaskServiceRunning");
             mContext.startService(serviceIntent);
             mContext.bindService(new Intent(mContext, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
         }

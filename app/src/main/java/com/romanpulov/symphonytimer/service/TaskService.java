@@ -66,27 +66,29 @@ public class TaskService extends Service implements Runnable {
                         break;
                     case MSG_TASK_TO_COMPLETED:
                         log("handleMessage to completed");
-                        //hostService.wakeAndStartActivity(MainActivity.class);
+                        hostService.wakeAndStartActivity(MainActivity.class);
 
                         //play sound
-                        mHostReference.mMediaPlayerHelper.startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+                        hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
 
                         //vibrate
-                        VibratorHelper.vibrate(mHostReference);
+                        VibratorHelper.vibrate(hostService);
                         break;
                     case MSG_TASK_UPDATE_COMPLETED:
                         log("handleMessage update completed");
+
                         //stop sound
-                        mHostReference.mMediaPlayerHelper.stop();
+                        hostService.mMediaPlayerHelper.stop();
+                        
                         //play sound
-                        mHostReference.mMediaPlayerHelper.startSoundFile(mHostReference.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+                        hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
                         break;
                     case MSG_TASK_TO_NOT_COMPLETED:
                         log("handleMessage to not completed");
                         //stop vibrating
-                        VibratorHelper.cancel(mHostReference);
+                        VibratorHelper.cancel(hostService);
                         //stop sound
-                        mHostReference.mMediaPlayerHelper.stop();
+                        hostService.mMediaPlayerHelper.stop();
                         break;
                     case MSG_QUERY_DM_TASKS:
                         hostService.mClientMessenger = msg.replyTo;
@@ -121,6 +123,8 @@ public class TaskService extends Service implements Runnable {
     private DMTasksStatus mDMTasksStatus;
 
     private synchronized void updateDMTasks(DMTasks value) {
+        log("UpdateDMTasks, value = " + value);
+
         //cancel old alarm
         mAlarm.cancelAlarm(this, 0);
 
@@ -225,6 +229,7 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void onDestroy() {
+        VibratorHelper.cancel(this);
         mMediaPlayerHelper.release();
         stopForeground(true);
         if (mScheduleExecutorTask != null) {
