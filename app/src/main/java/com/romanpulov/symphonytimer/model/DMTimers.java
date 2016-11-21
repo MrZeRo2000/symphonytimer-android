@@ -10,7 +10,7 @@ public class DMTimers implements Parcelable {
 
 	private static final long serialVersionUID = 5787816932299989884L;
 
-    private List<DMTimerRec> dataItems;
+    private final List<DMTimerRec> dataItems;
 
     public void clear() {
         dataItems.clear();

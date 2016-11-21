@@ -13,7 +13,7 @@ public class MediaPlayerHelper {
 		Log.d("MediaPlayerHelper", message);
 	}
 
-	private Context mContext;
+	private final Context mContext;
 	private MediaPlayer mMediaPlayer;
 	private int mOriginalVolume;
 	private AudioManager mAudioManager;

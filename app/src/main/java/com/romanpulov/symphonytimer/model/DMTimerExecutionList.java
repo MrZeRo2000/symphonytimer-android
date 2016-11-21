@@ -8,11 +8,11 @@ public class DMTimerExecutionList implements Iterable<DMTimerExecutionRec> {
 		
 	private static final long serialVersionUID = 4191447399203845533L;
 
-    private List<DMTimerExecutionRec> dataItems = new ArrayList<>();
+    private final List<DMTimerExecutionRec> dataItems = new ArrayList<>();
 	private long mMaxExecPercent;
 
     public void clear() {
-        dataItems.clear();;
+        dataItems.clear();
     }
 
     public boolean add(DMTimerExecutionRec rec) {
@@ -35,7 +35,7 @@ public class DMTimerExecutionList implements Iterable<DMTimerExecutionRec> {
 		
 		mMaxExecPercent = 0;
 		for  (DMTimerExecutionRec rec : dataItems) {
-			rec.mExecPerc = (long)(rec.mExecCnt * 100 / sumCnt);
+			rec.mExecPerc = rec.mExecCnt * 100 / sumCnt;
 			if (rec.mExecPerc > mMaxExecPercent)
 				mMaxExecPercent = rec.mExecPerc;
 		}

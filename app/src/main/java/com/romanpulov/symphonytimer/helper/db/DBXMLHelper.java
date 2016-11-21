@@ -21,7 +21,7 @@ import com.romanpulov.symphonytimer.helper.db.DBOpenHelper;
 public class DBXMLHelper {
 	
 	//private static DBXMLHelper dbXMLHelperInstance = null;
-	private Context mContext;
+	private final Context mContext;
 	
 	public DBXMLHelper(Context context) {
 		this.mContext = context;
@@ -178,7 +178,7 @@ public class DBXMLHelper {
             				
             			} else {
             				//create data structure for table item
-	        				tableDataRecList = new ArrayList<DBHelper.RawRecItem>();
+	        				tableDataRecList = new ArrayList<>();
 	        				//table item name
 	        				tableItem = getTableItem(tableName);
 	        				

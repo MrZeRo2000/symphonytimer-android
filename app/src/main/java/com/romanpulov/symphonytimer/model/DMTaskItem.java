@@ -9,10 +9,10 @@ public class DMTaskItem implements Parcelable {
 		void OnTaskItemCompletedEvent (DMTaskItem dmTaskItem);
 	}	
 	
-	private long mId;
-	private String mTitle; 
-	private long mMaxTimeSec;	
-	private String mSoundFile;
+	private final long mId;
+	private final String mTitle;
+	private final long mMaxTimeSec;
+	private final String mSoundFile;
 	private OnTaskItemCompleted mTaskItemCompletedListener;
 	
 	private long mStartTime;

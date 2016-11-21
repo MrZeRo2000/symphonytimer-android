@@ -64,7 +64,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     
     public static final Map<String, String> TABLE_BACKUP_QUERIES;
     static {
-    	TABLE_BACKUP_QUERIES = new HashMap<String, String> ();
+    	TABLE_BACKUP_QUERIES = new HashMap<> ();
     	TABLE_BACKUP_QUERIES.put(TIMER_TABLE_NAME, TIMER_BACKUP_GET_QUERY);
     	TABLE_BACKUP_QUERIES.put(TIMER_HISTORY_TABLE_NAME, TIMER_HISTORY_BACKUP_GET_QUERY);
     }

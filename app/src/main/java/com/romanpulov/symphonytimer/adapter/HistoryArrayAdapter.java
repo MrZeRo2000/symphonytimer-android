@@ -20,13 +20,13 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 
 
 public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
-	private DMTimers mDMTimers;
-	private List<DMTimerHistRec> mDMTimerHistList;
+	private final DMTimers mDMTimers;
+	private final List<DMTimerHistRec> mDMTimerHistList;
 	
 	private class ViewHolder {
-		public TextView mTitle;
-		public ImageView mImage;
-		public TextView mTime;
+		public final TextView mTitle;
+		public final ImageView mImage;
+		public final TextView mTime;
 		
 		public ViewHolder(View view) {
 			mTitle = (TextView)view.findViewById(R.id.history_text_view);

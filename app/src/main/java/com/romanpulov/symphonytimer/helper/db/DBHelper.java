@@ -20,14 +20,14 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 
 public class DBHelper {
 	private static DBHelper mDBHelperInstance = null;	
-	private Context mContext;
+	private final Context mContext;
 	private SQLiteDatabase mDB;
 	private final DBOpenHelper mDBOpenHelper;
 	private boolean mDBDataChanged = false;
 	
 	public static class RawRecItem {
 		
-		private Map<String, String> fields = new HashMap<>();
+		private final Map<String, String> fields = new HashMap<>();
 		
 		public Map<String, String> getFields () {
             return fields;
@@ -324,7 +324,7 @@ public class DBHelper {
 				dmRec.mTimerId = c.getLong(0);
 				dmRec.mExecCnt = c.getLong(1);
                 res.add(dmRec);
-			};
+			}
 
 		} finally {
 			if (null != c && !c.isClosed()) {
@@ -370,7 +370,6 @@ public class DBHelper {
                     dmRec.mExecCnt = c.getLong(1);
                     executionItem.put(c.getLong(0), c.getLong(1));
                 }
-                ;
 
             } finally {
                 if (null != c && !c.isClosed()) {

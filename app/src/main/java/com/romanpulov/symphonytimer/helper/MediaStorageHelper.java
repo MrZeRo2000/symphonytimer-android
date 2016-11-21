@@ -13,7 +13,7 @@ public class MediaStorageHelper {
     final private static String[] MEDIA_TAGS = {"IMG", "SND"};
 
     private static MediaStorageHelper mediaStorageHelperInstance;
-    private File mDir;
+    private final File mDir;
 
     public static MediaStorageHelper getInstance(Context context) {
         if (mediaStorageHelperInstance == null)

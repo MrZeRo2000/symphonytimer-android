@@ -116,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
                 if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
                     VibratorHelper.shortVibrate(MainActivity.this);
                     performTimerAction(mDMTimers.get(position));
-                };
+                }
                 mLastClickTime = clickTime;
             }
         });

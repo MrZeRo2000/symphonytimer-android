@@ -20,10 +20,10 @@ public class RoundedBitmapBackgroundBuilder {
     final public static int BG_PRESSED_ONLY = 3;
     final private static float BRIGHTENING_FACTOR = 50f;
 
-    private Context mContext;
-    private int mWidth;
-    private int mHeight;
-    private float mCornerRadius;
+    private final Context mContext;
+    private final int mWidth;
+    private final int mHeight;
+    private final float mCornerRadius;
 
     private Boolean mIsBitmapPrepared = false;
 

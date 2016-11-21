@@ -235,7 +235,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         if ((mItemWidth > 0) && (mItemHeight > 0)) {
             if (mBackgroundBuilder == null)
                 mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(getContext(), mItemWidth, mItemHeight, 6);
-        };
+        }
         return (mBackgroundBuilder != null);
     }
 }

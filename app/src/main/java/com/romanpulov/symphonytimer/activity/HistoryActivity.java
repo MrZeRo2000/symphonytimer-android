@@ -23,10 +23,10 @@ import java.util.List;
 
 public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
     //storage
-    public static String TIMERS_NAME = "timers";
-    private static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";
+    public final static String TIMERS_NAME = "timers";
+    private final static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";
     //underlying fragments for creation
-    private static List<Class<? extends HistoryFragment>> HISTORY_FRAGMENT_CLASS_LIST =
+    private final static List<Class<? extends HistoryFragment>> HISTORY_FRAGMENT_CLASS_LIST =
             Arrays.asList(
                     HistoryListFragment.class,
                     HistoryTopChartFragment.class,
@@ -39,7 +39,7 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
     private HistoryPagerAdapter mAdapter;
 
     private class HistoryPagerAdapter extends FragmentPagerAdapter {
-        public String[] mFragmentTags;
+        public final String[] mFragmentTags;
 
         public HistoryPagerAdapter(FragmentManager fm) {
             super(fm);

@@ -52,9 +52,13 @@ public class AssetsHelper {
 							 outStream.write(buf, 0, len);
 						 }
 					} finally {
-						inStream.close();
-						outStream.flush();
-						outStream.close();
+						try {
+							inStream.close();
+							outStream.flush();
+							outStream.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 					
 					// update media library

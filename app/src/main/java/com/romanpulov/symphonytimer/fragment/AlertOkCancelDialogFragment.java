@@ -43,11 +43,6 @@ public class AlertOkCancelDialogFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle data) {
         data.putInt(AlertOkCancelDialogFragment.STRING_MESSAGE, mMessage);
         super.onSaveInstanceState(data);

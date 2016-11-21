@@ -31,9 +31,13 @@ public final class UriHelper {
                     outStream.write(buf, 0, len);
                 }
             } finally {
-                inStream.close();
-                outStream.flush();
-                outStream.close();
+                try {
+                    inStream.close();
+                    outStream.flush();
+                    outStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         catch (FileNotFoundException e) {

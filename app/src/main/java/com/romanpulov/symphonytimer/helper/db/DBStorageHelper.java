@@ -19,7 +19,7 @@ public class DBStorageHelper {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
 	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdb";
 	
-	private Context mContext;
+	private final Context mContext;
 	
 	private String mSourceDBFileName;
 	private String mLocalBackupFolderName; 
@@ -71,9 +71,13 @@ public class DBStorageHelper {
 				 }				
 			}
 			finally {
-				inStream.close();
-				outStream.flush();
-				outStream.close();
+				try {
+					inStream.close();
+					outStream.flush();
+					outStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
 			// generate xml
@@ -94,7 +98,7 @@ public class DBStorageHelper {
 		int res;
 		try {
 			InputStream xmlInputStream = new BufferedInputStream(new FileInputStream(mDestXmlFileName));
-			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<String, List<DBHelper.RawRecItem>>() ;
+			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<>() ;
 			//reading data
 			res = new DBXMLHelper(mContext).parseDBXML(xmlInputStream, tableData);
 			if (0 == res) {

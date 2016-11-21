@@ -42,7 +42,7 @@ public class TaskService extends Service implements Runnable {
     public static final int MSG_TASK_TO_NOT_COMPLETED = 6;
 
     private Messenger mClientMessenger;
-    private MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
+    private final MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
 
     /**
      * Handler of incoming messages from clients.
@@ -167,7 +167,7 @@ public class TaskService extends Service implements Runnable {
         }
     }
 
-    private ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(2);
+    private final ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(2);
     private ScheduledFuture<?> mScheduleExecutorTask;
 
     /**

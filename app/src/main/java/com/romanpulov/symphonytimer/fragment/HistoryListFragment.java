@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryListFragment extends HistoryFragment {
-	private List<DMTimerHistRec> mDMTimerHistList = new ArrayList<>();
+	private final List<DMTimerHistRec> mDMTimerHistList = new ArrayList<>();
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

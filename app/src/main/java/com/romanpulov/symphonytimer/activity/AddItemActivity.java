@@ -33,8 +33,8 @@ public class AddItemActivity extends ActionBarActivity {
     private static final String EDIT_SOUND_DATA = "EDIT_SOUND_DATA";
     private static final String EDIT_IMAGE_DATA = "EDIT_IMAGE_DATA";
 
-    private static int SOUND_REQ_CODE = 1;
-    private static int IMAGE_REQ_CODE = 2;
+    private final static int SOUND_REQ_CODE = 1;
+    private final static int IMAGE_REQ_CODE = 2;
 
     private DMTimerRec editRec;
 
@@ -45,7 +45,7 @@ public class AddItemActivity extends ActionBarActivity {
     private TextView mSoundFileTextView;
     private ImageButton mImageFileButton;
 
-    private MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
+    private final MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
 
     private class AddItemInputException extends Exception {
 

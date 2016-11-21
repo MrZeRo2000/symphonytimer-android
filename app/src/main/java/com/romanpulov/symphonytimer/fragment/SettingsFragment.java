@@ -91,14 +91,14 @@ public class SettingsFragment extends PreferenceFragment implements
 	    			deleteDialog.show(getActivity().getFragmentManager(), null);
 					
 					return false;
-				};
+				}
 				
-			    private AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
+			    private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
 					@Override
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
 						DBHelper.getInstance(getActivity()).clearData();
 					}
-				};		
+				};
 			});
 		}
 		
@@ -114,8 +114,7 @@ public class SettingsFragment extends PreferenceFragment implements
 					}					
 					
 					return false;
-				};
-				
+				}
 			});
 		}
 		
@@ -129,14 +128,14 @@ public class SettingsFragment extends PreferenceFragment implements
 	    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
 	    			deleteDialog.show(getActivity().getFragmentManager(), null);
 					return false;
-				};
+				}
 				
-			    private AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
+			    private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
 					@Override
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
                         new RestoreLocalXmlTask().execute();
 					}
-				};		
+				};
 			});
 		}
 	}
