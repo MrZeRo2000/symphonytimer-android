@@ -10,6 +10,8 @@ import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.model.DMTasks;
 
+import java.lang.ref.WeakReference;
+
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
@@ -28,33 +30,37 @@ public class NotificationHelper {
         return mNotificationHelper;
     }
 
-    private final Context mContext;
+    private final WeakReference<Context> mContext;
     private final NotificationManager mNotificationManager;
-    private final Intent mNotificationIntent;
     private final PendingIntent mContentIntent;
 
     private NotificationHelper(Context context) {
-        mContext = context;
-        mNotificationManager = (NotificationManager) mContext.getSystemService(NOTIFICATION_SERVICE);
-        mNotificationIntent = new Intent(mContext, MainActivity.class);
-        mContentIntent = PendingIntent.getActivity(mContext, 0, mNotificationIntent, 0);
+        mContext = new WeakReference<>(context);
+        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        mContentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
     }
 
     public Notification getNotification(DMTasks dmTasks) {
-        Notification.Builder builder =
-                new Notification.Builder(mContext)
-                        .setSmallIcon(R.drawable.wait_notification)
-                        .setAutoCancel(false)
-                        .setOngoing(true)
-                        .setContentTitle(mContext.getString(R.string.app_name))
-                        .setContentText(dmTasks.getTaskTitles())
-                        .setProgress(100, dmTasks.getExecutionPercent(), false)
-                        .setContentIntent(mContentIntent);
-        return builder.build();
+        if (mContext.get() != null) {
+            Notification.Builder builder =
+                    new Notification.Builder(mContext.get())
+                            .setSmallIcon(R.drawable.wait_notification)
+                            .setAutoCancel(false)
+                            .setOngoing(true)
+                            .setContentTitle(mContext.get().getString(R.string.app_name))
+                            .setContentText(dmTasks.getTaskTitles())
+                            .setProgress(100, dmTasks.getExecutionPercent(), false)
+                            .setContentIntent(mContentIntent);
+            return builder.build();
+        } else
+            return null;
     }
 
     public void notify(DMTasks dmTasks) {
-        mNotificationManager.notify(ONGOING_NOTIFICATION_ID, getNotification(dmTasks));
+        Notification notification = getNotification(dmTasks);
+        if (notification != null)
+            mNotificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
     }
 
     public void cancel() {
