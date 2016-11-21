@@ -5,9 +5,27 @@ package com.romanpulov.symphonytimer.model;
  */
 
 public class DMTasksStatus {
+    public final static int STATUS_EVENT_NO_EVENT = 0;
     public final static int STATUS_EVENT_TO_COMPLETED = 1;
     public final static int STATUS_EVENT_UPDATE_COMPLETED = 2;
     public final static int STATUS_EVENT_TO_NOT_COMPLETED = 3;
+
+    public static String statusEventAsString(int statusChangeEvent) {
+        switch (statusChangeEvent) {
+            case 0:
+                return "STATUS_EVENT_NO_EVENT";
+            case STATUS_EVENT_TO_COMPLETED:
+                return "STATUS_EVENT_TO_COMPLETED";
+            case STATUS_EVENT_UPDATE_COMPLETED:
+                return "STATUS_EVENT_UPDATE_COMPLETED";
+            case STATUS_EVENT_TO_NOT_COMPLETED:
+                return "STATUS_EVENT_TO_NOT_COMPLETED";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
+
 
     private int mStatus;
 
@@ -35,11 +53,16 @@ public class DMTasksStatus {
         } else if ((mStatus == DMTasks.STATUS_COMPLETED) && (refDMTasks.getStatus() != DMTasks.STATUS_COMPLETED)) {
             result = STATUS_EVENT_TO_NOT_COMPLETED;
         } else
-            result = 0;
+            result = STATUS_EVENT_NO_EVENT;
 
         mStatus = refDMTasks.getStatus();
         mFirstTaskItemCompleted = refDMTasks.getFirstTaskItemCompleted();
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "{(status=" + mStatus + "), FirstTaskItemCompleted=(" + mFirstTaskItemCompleted + ")}";
     }
 }

@@ -66,7 +66,7 @@ public class TaskService extends Service implements Runnable {
                         break;
                     case MSG_TASK_TO_COMPLETED:
                         log("handleMessage to completed");
-                        hostService.wakeAndStartActivity(MainActivity.class);
+                        //hostService.wakeAndStartActivity(MainActivity.class);
 
                         //play sound
                         hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
@@ -123,16 +123,26 @@ public class TaskService extends Service implements Runnable {
     private DMTasksStatus mDMTasksStatus;
 
     private synchronized void updateDMTasks(DMTasks value) {
-        log("UpdateDMTasks, value = " + value);
+        log("UpdateDMTasks: new value = " + value);
 
         //cancel old alarm
         mAlarm.cancelAlarm(this, 0);
 
         mDMTasks = value;
-        if (mDMTasksStatus == null)
+        if (mDMTasksStatus == null) {
+            //first assignment or after restore with redelivered intent
+            log("UpdateDMTasks: null status, creating new");
+            if (mDMTasks.getFirstTaskItemCompleted() != null) {
+                log("UpdateDMTasks: exists completed");
+                processStatusChangeEvent(STATUS_EVENT_TO_COMPLETED);
+            }
             mDMTasksStatus = new DMTasksStatus(mDMTasks);
-        else
-            processStatusChangeEvent(mDMTasksStatus.getStatusChangeEvent(mDMTasks));
+        }
+        else {
+            int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
+            log("UpdateDMTasks: " + DMTasksStatus.statusEventAsString(statusChangeEvent));
+            processStatusChangeEvent(statusChangeEvent);
+        }
 
         //set new alarm
         if (mDMTasks.size() > 0) {
@@ -164,8 +174,10 @@ public class TaskService extends Service implements Runnable {
         if (messageId != 0) {
             Message msg = Message.obtain(null, messageId, 0, 0);
             try {
+                log("processStatusChangeEvent: sending" + messageId);
                 mMessenger.send(msg);
             } catch (RemoteException e) {
+                log("failed to send: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -190,7 +202,8 @@ public class TaskService extends Service implements Runnable {
         wl.acquire();
 
         try {
-            Intent activityIntent = new Intent(this, MainActivity.class);
+            log("starting activity");
+            Intent activityIntent = new Intent(this, activityClass);
             activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(activityIntent);
         } finally {
@@ -208,6 +221,7 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        log("onStartCommand: dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
         if (intent.getExtras() != null) {
             updateDMTasks((DMTasks)intent.getExtras().getParcelable(DMTasks.class.toString()));
             if (mDMTasks != null) {
@@ -229,6 +243,7 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void onDestroy() {
+        log("onDestroy");
         VibratorHelper.cancel(this);
         mMediaPlayerHelper.release();
         stopForeground(true);
@@ -243,11 +258,14 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void run() {
         try {
-            log("run " + System.currentTimeMillis());
+            log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
 
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
-            processStatusChangeEvent(mDMTasksStatus.getStatusChangeEvent(mDMTasks));
+            int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
+            log(DMTasksStatus.statusEventAsString(statusChangeEvent));
+
+            processStatusChangeEvent(statusChangeEvent);
 
             /*
             int newDMTasksStatus = mDMTasks.getStatus();

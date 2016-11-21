@@ -77,6 +77,7 @@ public class TaskServiceManager {
     }
 
     public void updateServiceDMTasks(DMTasks tasks) {
+        log("To service: updateServiceDMTasks:" + tasks);
         Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
         msg.replyTo = mMessenger;
         DMTasks newTasks = tasks.createParcelableCopy();
@@ -91,6 +92,7 @@ public class TaskServiceManager {
     }
 
     private void queryServiceDMTasks() {
+        log("queryServiceDMTasks");
         Message msg = Message.obtain(null, TaskService.MSG_QUERY_DM_TASKS, 0, 0);
         msg.replyTo = mMessenger;
         try {
