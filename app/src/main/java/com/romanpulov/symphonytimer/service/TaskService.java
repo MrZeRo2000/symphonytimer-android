@@ -79,7 +79,7 @@ public class TaskService extends Service implements Runnable {
 
                         //stop sound
                         hostService.mMediaPlayerHelper.stop();
-                        
+
                         //play sound
                         hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
                         break;
