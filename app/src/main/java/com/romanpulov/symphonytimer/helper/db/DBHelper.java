@@ -59,7 +59,7 @@ public class DBHelper {
 	
 	public static DBHelper getInstance(Context context) {
 		if (null == mDBHelperInstance) {
-			mDBHelperInstance = new DBHelper(context);			
+			mDBHelperInstance = new DBHelper(context.getApplicationContext());
 		}		
 		return mDBHelperInstance;
 	}
