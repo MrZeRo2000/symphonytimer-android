@@ -9,8 +9,6 @@ public class DMTasksStatus {
     public final static int STATUS_EVENT_UPDATE_COMPLETED = 2;
     public final static int STATUS_EVENT_TO_NOT_COMPLETED = 3;
 
-    private final DMTasks mDMTasks;
-
     private int mStatus;
 
     public int getStatus() {
@@ -24,9 +22,8 @@ public class DMTasksStatus {
     }
 
     public DMTasksStatus(DMTasks dmTasks){
-        mDMTasks = dmTasks;
-        mStatus = mDMTasks.getStatus();
-        mFirstTaskItemCompleted = mDMTasks.getFirstTaskItemCompleted();
+        mStatus = dmTasks.getStatus();
+        mFirstTaskItemCompleted = dmTasks.getFirstTaskItemCompleted();
     }
 
     public int getStatusChangeEvent(DMTasks refDMTasks) {
