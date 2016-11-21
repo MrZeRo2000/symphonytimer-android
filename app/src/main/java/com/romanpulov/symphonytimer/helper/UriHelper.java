@@ -46,47 +46,11 @@ public final class UriHelper {
         return true;
     }
 
-    public static String uriMediaToFileName(Context context, Uri contentUri) {
-        Cursor cursor = null;
-
-        if (ContentResolver.SCHEME_FILE.equals(contentUri.getScheme())) {
-            return contentUri.getPath();
-
-        } else {
-
-            try {
-                String[] proj = { MediaColumns.DATA };
-                cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-                cursor.moveToFirst();
-                return cursor.getString(column_index);
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-        }
-    }
-
     public static Uri fileNameToUri(Context context, String fileName) {
         File file = new File(fileName);
         if (file.exists()) {
             return Uri.parse(Uri.fromFile(file).toString());
         }	else
             return null;
-    }
-
-    public static Uri getImageContentUri(Context context, String fileName) {
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] { MediaStore.Images.Media._ID },
-                MediaStore.Images.Media.DATA + "=? ",
-                new String[] { fileName }, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
-            return Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "" + id);
-       } else {
-           return null;
-       }
     }
 }
