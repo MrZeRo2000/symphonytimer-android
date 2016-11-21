@@ -218,7 +218,7 @@ public class TaskService extends Service implements Runnable {
             }
         }
 
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Override
