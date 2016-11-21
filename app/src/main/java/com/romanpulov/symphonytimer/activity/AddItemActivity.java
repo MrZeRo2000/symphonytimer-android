@@ -19,8 +19,8 @@ import android.content.Intent;
 import android.view.Menu;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.romanpulov.library.view.SlideNumberPicker;
 
@@ -42,8 +42,13 @@ public class AddItemActivity extends ActionBarActivity {
     private File mEditImageFile;
     private File mEditSoundFile;
 
+    private EditText mTitleEditText;
     private TextView mSoundFileTextView;
+    private TextView mTimeTextView;
     private ImageButton mImageFileButton;
+    private SlideNumberPicker mHoursNumberPicker;
+    private SlideNumberPicker mMinutesNumberPicker;
+    private SlideNumberPicker mSecondsNumberPicker;
 
     private final MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
 
@@ -51,8 +56,15 @@ public class AddItemActivity extends ActionBarActivity {
 
         private static final long serialVersionUID = -6523044324262630252L;
 
-        public AddItemInputException(String message) {
+        private final TextView mItem;
+
+        public TextView getItem() {
+            return mItem;
+        }
+
+        public AddItemInputException(TextView item, String message) {
             super(message);
+            mItem = item;
         }
     }
 
@@ -61,29 +73,36 @@ public class AddItemActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
 
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
-
         ActionBar actionBar = this.getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
         actionBar.setIcon(R.drawable.tuba);
 
+        mTitleEditText = (EditText)findViewById(R.id.title_edit_text);
+        mTimeTextView = (TextView)findViewById(R.id.time_text_view);
         mSoundFileTextView = (TextView) findViewById(R.id.sound_file_text);
         mImageFileButton = (ImageButton)findViewById(R.id.image_file_image_button);
+        mHoursNumberPicker = (SlideNumberPicker)findViewById(R.id.hours_number_picker);
+        mMinutesNumberPicker = (SlideNumberPicker)findViewById(R.id.minutes_number_picker);
+        mSecondsNumberPicker = (SlideNumberPicker)findViewById(R.id.seconds_number_picker);
 
         editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
         updateEditRec();
+
+        //don't auto show keyboard if Title is not empty
+        if (editRec.mTitle != null)
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     private void updateEditRec(){
         mEditId = editRec.mId;
-        ((EditText)findViewById(R.id.title_edit_text)).setText(editRec.mTitle);
+        mTitleEditText.setText(editRec.mTitle);
         long hours =  editRec.mTimeSec / 3600;
         long minutes = editRec.mTimeSec % 3600 / 60;
         long seconds = editRec.mTimeSec % 60;
-        ((SlideNumberPicker)findViewById(R.id.hours_number_picker)).setValue((int) hours);
-        ((SlideNumberPicker)findViewById(R.id.minutes_number_picker)).setValue((int) minutes);
-        ((SlideNumberPicker)findViewById(R.id.seconds_number_picker)).setValue((int) seconds);
+        mHoursNumberPicker.setValue((int) hours);
+        mMinutesNumberPicker.setValue((int) minutes);
+        mSecondsNumberPicker.setValue((int) seconds);
 
         // update sound and image controls
         updateSoundImageFromFile(editRec.mSoundFile, editRec.mImageName);
@@ -114,22 +133,22 @@ public class AddItemActivity extends ActionBarActivity {
     private DMTimerRec getEditRec() throws AddItemInputException {
         DMTimerRec rec = new DMTimerRec();
         rec.mId = mEditId;
-        rec.mTitle = ((EditText)findViewById(R.id.title_edit_text)).getText().toString().trim();
+        rec.mTitle = mTitleEditText.getText().toString().trim();
 
         if (rec.mTitle.isEmpty()) {
-            throw new AddItemInputException(getResources().getString(R.string.error_title_not_assigned));
+            throw new AddItemInputException(mTitleEditText, getResources().getString(R.string.error_title_not_assigned));
         }
 
-        String hoursString =  String.valueOf(((SlideNumberPicker)findViewById(R.id.hours_number_picker)).getValue());
-        String minutesString =  String.valueOf(((SlideNumberPicker)findViewById(R.id.minutes_number_picker)).getValue());
-        String secondsString =  String.valueOf(((SlideNumberPicker)findViewById(R.id.seconds_number_picker)).getValue());
+        String hoursString =  String.valueOf(mHoursNumberPicker.getValue());
+        String minutesString =  String.valueOf(mMinutesNumberPicker.getValue());
+        String secondsString =  String.valueOf(mSecondsNumberPicker.getValue());
         long hours = Long.valueOf(hoursString);
         long minutes = Long.valueOf(minutesString);
         long seconds = Long.valueOf(secondsString);
         rec.mTimeSec = hours * 3600 + minutes * 60 + seconds;
 
         if (0 == rec.mTimeSec) {
-            throw new AddItemInputException(getResources().getString(R.string.error_time_zero));
+            throw new AddItemInputException(mTimeTextView, getResources().getString(R.string.error_time_zero));
         }
 
         rec.mSoundFile = null != mEditSoundFile ? mEditSoundFile.getPath() : null;
@@ -260,7 +279,10 @@ public class AddItemActivity extends ActionBarActivity {
             try {
                 resultRec = getEditRec();
             } catch (AddItemInputException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                if (!(e.getItem() instanceof EditText))
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                else
+                    e.getItem().setError(e.getMessage());
                 return;
             }
             resultIntent.putExtra(EDIT_REC_NAME, resultRec);
