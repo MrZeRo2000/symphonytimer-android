@@ -168,13 +168,10 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     	updateTimers();
 
         //waiting for data if the service is available
-        if ((!mTaskServiceManager.isServiceBound()) && (mTaskServiceManager.isTaskServiceRunning()))
+        if ((!mTaskServiceManager.isServiceBound()) && (mTaskServiceManager.isTaskServiceRunning())) {
             mDMTasks.lock();
-
-        mTaskServiceManager.updateServiceTasks(mDMTasks);
-
-        //prevent immediate click after displaying
-        //mLastClickTime = System.currentTimeMillis();
+            mTaskServiceManager.updateServiceTasks(mDMTasks);
+        }
     }
 
     @Override

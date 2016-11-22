@@ -125,8 +125,6 @@ public class TaskService extends Service implements Runnable {
     private synchronized void updateDMTasks(DMTasks value) {
         log("UpdateDMTasks: new value = " + value);
 
-        //cancel old alarm
-        mAlarm.cancelAlarm(this, 0);
 
         mDMTasks = value;
         if (mDMTasksStatus == null) {
@@ -151,8 +149,11 @@ public class TaskService extends Service implements Runnable {
             if (triggerTime < Long.MAX_VALUE) {
                 log("setting new alarm to " + triggerTime);
                 mAlarm.setOnetimeTimer(this, 0, triggerTime);
-            }
-        }
+            } else
+                mAlarm.cancelAlarm(this, 0);
+        }  else
+            //cancel old alarm
+            mAlarm.cancelAlarm(this, 0);
     }
 
     private void processStatusChangeEvent(int event) {
@@ -244,6 +245,7 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void onDestroy() {
         log("onDestroy");
+        mAlarm.cancelAlarm(this, 0);
         VibratorHelper.cancel(this);
         mMediaPlayerHelper.release();
         stopForeground(true);
@@ -258,12 +260,12 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void run() {
         try {
-            log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
+            //log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
 
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
             int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
-            log(DMTasksStatus.statusEventAsString(statusChangeEvent));
+            //log(DMTasksStatus.statusEventAsString(statusChangeEvent));
 
             processStatusChangeEvent(statusChangeEvent);
 
