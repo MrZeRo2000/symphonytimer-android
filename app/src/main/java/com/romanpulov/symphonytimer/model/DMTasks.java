@@ -3,6 +3,10 @@ package com.romanpulov.symphonytimer.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +18,10 @@ public class DMTasks implements Parcelable {
 	private static final long serialVersionUID = -7435677773769357006L;
 
     private final List<DMTaskItem> mDataItems = new ArrayList<>();
+
+    public List<DMTaskItem> getItems() {
+        return mDataItems;
+    }
 
     public boolean add(DMTaskItem item) {
         return mDataItems.add(item);
@@ -209,5 +217,43 @@ public class DMTasks implements Parcelable {
             s += ")";
         }
         return s;
+    }
+
+    /**
+     * Object serialization to JSON String
+     * @return String
+     */
+    public String toJSONString() {
+        JSONArray ja = new JSONArray();
+        for (DMTaskItem item : mDataItems) {
+            ja.put(item.toJSONObject());
+        }
+        JSONObject jo = new JSONObject();
+        try {
+            jo.put(DMTasks.class.getName(), ja);
+            return jo.toString();
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Object deserialization from JSON String
+     * @param data String
+     * @return deserialized object
+     */
+    public static DMTasks fromJSONString(String data) {
+        try {
+            DMTasks result = new DMTasks();
+
+            JSONObject jo = new JSONObject(data);
+            JSONArray ja = (JSONArray) jo.get(DMTasks.class.getName());
+            for (int i = 0; i < ja.length(); i++) {
+                result.add(DMTaskItem.fromJSONObject(ja.get(i)));
+            }
+            return result;
+        } catch (JSONException e) {
+            return null;
+        }
     }
 }

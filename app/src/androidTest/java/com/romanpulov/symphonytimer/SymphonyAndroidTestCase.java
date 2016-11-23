@@ -10,5 +10,6 @@ import com.romanpulov.symphonytimer.helper.db.DBHelper;
 public class SymphonyAndroidTestCase extends AndroidTestCase {
 
     public void testCase2() {
+
     }
 }

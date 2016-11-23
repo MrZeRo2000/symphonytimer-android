@@ -3,7 +3,15 @@ package com.romanpulov.symphonytimer.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class DMTaskItem implements Parcelable {
+    public final static String FIELD_NAME_ID = "id";
+    public final static String FIELD_NAME_TITLE = "title";
+    public final static String FIELD_NAME_MAX_TIME_SEC = "max_time_sec";
+    public final static String FIELD_NAME_START_TIME = "start_time";
+    public final static String FIELD_NAME_SOUND_FILE = "sound_file";
 	
 	public interface OnTaskItemCompleted {
 		void OnTaskItemCompletedEvent (DMTaskItem dmTaskItem);
@@ -19,11 +27,16 @@ public class DMTaskItem implements Parcelable {
 	private long mCurrentTime;
 	private boolean mCompletedFlag = false;
 	
-	DMTaskItem(long id, String title, long timeSec, String soundFile) {
+	public DMTaskItem(long id, String title, long timeSec, String soundFile) {
 		this.mId = id;
 		this.mTitle = title;
 		this.mMaxTimeSec = timeSec;		
 		this.mSoundFile = soundFile;
+	}
+
+	public DMTaskItem(long id, String title, long timeSec, long startTime, String soundFile) {
+        this(id, title, timeSec, soundFile);
+        mStartTime = startTime;
 	}
 	
 	void setTaskItemCompleted(OnTaskItemCompleted taskItemCompletedListener) {
@@ -61,7 +74,43 @@ public class DMTaskItem implements Parcelable {
 			return new DMTaskItem[size];
 		}
 	};
-	
+
+    /**
+     * Object serialization to JSON
+     * @return JSONObject
+     */
+    public Object toJSONObject() {
+        try {
+            JSONObject jo = new JSONObject();
+            jo.put(FIELD_NAME_ID, mId);
+            jo.put(FIELD_NAME_TITLE, mTitle);
+            jo.put(FIELD_NAME_MAX_TIME_SEC, mMaxTimeSec);
+            jo.put(FIELD_NAME_START_TIME, mStartTime);
+            jo.put(FIELD_NAME_SOUND_FILE, mSoundFile);
+            return jo;
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Object deserialization from JSON
+     * @param data JSONObject
+     * @return deserialized object
+     */
+    public static DMTaskItem fromJSONObject(Object data) {
+        try {
+            JSONObject jo = (JSONObject) data;
+            long id = jo.getLong(FIELD_NAME_ID);
+            String title = jo.getString(FIELD_NAME_TITLE);
+            long maxTimeSec = jo.getLong(FIELD_NAME_MAX_TIME_SEC);
+            long startTime = jo.getLong(FIELD_NAME_START_TIME);
+            String soundFile = jo.optString(FIELD_NAME_SOUND_FILE);
+            return new DMTaskItem(id, title, maxTimeSec, startTime, soundFile);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
 	
 	public long getId() {
 		return mId;
