@@ -80,5 +80,20 @@ public class SymphonyInstrumentedTest {
 
         //validation
         assertEquals(tasks.size(), newTasks.size());
+
+        //empty dm tasks test
+        DMTasks emptyTasks = new DMTasks();
+
+        //writing
+        String emptyTasksString = emptyTasks.toString();
+        Log.d("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
+        Log.d("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
+
+        //reading
+        DMTasks newEmptyTasks = DMTasks.fromJSONString(emptyTasksString);
+        Log.d("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
+
+        //validation
+        assertEquals(emptyTasks.size(), newEmptyTasks.size());
     }
 }

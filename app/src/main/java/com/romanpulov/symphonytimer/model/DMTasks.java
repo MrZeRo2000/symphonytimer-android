@@ -243,17 +243,20 @@ public class DMTasks implements Parcelable {
      * @return deserialized object
      */
     public static DMTasks fromJSONString(String data) {
-        try {
-            DMTasks result = new DMTasks();
+        DMTasks result = new DMTasks();
 
-            JSONObject jo = new JSONObject(data);
-            JSONArray ja = (JSONArray) jo.get(DMTasks.class.getName());
-            for (int i = 0; i < ja.length(); i++) {
-                result.add(DMTaskItem.fromJSONObject(ja.get(i)));
-            }
+        if ((data == null) || (data.equals("")))
             return result;
-        } catch (JSONException e) {
-            return null;
-        }
+        else
+            try {
+                JSONObject jo = new JSONObject(data);
+                JSONArray ja = (JSONArray) jo.get(DMTasks.class.getName());
+                for (int i = 0; i < ja.length(); i++) {
+                    result.add(DMTaskItem.fromJSONObject(ja.get(i)));
+                }
+                return result;
+            } catch (JSONException e) {
+                return result;
+            }
     }
 }
