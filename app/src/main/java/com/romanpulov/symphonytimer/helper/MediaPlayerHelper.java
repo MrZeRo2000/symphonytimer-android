@@ -4,13 +4,12 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.util.Log;
 
 import com.romanpulov.symphonytimer.R;
 
 public class MediaPlayerHelper {
 	private static void log(String message) {
-		Log.d("MediaPlayerHelper", message);
+		LoggerHelper.log("MediaPlayerHelper", message);
 	}
 
 	private final Context mContext;

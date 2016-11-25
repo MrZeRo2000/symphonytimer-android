@@ -1,7 +1,8 @@
 package com.romanpulov.symphonytimer;
-import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
+import android.support.test.runner.AndroidJUnit4;
+
+import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
 
@@ -49,18 +50,18 @@ public class SymphonyInstrumentedTest {
             ja.put(jio);
         }
 
-        Log.d("testJSON", ja.toString());
+        LoggerHelper.log("testJSON", ja.toString());
         jo.put("DMTasks", ja);
-        Log.d("testJSON", jo.toString());
+        LoggerHelper.log("testJSON", jo.toString());
 
         String jsonString = jo.toString();
 
         JSONObject joo = new JSONObject(jsonString);
         JSONArray joa = joo.optJSONArray("DMTasks");
         for (int i = 0; i< joa.length(); i++) {
-            Log.d("testJSON", joa.get(i).toString());
-            Log.d("testJSON", "id=" +((JSONObject)joa.get(i)).optInt("id"));
-            Log.d("testJSON", "title=" +((JSONObject)joa.get(i)).optString("title"));
+            LoggerHelper.log("testJSON", joa.get(i).toString());
+            LoggerHelper.log("testJSON", "id=" +((JSONObject)joa.get(i)).optInt("id"));
+            LoggerHelper.log("testJSON", "title=" +((JSONObject)joa.get(i)).optString("title"));
         }
 
     }
@@ -71,12 +72,12 @@ public class SymphonyInstrumentedTest {
 
         //writing
         String tasksString = tasks.toJSONString();
-        Log.d("testDMTasksJSON", "DMTasks=" + tasks);
-        Log.d("testDMTasksJSON", "JSON=" + tasksString);
+        LoggerHelper.log("testDMTasksJSON", "DMTasks=" + tasks);
+        LoggerHelper.log("testDMTasksJSON", "JSON=" + tasksString);
 
         //reading
         DMTasks newTasks = DMTasks.fromJSONString(tasksString);
-        Log.d("testDMTasksJSON", "Restored DMTasks=" + newTasks);
+        LoggerHelper.log("testDMTasksJSON", "Restored DMTasks=" + newTasks);
 
         //validation
         assertEquals(tasks.size(), newTasks.size());
@@ -86,12 +87,12 @@ public class SymphonyInstrumentedTest {
 
         //writing
         String emptyTasksString = emptyTasks.toString();
-        Log.d("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
-        Log.d("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
+        LoggerHelper.log("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
+        LoggerHelper.log("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
 
         //reading
         DMTasks newEmptyTasks = DMTasks.fromJSONString(emptyTasksString);
-        Log.d("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
+        LoggerHelper.log("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
 
         //validation
         assertEquals(emptyTasks.size(), newEmptyTasks.size());

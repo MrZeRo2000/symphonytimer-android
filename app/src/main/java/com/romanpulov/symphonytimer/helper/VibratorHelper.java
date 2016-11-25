@@ -3,12 +3,10 @@ package com.romanpulov.symphonytimer.helper;
 import android.content.Context;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.Toast;
 
 public class VibratorHelper {
     private static void log(String message) {
-        Log.d("VibratorHelper", message);
+        LoggerHelper.log("VibratorHelper", message);
     }
 
 	private final static long VIBRATE_SHORT_TIME = 200;

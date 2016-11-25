@@ -6,13 +6,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
-import android.util.Log;
 
 import com.romanpulov.symphonytimer.activity.MainActivity;
+import com.romanpulov.symphonytimer.helper.LoggerHelper;
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     private static void log(String message) {
-        Log.d("AlarmManagerReceiver", message);
+        LoggerHelper.log("AlarmManagerReceiver", message);
     }
 
 	final public static String WAKE_LOG_TAG = "wake log tag";

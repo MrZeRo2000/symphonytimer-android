@@ -1,6 +1,5 @@
 package com.romanpulov.symphonytimer.activity;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.ComponentName;
@@ -12,7 +11,6 @@ import android.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +26,7 @@ import com.romanpulov.symphonytimer.activity.actions.TimerMoveDown;
 import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
 import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
+import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.service.TaskService;
@@ -46,7 +45,7 @@ import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
 public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
     private static void log(String message) {
-        Log.d("MainActivity", message);
+        LoggerHelper.log("MainActivity", message);
     }
 
 	public static final int ADD_ITEM_RESULT_CODE = 1;

@@ -11,8 +11,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 
+import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.model.DMTasks;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class TaskServiceManager {
     private static void log(String message) {
-        Log.d("TaskServiceManager", message);
+        LoggerHelper.log("TaskServiceManager", message);
     }
 
     /**

@@ -11,9 +11,8 @@ import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.PowerManager;
 import android.os.RemoteException;
-import android.util.Log;
 
-import com.romanpulov.symphonytimer.activity.MainActivity;
+import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
@@ -32,7 +31,7 @@ import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_UPDA
 
 public class TaskService extends Service implements Runnable {
     private static void log(String message) {
-        Log.d("TaskService", message);
+        LoggerHelper.log("TaskService", message);
     }
 
     public static final String PREFS_NAME = "TaskServicePrefs";
