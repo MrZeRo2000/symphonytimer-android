@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.util.Log;
@@ -33,6 +34,8 @@ public class TaskService extends Service implements Runnable {
     private static void log(String message) {
         Log.d("TaskService", message);
     }
+
+    public static final String PREFS_NAME = "TaskServicePrefs";
 
     public static final int MSG_UPDATE_DM_TASKS = 1;
     public static final int MSG_UPDATE_DM_PROGRESS = 2;
@@ -125,8 +128,12 @@ public class TaskService extends Service implements Runnable {
     private synchronized void updateDMTasks(DMTasks value) {
         log("UpdateDMTasks: new value = " + value);
 
-
+        // set new value
         mDMTasks = value;
+
+        //persist to prefs
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putString(DMTasks.class.toString(), mDMTasks.toJSONString()).commit();
+
         if (mDMTasksStatus == null) {
             //first assignment or after restore with redelivered intent
             log("UpdateDMTasks: null status, creating new");
@@ -149,11 +156,15 @@ public class TaskService extends Service implements Runnable {
             if (triggerTime < Long.MAX_VALUE) {
                 log("setting new alarm to " + triggerTime);
                 mAlarm.setOnetimeTimer(this, 0, triggerTime);
-            } else
+            } else {
+                log("cancelling alarm: triggerTime = Long.MAX_VALUE");
                 mAlarm.cancelAlarm(this, 0);
-        }  else
+            }
+        }  else {
             //cancel old alarm
+            log("cancelling alarm: mDMTasks.size() = 0");
             mAlarm.cancelAlarm(this, 0);
+        }
     }
 
     private void processStatusChangeEvent(int event) {
@@ -175,7 +186,7 @@ public class TaskService extends Service implements Runnable {
         if (messageId != 0) {
             Message msg = Message.obtain(null, messageId, 0, 0);
             try {
-                log("processStatusChangeEvent: sending" + messageId);
+                log("processStatusChangeEvent: sending " + messageId);
                 mMessenger.send(msg);
             } catch (RemoteException e) {
                 log("failed to send: " + e.getMessage());
@@ -223,17 +234,28 @@ public class TaskService extends Service implements Runnable {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand: dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
-        if (intent.getExtras() != null) {
-            updateDMTasks((DMTasks)intent.getExtras().getParcelable(DMTasks.class.toString()));
-            if (mDMTasks != null) {
-                startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
-                if (mScheduleExecutorTask == null)
-                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
-            }
+        DMTasks newDMTasks;
+        Parcelable newParcelableTasks;
+        if ((intent.getExtras() != null) && ((newParcelableTasks = intent.getExtras().getParcelable(DMTasks.class.toString()))) != null ) {
+            newDMTasks = (DMTasks) newParcelableTasks;
+            log("onStartCommand: dmTasks found: " + newDMTasks);
+        } else {
+            newDMTasks = DMTasks.fromJSONString(getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(DMTasks.class.toString(), ""));
+            log("onStartCommand: dmTasks from Prefs: " + newDMTasks);
         }
 
-        return START_REDELIVER_INTENT;
+        updateDMTasks(newDMTasks);
+
+        if (mDMTasks != null) {
+            startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
+
+            if (mScheduleExecutorTask == null)
+                mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+        }
+
+
+        return START_STICKY;
     }
 
     @Override
@@ -260,7 +282,7 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void run() {
         try {
-            //log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
+            log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus + ",alarm=" + mAlarm);
 
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
