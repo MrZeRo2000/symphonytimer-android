@@ -236,7 +236,7 @@ public class TaskService extends Service implements Runnable {
 
         DMTasks newDMTasks;
         Parcelable newParcelableTasks;
-        if ((intent.getExtras() != null) && ((newParcelableTasks = intent.getExtras().getParcelable(DMTasks.class.toString()))) != null ) {
+        if ((intent !=null) && (intent.getExtras() != null) && ((newParcelableTasks = intent.getExtras().getParcelable(DMTasks.class.toString()))) != null ) {
             newDMTasks = (DMTasks) newParcelableTasks;
             log("onStartCommand: dmTasks found: " + newDMTasks);
         } else {
