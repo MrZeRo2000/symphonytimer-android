@@ -268,7 +268,7 @@ public class TaskService extends Service implements Runnable {
         log("onDestroy");
         mAlarm.cancelAlarm(this, 0);
         VibratorHelper.cancel(this);
-        mMediaPlayerHelper.release();
+        mMediaPlayerHelper.stop();
         stopForeground(true);
         if (mScheduleExecutorTask != null) {
             mScheduleExecutorTask.cancel(true);

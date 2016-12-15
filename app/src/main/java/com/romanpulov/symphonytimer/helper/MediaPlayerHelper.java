@@ -14,7 +14,7 @@ public class MediaPlayerHelper {
 
 	private final Context mContext;
 	private MediaPlayer mMediaPlayer;
-	private int mOriginalVolume;
+	private int mOriginalVolume = -1;
 	private AudioManager mAudioManager;
 
     private AudioManager getAudioManager() {
@@ -36,18 +36,14 @@ public class MediaPlayerHelper {
 			mMediaPlayer.reset();
             mMediaPlayer.release();
 			mMediaPlayer = null;
-			getAudioManager().setStreamVolume(AudioManager.STREAM_MUSIC, mOriginalVolume, 0);
+
+			if (mOriginalVolume != -1) {
+				log ("restore original volume");
+				getAudioManager().setStreamVolume(AudioManager.STREAM_MUSIC, mOriginalVolume, 0);
+			}
 		}
 	}
 	
-	public void release() {
-        log("release");
-		if (null != mMediaPlayer) {
-			mMediaPlayer.release();
-			mMediaPlayer = null;
-		}
-	}
-
     public void toggleSound(String soundFile) {
         if ((mMediaPlayer !=null) && (mMediaPlayer.isPlaying()))
             stop();
@@ -77,6 +73,7 @@ public class MediaPlayerHelper {
 		}
 		
 		mOriginalVolume = getAudioManager().getStreamVolume(AudioManager.STREAM_MUSIC);
+		log ("set max volume");
 		getAudioManager().setStreamVolume(AudioManager.STREAM_MUSIC, getAudioManager().getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 		
 		mMediaPlayer.setLooping(true);
