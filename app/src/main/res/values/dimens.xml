@@ -12,5 +12,6 @@
     <dimen name="history_image_size">30dp</dimen>
     <dimen name="chart_control_size">40dp</dimen>
     <dimen name="number_picker_size">60dp</dimen>
+    <dimen name="corner_radius">6dp</dimen>
 
 </resources>

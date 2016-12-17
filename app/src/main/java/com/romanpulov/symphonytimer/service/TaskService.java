@@ -274,6 +274,8 @@ public class TaskService extends Service implements Runnable {
 
         log("stopping executor");
         mScheduleExecutor.shutdown();
+
+        log("waiting for termination");
         try {
             if (!mScheduleExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
                 log("task did not terminate in 60 seconds");

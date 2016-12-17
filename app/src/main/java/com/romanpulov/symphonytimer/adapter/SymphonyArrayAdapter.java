@@ -232,10 +232,8 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 	}
 
     private boolean createBackgroundBuilder() {
-        if ((mItemWidth > 0) && (mItemHeight > 0)) {
-            if (mBackgroundBuilder == null)
-                mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(getContext(), mItemWidth, mItemHeight, 6);
-        }
+        if ((mItemWidth > 0) && (mItemHeight > 0) && (mBackgroundBuilder == null))
+            mBackgroundBuilder = new RoundedBitmapBackgroundBuilder(getContext(), mItemWidth, mItemHeight, getContext().getResources().getDimension(R.dimen.corner_radius));
         return (mBackgroundBuilder != null);
     }
 }
