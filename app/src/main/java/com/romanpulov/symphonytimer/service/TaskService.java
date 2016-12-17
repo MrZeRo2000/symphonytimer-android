@@ -337,9 +337,7 @@ public class TaskService extends Service implements Runnable {
                     e.printStackTrace();
                 }
             }
-
         } catch (Exception e) {
-            log(e.getMessage());
             e.printStackTrace();
         }
     }
