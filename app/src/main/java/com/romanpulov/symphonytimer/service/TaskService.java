@@ -273,9 +273,13 @@ public class TaskService extends Service implements Runnable {
         mMediaPlayerHelper.stop();
 
         log("stopping executor");
-        if (mScheduleExecutorTask != null) {
-            mScheduleExecutorTask.cancel(false);
-            mScheduleExecutorTask = null;
+        mScheduleExecutor.shutdown();
+        try {
+            if (!mScheduleExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                log("task did not terminate in 60 seconds");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         log("stop foreground");
@@ -289,6 +293,7 @@ public class TaskService extends Service implements Runnable {
         try {
             log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus + ",alarm=" + mAlarm);
 
+            log("NotificationHelper notify");
             NotificationHelper.getInstance(this).notify(mDMTasks);
 
             int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
