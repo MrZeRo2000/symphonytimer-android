@@ -43,6 +43,8 @@ public class TaskService extends Service implements Runnable {
     public static final int MSG_TASK_UPDATE_COMPLETED = 5;
     public static final int MSG_TASK_TO_NOT_COMPLETED = 6;
 
+    public static final String ACTION_STOP_SERVICE = "StopService";
+
     private Messenger mClientMessenger;
     private final MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
 
@@ -265,15 +267,19 @@ public class TaskService extends Service implements Runnable {
 
     @Override
     public void onDestroy() {
-        log("onDestroy");
+        log("destroying service");
         mAlarm.cancelAlarm(this, 0);
         VibratorHelper.cancel(this);
         mMediaPlayerHelper.stop();
-        stopForeground(true);
+
+        log("stopping executor");
         if (mScheduleExecutorTask != null) {
-            mScheduleExecutorTask.cancel(true);
+            mScheduleExecutorTask.cancel(false);
             mScheduleExecutorTask = null;
         }
+
+        log("stop foreground");
+        stopForeground(true);
 
         super.onDestroy();
     }
@@ -331,7 +337,9 @@ public class TaskService extends Service implements Runnable {
                     e.printStackTrace();
                 }
             }
+
         } catch (Exception e) {
+            log(e.getMessage());
             e.printStackTrace();
         }
     }
