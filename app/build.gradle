@@ -23,9 +23,10 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.romanpulov.library:library:1.0.14'
+    compile 'com.romanpulov.library.view:library:1.0.14'
+    compile 'com.romanpulov.library.common:library:1.0.3'
     // Unit testing dependencies
-    androidTestCompile 'com.android.support:support-annotations:22.0.0'
+    androidTestCompile 'com.android.support:support-annotations:22.2.1'
     androidTestCompile 'com.android.support.test:runner:0.2'
     androidTestCompile 'com.android.support.test:rules:0.2'
 }
