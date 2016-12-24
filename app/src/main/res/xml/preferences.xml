@@ -9,6 +9,11 @@
 		    android:defaultValue="true" 
 		    />
 		<CheckBoxPreference
+			android:key="pref_mute"
+			android:title="@string/pref_mute"
+			android:defaultValue="false"
+			/>
+		<CheckBoxPreference
 		    android:key="pref_bitmap_background"
 		    android:title="@string/pref_bitmap_background"
 		    android:summary="@string/pref_bitmap_background_summary"

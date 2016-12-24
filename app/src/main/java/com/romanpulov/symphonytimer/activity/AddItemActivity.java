@@ -50,7 +50,7 @@ public class AddItemActivity extends ActionBarActivity {
     private SlideNumberPicker mMinutesNumberPicker;
     private SlideNumberPicker mSecondsNumberPicker;
 
-    private final MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
+    private MediaPlayerHelper mMediaPlayerHelper;
 
     private class AddItemInputException extends Exception {
 
@@ -77,6 +77,8 @@ public class AddItemActivity extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
         actionBar.setIcon(R.drawable.tuba);
+
+        mMediaPlayerHelper = new MediaPlayerHelper(this);
 
         mTitleEditText = (EditText)findViewById(R.id.title_edit_text);
         mTimeTextView = (TextView)findViewById(R.id.time_text_view);

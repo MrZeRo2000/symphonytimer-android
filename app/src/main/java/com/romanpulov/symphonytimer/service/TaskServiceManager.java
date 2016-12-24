@@ -110,12 +110,12 @@ public class TaskServiceManager {
             log("updateServiceTasks: no more tasks");
             mContext.unbindService(mConnection);
             mServiceBound = false;
-            /*
-            another idea of stopping service:
+
+            //another idea of stopping service:
             serviceIntent.setAction(TaskService.ACTION_STOP_SERVICE);
             mContext.startService(serviceIntent);
-            */
-            mContext.stopService(serviceIntent);
+
+            //mContext.stopService(serviceIntent);
             return;
         }
 

@@ -19,6 +19,10 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  */
 
 public class NotificationHelper {
+    private static void log(String message) {
+        LoggerHelper.log("NotificationHelper", message);
+    }
+
     public static final int ONGOING_NOTIFICATION_ID = 1;
 
     private static NotificationHelper mNotificationHelper;
@@ -33,6 +37,28 @@ public class NotificationHelper {
     private final WeakReference<Context> mContext;
     private final NotificationManager mNotificationManager;
     private final PendingIntent mContentIntent;
+    private NotificationInfo mNotificationInfo;
+
+    private static class NotificationInfo {
+        private String mContent;
+        private int mProgress;
+        private boolean mModified = true;
+
+        public boolean isModified() {
+            return mModified;
+        }
+
+        public NotificationInfo(String content, int progress) {
+            mContent = content;
+            mProgress = progress;
+        }
+
+        public void updateNotificationInfo(String content, int progress) {
+            mModified = !content.equals(mContent) || mProgress != progress;
+            mContent = content;
+            mProgress = progress;
+        }
+    }
 
     private NotificationHelper(Context context) {
         mContext = new WeakReference<>(context);
@@ -53,14 +79,26 @@ public class NotificationHelper {
                             .setProgress(100, dmTasks.getExecutionPercent(), false)
                             .setContentIntent(mContentIntent);
             return builder.build();
-        } else
+        } else {
+            log("No context");
             return null;
+        }
     }
 
     public void notify(DMTasks dmTasks) {
-        Notification notification = getNotification(dmTasks);
-        if (notification != null)
-            mNotificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+        // get modification info
+        if (mNotificationInfo == null)
+            mNotificationInfo = new NotificationInfo(dmTasks.getTaskTitles(), dmTasks.getExecutionPercent());
+        else
+            mNotificationInfo.updateNotificationInfo(dmTasks.getTaskTitles(), dmTasks.getExecutionPercent());
+
+        if (mNotificationInfo.isModified()) {
+            Notification notification = getNotification(dmTasks);
+            if (notification != null)
+                mNotificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+        } else {
+            log("No change, skipping notification");
+        }
     }
 
     public void cancel() {

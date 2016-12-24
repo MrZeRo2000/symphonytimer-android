@@ -46,7 +46,7 @@ public class TaskService extends Service implements Runnable {
     public static final String ACTION_STOP_SERVICE = "StopService";
 
     private Messenger mClientMessenger;
-    private final MediaPlayerHelper mMediaPlayerHelper = new MediaPlayerHelper(this);
+    private MediaPlayerHelper mMediaPlayerHelper;
 
     /**
      * Handler of incoming messages from clients.
@@ -236,25 +236,47 @@ public class TaskService extends Service implements Runnable {
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand: dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
 
-        DMTasks newDMTasks;
-        Parcelable newParcelableTasks;
-        if ((intent !=null) && (intent.getExtras() != null) && ((newParcelableTasks = intent.getExtras().getParcelable(DMTasks.class.toString()))) != null ) {
-            newDMTasks = (DMTasks) newParcelableTasks;
-            log("onStartCommand: dmTasks found: " + newDMTasks);
+        if ((intent != null) && (intent.getAction() != null) && (intent.getAction().equals(ACTION_STOP_SERVICE))) {
+            log("stopping executor");
+            mScheduleExecutor.shutdown();
+
+            log("waiting for termination");
+            try {
+                if (!mScheduleExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    log("task did not terminate in 60 seconds");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            log("stop foreground");
+            stopForeground(true);
+
+            stopSelf();
         } else {
-            newDMTasks = DMTasks.fromJSONString(getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(DMTasks.class.toString(), ""));
-            log("onStartCommand: dmTasks from Prefs: " + newDMTasks);
+
+            if (mMediaPlayerHelper == null)
+                mMediaPlayerHelper = new MediaPlayerHelper(this);
+
+            DMTasks newDMTasks;
+            Parcelable newParcelableTasks;
+            if ((intent != null) && (intent.getExtras() != null) && ((newParcelableTasks = intent.getExtras().getParcelable(DMTasks.class.toString()))) != null) {
+                newDMTasks = (DMTasks) newParcelableTasks;
+                log("onStartCommand: dmTasks found: " + newDMTasks);
+            } else {
+                newDMTasks = DMTasks.fromJSONString(getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(DMTasks.class.toString(), ""));
+                log("onStartCommand: dmTasks from Prefs: " + newDMTasks);
+            }
+
+            updateDMTasks(newDMTasks);
+
+            if (mDMTasks != null) {
+                startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
+
+                if (mScheduleExecutorTask == null)
+                    mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+            }
         }
-
-        updateDMTasks(newDMTasks);
-
-        if (mDMTasks != null) {
-            startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
-
-            if (mScheduleExecutorTask == null)
-                mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
-        }
-
 
         return START_STICKY;
     }
@@ -270,22 +292,8 @@ public class TaskService extends Service implements Runnable {
         log("destroying service");
         mAlarm.cancelAlarm(this, 0);
         VibratorHelper.cancel(this);
-        mMediaPlayerHelper.stop();
-
-        log("stopping executor");
-        mScheduleExecutor.shutdown();
-
-        log("waiting for termination");
-        try {
-            if (!mScheduleExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-                log("task did not terminate in 60 seconds");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        log("stop foreground");
-        stopForeground(true);
+        if (mMediaPlayerHelper != null)
+            mMediaPlayerHelper.stop();
 
         super.onDestroy();
     }

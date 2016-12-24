@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 
 import com.romanpulov.symphonytimer.R;
 
@@ -13,6 +14,7 @@ public class MediaPlayerHelper {
 	}
 
 	private final Context mContext;
+    private final boolean mIsMute;
 	private MediaPlayer mMediaPlayer;
 	private int mOriginalVolume = -1;
 	private AudioManager mAudioManager;
@@ -25,6 +27,7 @@ public class MediaPlayerHelper {
 	
 	public MediaPlayerHelper(Context context){
 		mContext = context;
+		mIsMute = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_mute", false);
 	}
 	
 	public void stop() {
@@ -52,6 +55,9 @@ public class MediaPlayerHelper {
     }
 
 	public void startSoundFile(String soundFile) {
+        if (mIsMute)
+            return;
+
 		stop();
         log("startSoundFile");
 		if (null == soundFile) {
