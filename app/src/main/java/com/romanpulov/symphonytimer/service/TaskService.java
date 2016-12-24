@@ -30,8 +30,13 @@ import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_TO_N
 import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_UPDATE_COMPLETED;
 
 public class TaskService extends Service implements Runnable {
-    private static void log(String message) {
-        LoggerHelper.log("TaskService", message);
+    private void log(String message) {
+        LoggerHelper.logContext(this, "TaskService", message);
+    }
+
+    private static void unconditionalLog(String message) {
+        //enable for debug only
+        //LoggerHelper.unconditionalLog("TaskService", message);
     }
 
     public static final String PREFS_NAME = "TaskServicePrefs";
@@ -64,12 +69,12 @@ public class TaskService extends Service implements Runnable {
             if (hostService != null) {
                 switch (msg.what) {
                     case MSG_UPDATE_DM_TASKS:
-                        log("handleMessage update dm tasks");
+                        unconditionalLog("handleMessage update dm tasks");
                         hostService.updateDMTasks((DMTasks) msg.getData().getParcelable(DMTasks.class.toString()));
                         hostService.mClientMessenger = msg.replyTo;
                         break;
                     case MSG_TASK_TO_COMPLETED:
-                        log("handleMessage to completed");
+                        unconditionalLog("handleMessage to completed");
                         //hostService.wakeAndStartActivity(MainActivity.class);
 
                         //play sound
@@ -79,7 +84,7 @@ public class TaskService extends Service implements Runnable {
                         VibratorHelper.vibrate(hostService);
                         break;
                     case MSG_TASK_UPDATE_COMPLETED:
-                        log("handleMessage update completed");
+                        unconditionalLog("handleMessage update completed");
 
                         //stop sound
                         hostService.mMediaPlayerHelper.stop();
@@ -88,7 +93,7 @@ public class TaskService extends Service implements Runnable {
                         hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
                         break;
                     case MSG_TASK_TO_NOT_COMPLETED:
-                        log("handleMessage to not completed");
+                        unconditionalLog("handleMessage to not completed");
                         //stop vibrating
                         VibratorHelper.cancel(hostService);
                         //stop sound

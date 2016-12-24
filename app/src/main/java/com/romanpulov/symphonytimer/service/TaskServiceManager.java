@@ -22,8 +22,8 @@ import java.util.List;
  * Used by main activity
  */
 public class TaskServiceManager {
-    private static void log(String message) {
-        LoggerHelper.log("TaskServiceManager", message);
+    private void log(String message) {
+        LoggerHelper.logContext(mContext, "TaskServiceManager", message);
     }
 
     /**

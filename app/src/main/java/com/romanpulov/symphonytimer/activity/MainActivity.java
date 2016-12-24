@@ -44,8 +44,8 @@ import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
 
 public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
-    private static void log(String message) {
-        LoggerHelper.log("MainActivity", message);
+    private void log(String message) {
+        LoggerHelper.logContext(this, "MainActivity", message);
     }
 
 	public static final int ADD_ITEM_RESULT_CODE = 1;
@@ -144,6 +144,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
         mTaskServiceManager.unbindService();
         mTaskServiceManager = null;
+
+        LoggerHelper.clearInstance();
 
     	super.onDestroy();
     }

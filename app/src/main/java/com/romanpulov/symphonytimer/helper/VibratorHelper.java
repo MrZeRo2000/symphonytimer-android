@@ -6,10 +6,11 @@ import android.preference.PreferenceManager;
 
 public class VibratorHelper {
     private static void log(String message) {
-        LoggerHelper.log("VibratorHelper", message);
+		// to turn on for debugging only
+        //LoggerHelper.unconditionalLog("VibratorHelper", message);
     }
 
-	private final static long VIBRATE_SHORT_TIME = 200;
+	private final static long VIBRATE_SHORT_TIME = 100;
 	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
 	
 	private static boolean allowedVibrate(Context context) {

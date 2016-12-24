@@ -44,3 +44,6 @@ gradle.properties
 
 # Android Studio captures folder
 captures/
+
+# Test data logs
+data/*.log

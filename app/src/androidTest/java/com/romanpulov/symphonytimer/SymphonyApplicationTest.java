@@ -37,15 +37,15 @@ public class SymphonyApplicationTest extends ApplicationTestCase<Application> {
             }
         }
 
-        LoggerHelper.log(TAG, "uList=" + uList);
+        LoggerHelper.unconditionalLog(TAG, "uList=" + uList);
 
         for (HashMap<Long, Long> item : list) {
-            LoggerHelper.log(TAG, "next series");
+            LoggerHelper.unconditionalLog(TAG, "next series");
             for (Map.Entry<Long, Long> argumentItem : uList.entrySet()) {
                 Long key = argumentItem.getKey();
                 Long value = item.get(argumentItem.getKey());
                 long lValue = value == null ? 0 : value;
-                LoggerHelper.log(TAG, "Key=" + key + ", Value=" + lValue);
+                LoggerHelper.unconditionalLog(TAG, "Key=" + key + ", Value=" + lValue);
             }
         }
 

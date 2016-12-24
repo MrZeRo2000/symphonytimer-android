@@ -50,18 +50,18 @@ public class SymphonyInstrumentedTest {
             ja.put(jio);
         }
 
-        LoggerHelper.log("testJSON", ja.toString());
+        LoggerHelper.unconditionalLog("testJSON", ja.toString());
         jo.put("DMTasks", ja);
-        LoggerHelper.log("testJSON", jo.toString());
+        LoggerHelper.unconditionalLog("testJSON", jo.toString());
 
         String jsonString = jo.toString();
 
         JSONObject joo = new JSONObject(jsonString);
         JSONArray joa = joo.optJSONArray("DMTasks");
         for (int i = 0; i< joa.length(); i++) {
-            LoggerHelper.log("testJSON", joa.get(i).toString());
-            LoggerHelper.log("testJSON", "id=" +((JSONObject)joa.get(i)).optInt("id"));
-            LoggerHelper.log("testJSON", "title=" +((JSONObject)joa.get(i)).optString("title"));
+            LoggerHelper.unconditionalLog("testJSON", joa.get(i).toString());
+            LoggerHelper.unconditionalLog("testJSON", "id=" +((JSONObject)joa.get(i)).optInt("id"));
+            LoggerHelper.unconditionalLog("testJSON", "title=" +((JSONObject)joa.get(i)).optString("title"));
         }
 
     }
@@ -72,12 +72,12 @@ public class SymphonyInstrumentedTest {
 
         //writing
         String tasksString = tasks.toJSONString();
-        LoggerHelper.log("testDMTasksJSON", "DMTasks=" + tasks);
-        LoggerHelper.log("testDMTasksJSON", "JSON=" + tasksString);
+        LoggerHelper.unconditionalLog("testDMTasksJSON", "DMTasks=" + tasks);
+        LoggerHelper.unconditionalLog("testDMTasksJSON", "JSON=" + tasksString);
 
         //reading
         DMTasks newTasks = DMTasks.fromJSONString(tasksString);
-        LoggerHelper.log("testDMTasksJSON", "Restored DMTasks=" + newTasks);
+        LoggerHelper.unconditionalLog("testDMTasksJSON", "Restored DMTasks=" + newTasks);
 
         //validation
         assertEquals(tasks.size(), newTasks.size());
@@ -87,12 +87,12 @@ public class SymphonyInstrumentedTest {
 
         //writing
         String emptyTasksString = emptyTasks.toString();
-        LoggerHelper.log("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
-        LoggerHelper.log("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
+        LoggerHelper.unconditionalLog("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
+        LoggerHelper.unconditionalLog("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
 
         //reading
         DMTasks newEmptyTasks = DMTasks.fromJSONString(emptyTasksString);
-        LoggerHelper.log("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
+        LoggerHelper.unconditionalLog("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
 
         //validation
         assertEquals(emptyTasks.size(), newEmptyTasks.size());

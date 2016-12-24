@@ -9,8 +9,8 @@ import android.preference.PreferenceManager;
 import com.romanpulov.symphonytimer.R;
 
 public class MediaPlayerHelper {
-	private static void log(String message) {
-		LoggerHelper.log("MediaPlayerHelper", message);
+	private void log(String message) {
+		LoggerHelper.getInstance(mContext).log("MediaPlayerHelper", message);
 	}
 
 	private final Context mContext;

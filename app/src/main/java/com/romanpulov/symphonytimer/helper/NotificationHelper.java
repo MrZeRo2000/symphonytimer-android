@@ -19,8 +19,8 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  */
 
 public class NotificationHelper {
-    private static void log(String message) {
-        LoggerHelper.log("NotificationHelper", message);
+    private void log(String message) {
+        LoggerHelper.logContext(mContext.get(), "NotificationHelper", message);
     }
 
     public static final int ONGOING_NOTIFICATION_ID = 1;

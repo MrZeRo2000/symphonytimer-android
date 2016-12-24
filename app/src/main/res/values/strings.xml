@@ -31,11 +31,16 @@
     <string name="action_preferences">Preferences</string>
     <string name="pref_cat_settings">Application Settings</string>
     <string name="pref_vibrate">Vibrate</string>
+    <string name="pref_summary_vibrate">Enables vibration on task completion</string>
     <string name="pref_mute">Mute</string>
+    <string name="pref_summary_mute">Disables sound on task completion</string>
+    <string name="pref_logging">Logging</string>
+    <string name="pref_logging_summary">Writes logs to application folder.\nClose and open the application for the changes to take effect</string>
     <string name="pref_bitmap_background">Bitmap background</string>
     <string name="pref_bitmap_background_summary">Disable for minimum resource consumption</string>
     <string name="pref_reset_data">Reset data</string>
-    <string name="pref_cat_local_backup">Local backup</string>
+    <string name="pref_summary_reset_data">Removes all data, use with great care</string>
+    <string name="pref_cat_data_management">Data management</string>
     <string name="pref_cat_summary_local_backup">Backup to local SD card</string>    
     <string name="pref_backup">Backup</string>
     <string name="pref_summary_backup">Backup current data to local SD card</string>    
