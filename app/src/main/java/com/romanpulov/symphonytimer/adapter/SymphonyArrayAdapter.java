@@ -25,7 +25,6 @@ import android.widget.Toast;
 import java.util.Locale;
 
 public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
-    private final ActionMode.Callback mActionModeCallback;
 	private final DMTimers mValues;
 	private DMTasks mTasks;
     private final MainActivity.OnDMTimerInteractionListener mListener;
@@ -91,7 +90,6 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 	
 	public SymphonyArrayAdapter(Context context, ActionMode.Callback actionModeCallback, DMTimers values, DMTasks tasks, MainActivity.OnDMTimerInteractionListener listener) {
 		super(context, R.layout.symphony_row_view);
-        mActionModeCallback = actionModeCallback;
 		mValues = values;
 		mTasks = tasks;
         mListener = listener;

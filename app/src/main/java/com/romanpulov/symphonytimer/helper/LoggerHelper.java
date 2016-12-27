@@ -34,10 +34,10 @@ public class LoggerHelper {
         mInstance = null;
     }
 
-    private static DateFormat mDateFormat = new SimpleDateFormat(LOG_FILE_DATE_FORMAT, Locale.getDefault());
+    private static final DateFormat mDateFormat = new SimpleDateFormat(LOG_FILE_DATE_FORMAT, Locale.getDefault());
 
     private static FileLogger mLogger;
-    private static File mLogFolder = prepareLogFolder();
+    private static final File mLogFolder = prepareLogFolder();
 
     private final boolean mEnableLogging;
 

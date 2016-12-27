@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,103 +12,102 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
-import android.os.Environment;
+
+import com.romanpulov.library.common.storage.BackupUtils;
 
 public class DBStorageHelper {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
-	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdb";
-	
+    // database backup file name
+    private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb";
+    // XML backup file name
+	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdata";
+    // XML data file
+    private static final String LOCAL_BACKUP_DATA_FILE_NAME = "symphonytimerdbdata";
+
+	private final BackupUtils mXMLBackupUtils;
+
 	private final Context mContext;
 	
-	private String mSourceDBFileName;
-	private String mLocalBackupFolderName; 
-	private String mDestDBFileName;
-	private String mDestXmlFileName;
-	
-	private void initLocalFileNames () {
-		this.mSourceDBFileName = getDatabasePath();
-		
-		StringBuilder destFolderStringBuilder = new StringBuilder(Environment.getExternalStorageDirectory().toString());	
-		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FOLDER_NAME);
-		this.mLocalBackupFolderName = destFolderStringBuilder.toString();
-		
-		destFolderStringBuilder.append("/").append(LOCAL_BACKUP_FILE_NAME);
-		this.mDestDBFileName = destFolderStringBuilder.toString();
-		
-		destFolderStringBuilder.append(".xml");
-		this.mDestXmlFileName = destFolderStringBuilder.toString();
-	}
+    private final String mXMLFileName;
 	
 	public DBStorageHelper(Context context) {
-		this.mContext = context;
-		initLocalFileNames();
-	}
-	
-	private String getDatabasePath () {
-		return mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
-	}
-	
-	public String createLocalBackup() {		
-		// create backup folder if not exists
-		File backupFolder = new File(mLocalBackupFolderName);
-		if (!backupFolder.exists()) {
-			if (!backupFolder.mkdir()) {
-				return null;
-			}
-		}
-		
-		//IO operations
-		try {
-			//copy source database to backup folder
-			FileInputStream inStream = new FileInputStream(mSourceDBFileName);
-			FileOutputStream outStream = new FileOutputStream(mDestDBFileName);
-			try {
-				byte[] buf = new byte[1024];
-				int len;
-				 while ((len = inStream.read(buf)) > 0) {
-					 outStream.write(buf, 0, len);
-				 }				
-			}
-			finally {
-				try {
-					inStream.close();
-					outStream.flush();
-					outStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+        this.mContext = context;
 
-			// generate xml
-			File xmlFile = new File(mDestXmlFileName);
-			FileWriter xmlFileWriter = new FileWriter(xmlFile);
-			new DBXMLHelper(mContext).writeDBXML(xmlFileWriter);
-			xmlFileWriter.flush();
-			xmlFileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		return mDestXmlFileName;
+        mXMLFileName = BackupUtils.getLocalBackupFolderName(LOCAL_BACKUP_FOLDER_NAME) + LOCAL_BACKUP_DATA_FILE_NAME;
+		mXMLBackupUtils = new BackupUtils(mXMLFileName, LOCAL_BACKUP_FOLDER_NAME, LOCAL_BACKUP_FILE_NAME);
 	}
-	
+
+    /**
+     * Creates local backup and returns backup file name if successful     *
+     * @return backup file name
+     */
+	public String createLocalBackup() {
+
+        //backup database and ignore any errors
+        BackupUtils databaseBackupUtils = new BackupUtils(mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(), LOCAL_BACKUP_FOLDER_NAME, LOCAL_BACKUP_DB_FILE_NAME);
+        databaseBackupUtils.createRollingLocalBackup();
+
+        // write XML file
+        File xmlFile = new File(mXMLFileName);
+        try {
+            FileWriter xmlFileWriter = new FileWriter(xmlFile);
+            new DBXMLHelper(mContext).writeDBXML(xmlFileWriter);
+            try {
+                xmlFileWriter.flush();
+                xmlFileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // backup
+            mXMLBackupUtils.createRollingLocalBackup();
+
+            // delete XML file and ignore any errors
+            xmlFile.delete();
+
+            return mXMLFileName;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+	}
+
+    /**
+     * Restore from local backup and return error code:
+     * 1 - local backup not found
+     * 2 - local backup could not be unarchived
+     * 3 - XML data parse error
+     * @return error code or 0 if successful
+     */
 	public int restoreLocalXmlBackup() {
-		int res;
-		try {
-			InputStream xmlInputStream = new BufferedInputStream(new FileInputStream(mDestXmlFileName));
-			Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<>() ;
-			//reading data
-			res = new DBXMLHelper(mContext).parseDBXML(xmlInputStream, tableData);
-			if (0 == res) {
-				DBHelper.getInstance(mContext).restoreBackupData(tableData);				
-			}
-		
-		} catch (FileNotFoundException e) {
-			res = 1;
-			e.printStackTrace();
-		}
-		
-		return res;
+        int result = 0;
+
+        if (mXMLBackupUtils.restoreLocalBackup() != null) {
+
+            File xmlFile = new File(mXMLFileName);
+
+            try {
+                InputStream xmlInputStream = new BufferedInputStream(new FileInputStream(xmlFile));
+                Map<String, List<DBHelper.RawRecItem>> tableData = new HashMap<>() ;
+
+                //reading data
+                int res = new DBXMLHelper(mContext).parseDBXML(xmlInputStream, tableData);
+                if (0 == res) {
+                    DBHelper.getInstance(mContext).restoreBackupData(tableData);
+                    //delete file ignoring errors
+                    xmlFile.delete();
+                } else
+                    result = 3;
+
+            } catch (FileNotFoundException e) {
+                result = 2;
+                e.printStackTrace();
+            }
+
+        } else
+            result = 1;
+
+        return result;
 	}
 }
