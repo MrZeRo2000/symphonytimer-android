@@ -5,9 +5,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.PowerManager;
+import android.os.Build;
 
 import com.romanpulov.symphonytimer.activity.MainActivity;
+import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 
 public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
@@ -15,28 +16,10 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         LoggerHelper.logContext(context, "AlarmManagerReceiver", message);
     }
 
-	final public static String WAKE_LOG_TAG = "wake log tag";
-
 	@Override
 	public void onReceive(Context context, Intent intent) {
         logContext(context, "onReceive");
-
-		 PowerManager pm = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
-         @SuppressWarnings("deprecation")
-		PowerManager.WakeLock wl = pm.newWakeLock(        		 
-        		 PowerManager.FULL_WAKE_LOCK |				 
-                 PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                 PowerManager.ON_AFTER_RELEASE, AlarmManagerBroadcastReceiver.WAKE_LOG_TAG);
-
-        wl.acquire();
-        try {
-            logContext(context, "Waking activity");
-            Intent activityIntent = new Intent(context.getApplicationContext(), MainActivity.class);
-            activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.getApplicationContext().startActivity(activityIntent);
-         } finally {
-            wl.release();
-         }
+        ActivityWakeHelper.WakeAndStartActivity(context, MainActivity.class);
 	}
 
     public void cancelAlarm(Context context, long alarmId) {
@@ -54,6 +37,10 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     	AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, (int)alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        } else {
+            am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        }
     }
 }

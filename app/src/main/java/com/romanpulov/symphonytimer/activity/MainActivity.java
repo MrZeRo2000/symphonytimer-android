@@ -78,10 +78,6 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     private long mLastClickTime;
     private boolean mActivityVisible = false;
 
-    private AlarmManagerBroadcastReceiver mAlarm;
-
-    //Common activity events handling
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

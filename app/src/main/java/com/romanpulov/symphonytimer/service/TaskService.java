@@ -12,6 +12,8 @@ import android.os.Parcelable;
 import android.os.PowerManager;
 import android.os.RemoteException;
 
+import com.romanpulov.symphonytimer.activity.MainActivity;
+import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
@@ -209,24 +211,7 @@ public class TaskService extends Service implements Runnable {
      * @param activityClass activity to start
      */
     private void wakeAndStartActivity(Class<?> activityClass) {
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-
-        @SuppressWarnings("deprecation")
-        PowerManager.WakeLock wl = pm.newWakeLock(
-                PowerManager.FULL_WAKE_LOCK |
-                        PowerManager.ACQUIRE_CAUSES_WAKEUP |
-                        PowerManager.ON_AFTER_RELEASE, AlarmManagerBroadcastReceiver.WAKE_LOG_TAG);
-
-        wl.acquire();
-
-        try {
-            log("starting activity");
-            Intent activityIntent = new Intent(this, activityClass);
-            activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(activityIntent);
-        } finally {
-            wl.release();
-        }
+        ActivityWakeHelper.WakeAndStartActivity(this, activityClass);
     }
 
     public TaskService() {
