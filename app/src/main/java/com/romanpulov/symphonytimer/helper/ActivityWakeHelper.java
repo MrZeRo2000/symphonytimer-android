@@ -15,25 +15,47 @@ public class ActivityWakeHelper {
         LoggerHelper.logContext(context, "ActivityWakeHelper", message);
     }
 
-    final private static String WAKE_LOG_TAG = "wake log tag";
+    private final static String WAKE_LOG_TAG = "wake log tag";
+    private final static int WAKE_LOCK_DURATION = 5000;
 
-    public static void WakeAndStartActivity(Context context, Class<?> activityClass) {
+    private static PowerManager.WakeLock createWakeLock(Context context) {
         PowerManager pm = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
         @SuppressWarnings("deprecation")
-        PowerManager.WakeLock wl = pm.newWakeLock(
+        PowerManager.WakeLock wakeLock = pm.newWakeLock(
                 PowerManager.FULL_WAKE_LOCK |
                         PowerManager.ACQUIRE_CAUSES_WAKEUP |
                         PowerManager.ON_AFTER_RELEASE, WAKE_LOG_TAG);
 
-        wl.acquire();
+        return wakeLock;
+    }
+
+    /**
+     * Wakes the device for WAKE_LOCK_DURATION
+     * @param context Context
+     */
+    public static void wake(Context context) {
+        PowerManager.WakeLock wakeLock = createWakeLock(context);
+
+        wakeLock.acquire(WAKE_LOCK_DURATION);
+    }
+
+    /**
+     * Wakes the device and starts activity
+     * @param context Context
+     * @param activityClass Activity to start
+     */
+    public static void wakeAndStartActivity(Context context, Class<?> activityClass) {
+        PowerManager.WakeLock wakeLock = createWakeLock(context);
+
+        wakeLock.acquire();
         try {
             logContext(context, "Waking activity");
             Intent activityIntent = new Intent(context.getApplicationContext(), activityClass);
             activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.getApplicationContext().startActivity(activityIntent);
         } finally {
-            wl.release();
+            wakeLock.release();
         }
     }
 }

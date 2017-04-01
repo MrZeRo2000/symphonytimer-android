@@ -19,7 +19,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
         logContext(context, "onReceive");
-        ActivityWakeHelper.WakeAndStartActivity(context, MainActivity.class);
+        ActivityWakeHelper.wake(context);
 	}
 
     public void cancelAlarm(Context context, long alarmId) {

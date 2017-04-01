@@ -1,7 +1,6 @@
 package com.romanpulov.symphonytimer.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,7 +8,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
-import android.os.PowerManager;
 import android.os.RemoteException;
 
 import com.romanpulov.symphonytimer.activity.MainActivity;
@@ -18,7 +16,6 @@ import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
-import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTasksStatus;
 import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
@@ -77,7 +74,8 @@ public class TaskService extends Service implements Runnable {
                         break;
                     case MSG_TASK_TO_COMPLETED:
                         unconditionalLog("handleMessage to completed");
-                        //hostService.wakeAndStartActivity(MainActivity.class);
+
+                        hostService.wakeAndStartActivity(MainActivity.class);
 
                         //play sound
                         hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
@@ -211,7 +209,7 @@ public class TaskService extends Service implements Runnable {
      * @param activityClass activity to start
      */
     private void wakeAndStartActivity(Class<?> activityClass) {
-        ActivityWakeHelper.WakeAndStartActivity(this, activityClass);
+        ActivityWakeHelper.wakeAndStartActivity(this, activityClass);
     }
 
     public TaskService() {
