@@ -40,7 +40,6 @@ import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 import com.romanpulov.symphonytimer.service.TaskServiceManager;
-import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
 
 public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
@@ -309,7 +308,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
             /*
             if (null == mAlarm)
-                mAlarm = new AlarmManagerBroadcastReceiver();
+                mAlarm = new OneTimeAlarmManagerBroadcastReceiver();
             mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
             */
 

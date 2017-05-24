@@ -45,7 +45,8 @@
         </activity>
 
         <!-- Broadcast receiver -->
-        <receiver android:name=".utils.AlarmManagerBroadcastReceiver" />
+        <receiver android:name=".receiver.OneTimeAlarmManagerBroadcastReceiver" />
+        <receiver android:name=".receiver.RepeatingAlarmManagerBroadcastReceiver" />
 
         <activity
             android:name=".activity.HistoryActivity"

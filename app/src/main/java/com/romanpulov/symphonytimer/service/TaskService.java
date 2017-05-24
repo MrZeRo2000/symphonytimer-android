@@ -12,13 +12,13 @@ import android.os.RemoteException;
 
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
+import com.romanpulov.symphonytimer.helper.AlarmManagerHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTasksStatus;
-import com.romanpulov.symphonytimer.utils.AlarmManagerBroadcastReceiver;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -126,7 +126,7 @@ public class TaskService extends Service implements Runnable {
      */
     final Messenger mMessenger = new Messenger(new IncomingHandler(this));
 
-    final AlarmManagerBroadcastReceiver mAlarm = new AlarmManagerBroadcastReceiver();
+    final AlarmManagerHelper mAlarm = new AlarmManagerHelper();
 
     private DMTasks mDMTasks;
     private DMTasksStatus mDMTasksStatus;
@@ -161,15 +161,16 @@ public class TaskService extends Service implements Runnable {
             log("firstTriggerAtTime = " + triggerTime);
             if (triggerTime < Long.MAX_VALUE) {
                 log("setting new alarm to " + triggerTime);
-                mAlarm.setOnetimeTimer(this, 0, triggerTime);
+                mAlarm.setOnetimeTimer(this, triggerTime);
+                mAlarm.setRepeatingTimer(this, 1000 * 5);
             } else {
                 log("cancelling alarm: triggerTime = Long.MAX_VALUE");
-                mAlarm.cancelAlarm(this, 0);
+                mAlarm.cancelAlarms(this);
             }
         }  else {
             //cancel old alarm
             log("cancelling alarm: mDMTasks.size() = 0");
-            mAlarm.cancelAlarm(this, 0);
+            mAlarm.cancelAlarms(this);
         }
     }
 
@@ -278,7 +279,7 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void onDestroy() {
         log("destroying service");
-        mAlarm.cancelAlarm(this, 0);
+        mAlarm.cancelAlarms(this);
         VibratorHelper.cancel(this);
         if (mMediaPlayerHelper != null)
             mMediaPlayerHelper.stop();
