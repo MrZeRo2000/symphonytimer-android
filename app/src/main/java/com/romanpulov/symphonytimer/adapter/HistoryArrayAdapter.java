@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
@@ -79,7 +80,7 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.mTimerId);
 		
 		viewHolder.mTitle.setText(dmTimerRec.mTitle);		
-		viewHolder.mTime.setText(java.text.DateFormat.getDateTimeInstance().format(new Date(rec.mStartTime)));
+		viewHolder.mTime.setText(DateFormatterHelper.format(rec.mStartTime));
 		viewHolder.mImage.setImageURI(
 				null != dmTimerRec.mImageName ? Uri.parse(dmTimerRec.mImageName) : null);
 		

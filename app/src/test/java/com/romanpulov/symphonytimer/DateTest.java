@@ -1,5 +1,7 @@
 package com.romanpulov.symphonytimer;
 
+import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
+
 import org.junit.Test;
 
 import java.util.Date;
@@ -12,6 +14,6 @@ public class DateTest {
     @Test
     public void simpleTest() {
         System.out.println("Date test");
-        System.out.println(java.text.DateFormat.getDateTimeInstance().format(new Date(1491054630812L)));
+        System.out.println(DateFormatterHelper.format(1491054630812L));
     }
 }
