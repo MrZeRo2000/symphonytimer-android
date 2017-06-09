@@ -16,6 +16,7 @@ public class ActivityWakeHelper {
     }
 
     private final static String WAKE_LOG_TAG = "wake log tag";
+    private final static String PARTIAL_WAKE_LOG_TAG = "partial wake log tag";
     private final static int WAKE_LOCK_DURATION = 5000;
 
     private static PowerManager.WakeLock createWakeLock(Context context) {
@@ -30,6 +31,16 @@ public class ActivityWakeHelper {
         return wakeLock;
     }
 
+    private static PowerManager.WakeLock createPartialWakeLock(Context context) {
+        PowerManager pm = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+
+        PowerManager.WakeLock wakeLock = pm.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                PARTIAL_WAKE_LOG_TAG);
+
+        return wakeLock;
+    }
+
     /**
      * Wakes the device for WAKE_LOCK_DURATION
      * @param context Context
@@ -39,6 +50,13 @@ public class ActivityWakeHelper {
 
         wakeLock.acquire(WAKE_LOCK_DURATION);
     }
+
+    public static void wakePartial(Context context) {
+        PowerManager.WakeLock wakeLock = createPartialWakeLock(context);
+
+        wakeLock.acquire(WAKE_LOCK_DURATION);
+    }
+
 
     /**
      * Wakes the device and starts activity

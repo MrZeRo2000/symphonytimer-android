@@ -47,16 +47,16 @@ public class AlarmManagerHelper {
         cancelRepeatingTimeAlarm(context);
     }
 
-    public void setRepeatingTimer(Context context, long intervalMillis) {
-        logContext(context, "setRepeatingTimer to " + intervalMillis);
+    public void setRepeatingTimer(Context context, long triggerAt, long interval) {
+        logContext(context, "setRepeatingTimer to " + interval + " triggering at " + DateFormatterHelper.formatLog(triggerAt));
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, RepeatingAlarmManagerBroadcastReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, AlarmManagerHelper.ALARM_TYPE_REPEATING, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalMillis, pi);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
     }
 
     public void setOnetimeTimer(Context context, long triggerAt){
-        logContext(context, "setOnetimeTimer to " + DateFormatterHelper.format(triggerAt));
+        logContext(context, "setOnetimeTimer to " + DateFormatterHelper.formatLog(triggerAt));
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, OneTimeAlarmManagerBroadcastReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, AlarmManagerHelper.ALARM_TYPE_ONETIME, intent, PendingIntent.FLAG_UPDATE_CURRENT);

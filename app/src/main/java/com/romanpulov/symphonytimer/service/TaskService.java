@@ -13,6 +13,7 @@ import android.os.RemoteException;
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.AlarmManagerHelper;
+import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
@@ -162,7 +163,7 @@ public class TaskService extends Service implements Runnable {
             if (triggerTime < Long.MAX_VALUE) {
                 log("setting new alarm to " + triggerTime);
                 mAlarm.setOnetimeTimer(this, triggerTime);
-                mAlarm.setRepeatingTimer(this, 1000 * 5);
+                mAlarm.setRepeatingTimer(this, triggerTime - (1 * 60 * 1000), 1000 * 5);
             } else {
                 log("cancelling alarm: triggerTime = Long.MAX_VALUE");
                 mAlarm.cancelAlarms(this);
@@ -290,7 +291,7 @@ public class TaskService extends Service implements Runnable {
     @Override
     public void run() {
         try {
-            log("run " + System.currentTimeMillis() + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus + ",alarm=" + mAlarm);
+            log("run " + DateFormatterHelper.formatLog(System.currentTimeMillis()) + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus + ",alarm=" + mAlarm);
 
             log("NotificationHelper notify");
             NotificationHelper.getInstance(this).notify(mDMTasks);
