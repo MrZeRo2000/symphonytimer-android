@@ -18,6 +18,7 @@ import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
+import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTasksStatus;
 
@@ -298,6 +299,18 @@ public class TaskService extends Service implements Runnable {
 
             int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
             //log(DMTasksStatus.statusEventAsString(statusChangeEvent));
+
+            // log to completed event
+            if (statusChangeEvent == STATUS_EVENT_TO_COMPLETED) {
+                DMTaskItem dmTaskItem = mDMTasks.getFirstTaskItemCompleted();
+                if (dmTaskItem != null) {
+                    log("Due time: " +
+                            DateFormatterHelper.formatLog(dmTaskItem.getTriggerAtTime()) +
+                            ", real time: " +
+                            DateFormatterHelper.formatLog(System.currentTimeMillis())
+                    );
+                }
+            }
 
             processStatusChangeEvent(statusChangeEvent);
 

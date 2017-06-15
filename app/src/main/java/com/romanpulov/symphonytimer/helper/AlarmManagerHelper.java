@@ -27,6 +27,7 @@ public class AlarmManagerHelper {
         Intent intent = new Intent(context, OneTimeAlarmManagerBroadcastReceiver.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, ALARM_TYPE_ONETIME, intent, PendingIntent.FLAG_NO_CREATE);
         if (null != sender) {
+            logContext(context, "cancelOneTimeAlarm: cancelling alarm");
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(sender);
         }
@@ -37,14 +38,25 @@ public class AlarmManagerHelper {
         Intent intent = new Intent(context, RepeatingAlarmManagerBroadcastReceiver.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, ALARM_TYPE_REPEATING, intent, PendingIntent.FLAG_NO_CREATE);
         if (null != sender) {
+            logContext(context, "cancelRepeatingTimeAlarm: cancelling alarm");
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(sender);
+        }
+    }
+
+    private void cancelTimeAlarm(Context context, Class<?> intentClass, int requestCode) {
+        Intent intent = new Intent(context, intentClass);
+        PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_NO_CREATE);
+        if (null != sender) {
+            logContext(context, intentClass.getName() + ": cancelling alarm");
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(sender);
         }
     }
 
     public void cancelAlarms(Context context) {
-        cancelOneTimeAlarm(context);
-        cancelRepeatingTimeAlarm(context);
+        cancelTimeAlarm(context, OneTimeAlarmManagerBroadcastReceiver.class, ALARM_TYPE_ONETIME);
+        cancelTimeAlarm(context, RepeatingAlarmManagerBroadcastReceiver.class, ALARM_TYPE_REPEATING);
     }
 
     public void setRepeatingTimer(Context context, long triggerAt, long interval) {
