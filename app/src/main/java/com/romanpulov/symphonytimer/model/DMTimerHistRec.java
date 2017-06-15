@@ -5,6 +5,7 @@ public class DMTimerHistRec {
 	public long mTimerId;
 	public long mStartTime;
 	public long mEndTime;
+	public long mRealTime;
 
 	public DMTimerHistRec() {
 		

@@ -62,6 +62,18 @@
 		    android:layout_marginRight="@dimen/control_padding"
 		    android:typeface="sans"
 		    android:textAppearance="@android:style/TextAppearance.Small" />
+
+		<TextView
+			android:id="@+id/history_time_details_view"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="right"
+			android:layout_marginLeft="@dimen/control_padding"
+			android:layout_marginTop="@dimen/control_padding_half"
+			android:layout_marginBottom="@dimen/control_padding"
+			android:layout_marginRight="@dimen/control_padding"
+			android:typeface="sans"
+			android:textAppearance="@android:style/TextAppearance.Small" />
 	
 	</LinearLayout>
 </LinearLayout>

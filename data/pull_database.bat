@@ -1,1 +1,3 @@
-"C:\Users\rpulov\AppData\Local\Android\sdk\platform-tools\adb.exe" pull data/data/com.romanpulov.symphonytimer/databases/symphonytimerdb D:\Work\AndroidStudioProjects\symphonytimer-android\data\symphonytimerdb
+rem "C:\Users\rpulov\AppData\Local\Android\sdk\platform-tools\adb.exe" pull data/data/com.romanpulov.symphonytimer/databases/symphonytimerdb D:\Work\AndroidStudioProjects\symphonytimer-android\data\symphonytimerdb
+
+"C:\Users\romanpulov\AppData\Local\Android\sdk\platform-tools\adb.exe" pull data/data/com.romanpulov.symphonytimer/databases/symphonytimerdb D:\prj\AndroidStudioProjects\symphonytimer-android\data\symphonytimerdb

@@ -112,6 +112,7 @@ public class DBHelper {
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], dmTaskItem.getId());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], dmTaskItem.getStartTime());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], dmTaskItem.getCurrentTime());
+		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4], System.currentTimeMillis());
 
 		return mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
 	}
@@ -294,6 +295,7 @@ public class DBHelper {
 				dmRec.mTimerId = c.getLong(1);
 				dmRec.mStartTime = c.getLong(2);
 				dmRec.mEndTime = c.getLong(3);
+                dmRec.mRealTime = c.getLong(4);
 				
 				dmList.add(dmRec);
 			}
@@ -431,6 +433,7 @@ public class DBHelper {
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3]));
+            cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4]));
 
 			mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);						
 		}

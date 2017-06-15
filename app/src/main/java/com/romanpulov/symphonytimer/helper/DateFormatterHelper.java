@@ -12,14 +12,23 @@ import java.util.Locale;
 
 public class DateFormatterHelper {
     public static String LOG_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static String TIME_FORMAT = "HH:mm:ss";
 
     public static DateFormat mLogDateFormat;
+    public static DateFormat mTimeFormat;
 
     public static DateFormat getLogDateFormat() {
         if (mLogDateFormat == null)
             mLogDateFormat = new SimpleDateFormat(LOG_DATE_FORMAT, Locale.getDefault());
 
         return mLogDateFormat;
+    }
+
+    public static DateFormat getTimeFormat() {
+        if (mTimeFormat == null)
+            mTimeFormat = new SimpleDateFormat(TIME_FORMAT, Locale.getDefault());
+
+        return mTimeFormat;
     }
 
 
@@ -39,5 +48,14 @@ public class DateFormatterHelper {
      */
     public static String formatLog(long miliseconds) {
         return getLogDateFormat().format(new Date(miliseconds));
+    }
+
+    /**
+     * Format time only
+     * @param miliseconds date in miliseconds
+     * @return formatted time string
+     */
+    public static String formatTime(long miliseconds) {
+        return getTimeFormat().format(new Date(miliseconds));
     }
 }

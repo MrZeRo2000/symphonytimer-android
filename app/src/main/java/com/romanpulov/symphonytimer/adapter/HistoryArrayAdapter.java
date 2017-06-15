@@ -2,10 +2,12 @@ package com.romanpulov.symphonytimer.adapter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.romanpulov.library.common.logger.DateFormatter;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
@@ -28,11 +31,13 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		public final TextView mTitle;
 		public final ImageView mImage;
 		public final TextView mTime;
+		public final TextView mTimeDetails;
 		
 		public ViewHolder(View view) {
 			mTitle = (TextView)view.findViewById(R.id.history_text_view);
 			mImage = (ImageView)view.findViewById(R.id.history_image_view);
 			mTime = (TextView)view.findViewById(R.id.history_time_view);
+			mTimeDetails = (TextView)view.findViewById(R.id.history_time_details_view);
 		}
 	}
 
@@ -83,6 +88,18 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		viewHolder.mTime.setText(DateFormatterHelper.format(rec.mStartTime));
 		viewHolder.mImage.setImageURI(
 				null != dmTimerRec.mImageName ? Uri.parse(dmTimerRec.mImageName) : null);
+
+        boolean hideTimeDetails = !PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_full_history_info", false);
+
+        if ((rec.mRealTime == 0) || hideTimeDetails) {
+            viewHolder.mTimeDetails.setVisibility(View.GONE);
+        }
+        else {
+            viewHolder.mTimeDetails.setVisibility(View.VISIBLE);
+            String detailsText = getContext().getString(R.string.caption_due_real_time, DateFormatterHelper.formatTime(rec.mEndTime), DateFormatterHelper.formatTime(rec.mRealTime));
+            //viewHolder.mTimeDetails.setText("Due time : " + DateFormatterHelper.formatTime(rec.mEndTime) + ", real time : " + DateFormatterHelper.formatTime(rec.mRealTime));
+            viewHolder.mTimeDetails.setText(detailsText);
+        }
 		
 		return rowView;
 	}

@@ -23,6 +23,7 @@
     <string name="caption_cancel">Cancel</string>
     <string name="caption_loading">Loading &#8230;</string>
     <string name="caption_saving">Saving &#8230;</string>
+    <string name="caption_due_real_time">Due time : %1$s, real time : %2$s</string>
     <string name="action_add">Add</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
@@ -36,10 +37,13 @@
     <string name="pref_summary_mute">Disables sound on task completion</string>
     <string name="pref_logging">Logging</string>
     <string name="pref_logging_summary">Writes logs to application folder.\nClose and open the application for the changes to take effect</string>
-    <string name="pref_bitmap_background">Bitmap background</string>
-    <string name="pref_bitmap_background_summary">Disable for minimum resource consumption</string>
     <string name="pref_reset_data">Reset data</string>
     <string name="pref_summary_reset_data">Removes all data, use with great care</string>
+    <string name="pref_cat_interface">Interface</string>
+    <string name="pref_bitmap_background">Bitmap background</string>
+    <string name="pref_bitmap_background_summary">Disable for minimum resource consumption</string>
+    <string name="pref_full_history_info">Full history info</string>
+    <string name="pref_full_history_info_summary">Shows supplemental info on timer operation</string>
     <string name="pref_cat_data_management">Data management</string>
     <string name="pref_cat_summary_local_backup">Backup to local SD card</string>    
     <string name="pref_backup">Backup</string>

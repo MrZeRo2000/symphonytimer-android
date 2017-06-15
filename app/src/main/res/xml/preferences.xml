@@ -16,17 +16,27 @@
 			android:defaultValue="false"
 			/>
 		<CheckBoxPreference
-		    android:key="pref_bitmap_background"
-		    android:title="@string/pref_bitmap_background"
-		    android:summary="@string/pref_bitmap_background_summary"
-		    android:defaultValue="false"
-		    />
-		<CheckBoxPreference
 			android:key="pref_logging"
 			android:title="@string/pref_logging"
 			android:summary="@string/pref_logging_summary"
 			android:defaultValue="false"
 			/>
+	</PreferenceCategory>
+	<PreferenceCategory
+		android:title="@string/pref_cat_interface"
+		>
+		<CheckBoxPreference
+			android:key="pref_bitmap_background"
+			android:title="@string/pref_bitmap_background"
+			android:summary="@string/pref_bitmap_background_summary"
+			android:defaultValue="false"
+			/>
+        <CheckBoxPreference
+            android:key="pref_full_history_info"
+            android:title="@string/pref_full_history_info"
+            android:summary="@string/pref_full_history_info_summary"
+            android:defaultValue="false"
+            />
 	</PreferenceCategory>
 	<PreferenceCategory
 	    android:title="@string/pref_cat_data_management"
