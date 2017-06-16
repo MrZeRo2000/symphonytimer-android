@@ -9,7 +9,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 
+import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.AlarmManagerHelper;
@@ -18,6 +20,7 @@ import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
+import com.romanpulov.symphonytimer.helper.WakeConfigHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTasksStatus;
@@ -160,11 +163,23 @@ public class TaskService extends Service implements Runnable {
         //set new alarm
         if (mDMTasks.size() > 0) {
             long triggerTime = mDMTasks.getFirstTriggerAtTime();
-            log("firstTriggerAtTime = " + triggerTime);
+            log("firstTriggerAtTime = " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
             if (triggerTime < Long.MAX_VALUE) {
-                log("setting new alarm to " + triggerTime);
+                log("setting new alarm to " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
                 mAlarm.setOnetimeTimer(this, triggerTime);
-                mAlarm.setRepeatingTimer(this, triggerTime - (1 * 60 * 1000), 1000 * 5);
+
+                WakeConfigHelper wakeConfigHelper = new WakeConfigHelper(getApplicationContext());
+                if (wakeConfigHelper.isValidConfig()) {
+
+                    log("wake before config: " + wakeConfigHelper.getWakeBefore() + ", wake interval config: " + wakeConfigHelper.getWakeInterval());
+                    long wakeBefore = triggerTime - wakeConfigHelper.getWakeBeforeTime();
+                    long wakeInterval = wakeConfigHelper.getWakeIntervalTime();
+
+                    log("wake before: " + DateFormatterHelper.formatLog(wakeBefore) + ", wake interval : " + wakeInterval);
+                    mAlarm.setRepeatingTimer(this, wakeBefore, wakeInterval);
+                } else {
+                    log("wake config is invalid");
+                }
             } else {
                 log("cancelling alarm: triggerTime = Long.MAX_VALUE");
                 mAlarm.cancelAlarms(this);
