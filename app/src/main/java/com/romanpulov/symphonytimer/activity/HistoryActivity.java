@@ -92,11 +92,13 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNa
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 
         mActionBar = this.getSupportActionBar();
-        mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-        mActionBar.setHomeButtonEnabled(true);
-        //mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setIcon(R.drawable.tuba);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        if (mActionBar != null) {
+            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
+            mActionBar.setHomeButtonEnabled(true);
+            //mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setIcon(R.drawable.tuba);
+            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        }
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.history_filter, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

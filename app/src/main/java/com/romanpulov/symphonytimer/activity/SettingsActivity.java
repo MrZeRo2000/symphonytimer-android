@@ -17,9 +17,11 @@ public class SettingsActivity extends ActionBarActivity {
         setContentView(R.layout.activity_settings);
         
         ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-        actionBar.setIcon(R.drawable.tuba);
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
+            actionBar.setIcon(R.drawable.tuba);
+        }
     }
 
     @Override

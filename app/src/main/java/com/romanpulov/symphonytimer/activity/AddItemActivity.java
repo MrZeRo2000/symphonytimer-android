@@ -74,9 +74,11 @@ public class AddItemActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_item);
 
         ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-        actionBar.setIcon(R.drawable.tuba);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
+            actionBar.setIcon(R.drawable.tuba);
+        }
 
         mMediaPlayerHelper = new MediaPlayerHelper(this);
 
