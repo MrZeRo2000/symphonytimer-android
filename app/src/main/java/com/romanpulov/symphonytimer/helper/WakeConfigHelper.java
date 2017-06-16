@@ -11,7 +11,6 @@ import com.romanpulov.symphonytimer.R;
  */
 
 public class WakeConfigHelper {
-
     /**
      * Wake before time in minutes
      */
@@ -21,12 +20,16 @@ public class WakeConfigHelper {
         return mWakeBefore;
     }
 
+    /**
+     *
+     * @return Before time converted to milliseconds
+     */
     public long getWakeBeforeTime() {
         return mWakeBefore * 60 * 1000;
     }
 
     /**
-     * Wake interval time inseconds
+     * Wake interval time in seconds
      */
     private int mWakeInterval;
 
@@ -34,6 +37,10 @@ public class WakeConfigHelper {
         return mWakeInterval;
     }
 
+    /**
+     *
+     * @return Wake interval converted to milliseconds
+     */
     public long getWakeIntervalTime () {
         return mWakeInterval * 1000;
     }
