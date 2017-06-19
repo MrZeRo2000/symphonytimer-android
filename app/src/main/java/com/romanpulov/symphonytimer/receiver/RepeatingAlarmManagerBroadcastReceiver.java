@@ -19,6 +19,8 @@ public class RepeatingAlarmManagerBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         logContext(context, "onReceive");
-        ActivityWakeHelper.wakePartial(context);
+
+        long wakeDuration = intent.getLongExtra(ActivityWakeHelper.WAKE_INTERVAL_EXTRA_NAME, ActivityWakeHelper.WAKE_LOCK_DURATION);
+        ActivityWakeHelper.wakePartial(context, wakeDuration);
     }
 }

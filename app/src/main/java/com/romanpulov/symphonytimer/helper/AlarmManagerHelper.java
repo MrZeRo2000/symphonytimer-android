@@ -63,6 +63,7 @@ public class AlarmManagerHelper {
         logContext(context, "setRepeatingTimer to " + interval + " triggering at " + DateFormatterHelper.formatLog(triggerAt));
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, RepeatingAlarmManagerBroadcastReceiver.class);
+        intent.putExtra(ActivityWakeHelper.WAKE_INTERVAL_EXTRA_NAME, interval);
         PendingIntent pi = PendingIntent.getBroadcast(context, AlarmManagerHelper.ALARM_TYPE_REPEATING, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.setRepeating(AlarmManager.RTC_WAKEUP, triggerAt, interval, pi);
     }
