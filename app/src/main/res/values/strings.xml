@@ -42,10 +42,6 @@
     <string name="pref_wake_before_summary">Wake before time in case of waking issue.\nWorkaround for Android 5 bug</string>
     <string name="pref_wake_before_default">0</string>
 
-    <string name="pref_wake_interval">Wake interval</string>
-    <string name="pref_wake_interval_summary">Wake interval in case of waking issue.\nWorkaround for Android 5 bug</string>
-    <string name="pref_wake_interval_default">0</string>
-
     <string name="pref_reset_data">Reset data</string>
     <string name="pref_summary_reset_data">Removes all data, use with great care</string>
     <string name="pref_cat_interface">Interface</string>

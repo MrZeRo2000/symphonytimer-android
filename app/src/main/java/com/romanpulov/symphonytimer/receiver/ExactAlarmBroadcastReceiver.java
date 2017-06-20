@@ -8,9 +8,9 @@ import android.os.Build;
 import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 
-public class OneTimeAlarmManagerBroadcastReceiver extends BroadcastReceiver {
+public class ExactAlarmBroadcastReceiver extends BroadcastReceiver {
     private static void logContext(Context context, String message) {
-        LoggerHelper.logContext(context, "OneTimeAlarmManagerBroadcastReceiver", message);
+        LoggerHelper.logContext(context, "ExactAlarmBroadcastReceiver", message);
     }
 
 	@Override

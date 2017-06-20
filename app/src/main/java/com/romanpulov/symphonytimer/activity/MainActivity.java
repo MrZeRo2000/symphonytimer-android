@@ -312,7 +312,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
             /*
             if (null == mAlarm)
-                mAlarm = new OneTimeAlarmManagerBroadcastReceiver();
+                mAlarm = new ExactAlarmBroadcastReceiver();
             mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
             */
 

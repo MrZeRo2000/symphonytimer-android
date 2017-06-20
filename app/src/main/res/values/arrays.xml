@@ -18,18 +18,4 @@
         <item>20</item>
         <item>30</item>
     </string-array>
-    <string-array name="wake_interval_entries">
-        <item>Off</item>
-        <item>5 sec</item>
-        <item>10 sec</item>
-        <item>30 sec</item>
-        <item>60 sec</item>
-    </string-array>
-    <string-array name="wake_interval_entry_values">
-        <item>0</item>
-        <item>5</item>
-        <item>10</item>
-        <item>30</item>
-        <item>60</item>
-    </string-array>
 </resources>

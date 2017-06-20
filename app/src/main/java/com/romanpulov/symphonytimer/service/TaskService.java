@@ -166,17 +166,16 @@ public class TaskService extends Service implements Runnable {
             log("firstTriggerAtTime = " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
             if (triggerTime < Long.MAX_VALUE) {
                 log("setting new alarm to " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
-                mAlarm.setOnetimeTimer(this, triggerTime);
+                mAlarm.setExactTimer(this, triggerTime);
 
                 WakeConfigHelper wakeConfigHelper = new WakeConfigHelper(getApplicationContext());
                 if (wakeConfigHelper.isValidConfig()) {
 
-                    log("wake before config: " + wakeConfigHelper.getWakeBefore() + ", wake interval config: " + wakeConfigHelper.getWakeInterval());
+                    log("wake before config: " + wakeConfigHelper.getWakeBeforeTime());
                     long wakeBefore = triggerTime - wakeConfigHelper.getWakeBeforeTime();
-                    long wakeInterval = wakeConfigHelper.getWakeIntervalTime();
 
-                    log("wake before: " + DateFormatterHelper.formatLog(wakeBefore) + ", wake interval : " + wakeInterval);
-                    mAlarm.setRepeatingTimer(this, wakeBefore, wakeInterval);
+                    log("wake before: " + DateFormatterHelper.formatLog(wakeBefore));
+                    mAlarm.setAdvanceTimer(this, wakeBefore, triggerTime);
                 } else {
                     log("wake config is invalid");
                 }

@@ -11,16 +11,23 @@ import com.romanpulov.symphonytimer.helper.LoggerHelper;
  * Created by romanpulov on 24.05.2017.
  */
 
-public class RepeatingAlarmManagerBroadcastReceiver extends BroadcastReceiver {
+public class AdvanceAlarmBroadcastReceiver extends BroadcastReceiver {
     private static void logContext(Context context, String message) {
-        LoggerHelper.logContext(context, "RepeatingAlarmManagerBroadcastReceiver", message);
+        LoggerHelper.logContext(context, "AdvanceAlarmBroadcastReceiver", message);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         logContext(context, "onReceive");
 
-        long wakeDuration = intent.getLongExtra(ActivityWakeHelper.WAKE_INTERVAL_EXTRA_NAME, ActivityWakeHelper.WAKE_LOCK_DURATION);
+        long wakeDuration;
+        long wakeTarget = intent.getLongExtra(ActivityWakeHelper.WAKE_TARGET_EXTRA_NAME, 0);
+        if (wakeTarget != 0) {
+            wakeDuration = wakeTarget - System.currentTimeMillis();
+        } else
+            wakeDuration = ActivityWakeHelper.WAKE_LOCK_DURATION;
+
+        logContext(context, "waking with duration " + wakeDuration);
         ActivityWakeHelper.wakePartial(context, wakeDuration);
     }
 }

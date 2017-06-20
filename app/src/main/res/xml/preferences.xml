@@ -30,15 +30,6 @@
             android:entryValues="@array/wake_before_entry_values"
             android:defaultValue="@string/pref_wake_before_default"
             />
-        <ListPreference
-            android:key="pref_wake_interval"
-            android:title="@string/pref_wake_interval"
-            android:dialogTitle="@string/pref_wake_interval"
-            android:summary="@string/pref_wake_interval_summary"
-            android:entries="@array/wake_interval_entries"
-            android:entryValues="@array/wake_interval_entry_values"
-            android:defaultValue="@string/pref_wake_interval_default"
-            />
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/pref_cat_interface"
