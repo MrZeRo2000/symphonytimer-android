@@ -23,9 +23,13 @@ public class AdvanceAlarmBroadcastReceiver extends BroadcastReceiver {
         long wakeDuration;
         long wakeTarget = intent.getLongExtra(ActivityWakeHelper.WAKE_TARGET_EXTRA_NAME, 0);
         if (wakeTarget != 0) {
-            wakeDuration = wakeTarget - System.currentTimeMillis();
-        } else
+            // added offset for more reliable wake
+            logContext(context, "wake target found");
+            wakeDuration = wakeTarget - System.currentTimeMillis() + ActivityWakeHelper.WAKE_LOCK_OFFSET;
+        } else {
+            logContext(context, "wake target not found");
             wakeDuration = ActivityWakeHelper.WAKE_LOCK_DURATION;
+        }
 
         logContext(context, "waking with duration " + wakeDuration);
         ActivityWakeHelper.wakePartial(context, wakeDuration);

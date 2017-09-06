@@ -18,6 +18,7 @@ public class ActivityWakeHelper {
     public final static String WAKE_INTERVAL_EXTRA_NAME = "wake interval";
     public final static String WAKE_TARGET_EXTRA_NAME = "wake target";
     public final static int WAKE_LOCK_DURATION = 5000;
+    public final static int WAKE_LOCK_OFFSET = 5000;
 
     private final static String WAKE_LOG_TAG = "wake log tag";
     private final static String PARTIAL_WAKE_LOG_TAG = "partial wake log tag";
