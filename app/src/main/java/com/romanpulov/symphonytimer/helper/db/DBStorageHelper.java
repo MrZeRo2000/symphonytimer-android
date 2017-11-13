@@ -33,7 +33,7 @@ public class DBStorageHelper {
 	public DBStorageHelper(Context context) {
         this.mContext = context;
 
-        mXMLFileName = BackupUtils.getLocalBackupFolderName(LOCAL_BACKUP_FOLDER_NAME) + LOCAL_BACKUP_DATA_FILE_NAME;
+        mXMLFileName = BackupUtils.getBackupFolderName(LOCAL_BACKUP_FOLDER_NAME) + LOCAL_BACKUP_DATA_FILE_NAME;
 		mXMLBackupUtils = new BackupUtils(mXMLFileName, LOCAL_BACKUP_FOLDER_NAME, LOCAL_BACKUP_FILE_NAME);
 	}
 
@@ -83,7 +83,7 @@ public class DBStorageHelper {
 	public int restoreLocalXmlBackup() {
         int result = 0;
 
-        if (mXMLBackupUtils.restoreLocalBackup() != null) {
+        if (mXMLBackupUtils.restoreBackup() != null) {
 
             File xmlFile = new File(mXMLFileName);
 
