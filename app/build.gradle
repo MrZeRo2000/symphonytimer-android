@@ -19,12 +19,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        abortOnError false
+    }
 }
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:22.2.1'
     implementation 'com.romanpulov.library.common:library:1.0.10'
-    implementation 'com.romanpulov.library.dropbox:library:1.0.4'
+    implementation 'com.romanpulov.library.dropbox:library:1.0.6'
     implementation 'com.romanpulov.library.view:library:1.0.16'
     // Unit testing dependencies
     androidTestImplementation 'com.android.support:support-annotations:22.2.1'
