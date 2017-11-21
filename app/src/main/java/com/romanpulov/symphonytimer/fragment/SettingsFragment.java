@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.widget.Toast;
 
+import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
@@ -138,6 +139,18 @@ public class SettingsFragment extends PreferenceFragment implements
 				};
 			});
 		}
+
+		//account dropbox
+        button = findPreference("pref_account_dropbox");
+		if (null != button) {
+		    button.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    DropboxHelper.getInstance(getActivity().getApplicationContext()).invokeAuthActivity(getActivity().getResources().getString(R.string.app_key));
+                    return false;
+                }
+            });
+        }
 	}
 
 	@Override
