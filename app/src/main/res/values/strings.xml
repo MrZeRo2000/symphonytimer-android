@@ -76,4 +76,7 @@
     <string name="button_minus">-</string>
     <!-- Dropbox -->
     <string name="app_key">ml2bc3bur9qdrl7</string>
+    <!-- Loader -->
+    <string name="pref_message_last_loaded_never">Last loaded: Never</string>
+    <string name="pref_message_last_loaded_format">Last loaded: %s</string>
 </resources>
