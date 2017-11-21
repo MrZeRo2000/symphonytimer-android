@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.os.Environment;
 
 import com.romanpulov.library.common.storage.BackupUtils;
 
@@ -29,12 +30,16 @@ public class DBStorageHelper {
 	private final Context mContext;
 	
     private final String mXMLFileName;
+
+    private String getLocalBackupFolderName() {
+        return Environment.getExternalStorageDirectory() + File.separator + LOCAL_BACKUP_FOLDER_NAME;
+    }
 	
 	public DBStorageHelper(Context context) {
         this.mContext = context;
 
-        mXMLFileName = BackupUtils.getBackupFolderName(LOCAL_BACKUP_FOLDER_NAME) + LOCAL_BACKUP_DATA_FILE_NAME;
-		mXMLBackupUtils = new BackupUtils(mXMLFileName, LOCAL_BACKUP_FOLDER_NAME, LOCAL_BACKUP_FILE_NAME);
+        mXMLFileName = BackupUtils.getBackupFolderName(getLocalBackupFolderName()) + LOCAL_BACKUP_DATA_FILE_NAME;
+		mXMLBackupUtils = new BackupUtils(mXMLFileName, getLocalBackupFolderName(), LOCAL_BACKUP_FILE_NAME);
 	}
 
     /**
@@ -44,7 +49,10 @@ public class DBStorageHelper {
 	public String createLocalBackup() {
 
         //backup database and ignore any errors
-        BackupUtils databaseBackupUtils = new BackupUtils(mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(), LOCAL_BACKUP_FOLDER_NAME, LOCAL_BACKUP_DB_FILE_NAME);
+        BackupUtils databaseBackupUtils = new BackupUtils(
+                mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
+                getLocalBackupFolderName(),
+                LOCAL_BACKUP_DB_FILE_NAME);
         databaseBackupUtils.createRollingLocalBackup();
 
         // write XML file

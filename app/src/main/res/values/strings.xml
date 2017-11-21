@@ -51,11 +51,13 @@
     <string name="pref_full_history_info_summary">Shows supplemental info on timer operation</string>
     <string name="pref_cat_data_management">Data management</string>
     <string name="pref_cat_summary_local_backup">Backup to local SD card</string>    
-    <string name="pref_backup">Backup</string>
-    <string name="pref_summary_backup">Backup current data to local SD card</string>    
-    <string name="pref_restore">Restore</string>
-    <string name="pref_summary_restore">Restore current data from local SD card</string>
+    <string name="pref_local_backup">Local backup</string>
+    <string name="pref_summary_local_backup">Backup current data to local SD card</string>
+    <string name="pref_local_restore">Local restore</string>
+    <string name="pref_summary_local_restore">Restore current data from local SD card</string>
     <string name="pref_cat_dropbox_backup">DropBox backup</string>
+    <string name="pref_cat_account">Account</string>
+    <string name="pref_account_dropbox">Dropbox</string>
     <string name="error_action_timer">Error during timer action: %s</string>
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>
