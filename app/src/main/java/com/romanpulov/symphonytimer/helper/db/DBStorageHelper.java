@@ -26,6 +26,7 @@ public class DBStorageHelper {
     private static final String LOCAL_BACKUP_DATA_FILE_NAME = "symphonytimerdbdata";
 
 	private final BackupUtils mXMLBackupUtils;
+    private final BackupUtils mDatabaseBackupUtils;
 
 	private final Context mContext;
 	
@@ -40,6 +41,10 @@ public class DBStorageHelper {
 
         mXMLFileName = BackupUtils.getBackupFolderName(getLocalBackupFolderName()) + LOCAL_BACKUP_DATA_FILE_NAME;
 		mXMLBackupUtils = new BackupUtils(mXMLFileName, getLocalBackupFolderName(), LOCAL_BACKUP_FILE_NAME);
+        mDatabaseBackupUtils = new BackupUtils(
+                mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
+                getLocalBackupFolderName(),
+                LOCAL_BACKUP_DB_FILE_NAME);
 	}
 
     /**
@@ -48,12 +53,7 @@ public class DBStorageHelper {
      */
 	public String createLocalBackup() {
 
-        //backup database and ignore any errors
-        BackupUtils databaseBackupUtils = new BackupUtils(
-                mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
-                getLocalBackupFolderName(),
-                LOCAL_BACKUP_DB_FILE_NAME);
-        databaseBackupUtils.createRollingLocalBackup();
+        mDatabaseBackupUtils.createRollingLocalBackup();
 
         // write XML file
         File xmlFile = new File(mXMLFileName);
@@ -118,4 +118,20 @@ public class DBStorageHelper {
 
         return result;
 	}
+
+    /**
+     * Returns list of XML backup files
+     * @return Files
+     */
+    public File[] getXMLBackupFiles()  {
+        return mXMLBackupUtils.getBackupFiles();
+    }
+
+    /**
+     * Returns list of database backup files
+     * @return Files
+     */
+    public File[] getDatabaseBackupFiles()  {
+        return mDatabaseBackupUtils.getBackupFiles();
+    }
 }

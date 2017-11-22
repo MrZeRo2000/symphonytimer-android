@@ -1,24 +1,84 @@
 package com.romanpulov.symphonytimer.fragment;
 
-import android.app.ProgressDialog;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
+import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
+import com.romanpulov.symphonytimer.preference.PreferenceBackupDropboxProcessor;
+import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
+import com.romanpulov.symphonytimer.preference.PreferenceRepository;
+import com.romanpulov.symphonytimer.service.LoaderService;
+import com.romanpulov.symphonytimer.service.LoaderServiceManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SettingsFragment extends PreferenceFragment implements
 	SharedPreferences.OnSharedPreferenceChangeListener,
 	Preference.OnPreferenceClickListener {
+
+    private PreferenceBackupDropboxProcessor mPreferenceBackupDropboxProcessor;
+
+    private Map<String, PreferenceLoaderProcessor> mPreferenceLoadProcessors = new HashMap<>();
+    private LoaderServiceManager mLoaderServiceManager;
+    private BroadcastReceiver mLoaderServiceBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String loaderClassName = intent.getStringExtra(LoaderService.SERVICE_RESULT_LOADER_NAME);
+            String errorMessage = intent.getStringExtra(LoaderService.SERVICE_RESULT_ERROR_MESSAGE);
+
+            PreferenceLoaderProcessor preferenceLoaderProcessor = mPreferenceLoadProcessors.get(loaderClassName);
+            if (preferenceLoaderProcessor != null)
+                preferenceLoaderProcessor.postExecute(errorMessage);
+        }
+    };
+
+    private LoaderService mBoundService;
+    private boolean mIsBound;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mBoundService = ((LoaderService.LoaderBinder)service).getService();
+
+            PreferenceLoaderProcessor preferenceLoaderProcessor = mPreferenceLoadProcessors.get(mBoundService.getLoaderClassName());
+            if (preferenceLoaderProcessor != null)
+                preferenceLoaderProcessor.preExecute();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mBoundService = null;
+        }
+    };
+
+    /*
 
     private class RestoreLocalXmlTask extends AsyncTask<Void, Void, Integer> {
         ProgressDialog progressDialog;
@@ -68,6 +128,7 @@ public class SettingsFragment extends PreferenceFragment implements
                 Toast.makeText(getActivity(), res, Toast.LENGTH_LONG).show();
         }
     }
+    */
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -78,12 +139,12 @@ public class SettingsFragment extends PreferenceFragment implements
 		
 		addPreferencesFromResource(R.xml.preferences);
 		
-		Preference button;
-		
+		Preference preference;
+
 		//reset data
-		button = findPreference("pref_reset_data");
-		if (null != button) {
-			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+		preference = findPreference("pref_reset_data");
+		if (null != preference) {
+			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				
 				@Override
 				public boolean onPreferenceClick(Preference arg0) {
@@ -104,9 +165,9 @@ public class SettingsFragment extends PreferenceFragment implements
 		}
 		
 		//local backup
-		button = findPreference("pref_local_backup");
-		if (null != button) {
-			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {			
+		preference = findPreference("pref_local_backup");
+		if (null != preference) {
+			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					final String localBackupFileName = new DBStorageHelper(getActivity()).createLocalBackup();
@@ -120,9 +181,9 @@ public class SettingsFragment extends PreferenceFragment implements
 		}
 		
 		//local restore
-		button = findPreference("pref_local_restore");
-		if (null != button) {
-			button.setOnPreferenceClickListener(new OnPreferenceClickListener() {		
+		preference = findPreference("pref_local_restore");
+		if (null != preference) {
+			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 	    			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(null, R.string.question_are_you_sure);
@@ -134,16 +195,16 @@ public class SettingsFragment extends PreferenceFragment implements
 			    private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
 					@Override
 					public void OnOkButtonClickEvent(DialogFragment dialog) {
-                        new RestoreLocalXmlTask().execute();
+                        new DBStorageHelper(getActivity()).restoreLocalXmlBackup();
 					}
 				};
 			});
 		}
 
 		//account dropbox
-        button = findPreference("pref_account_dropbox");
-		if (null != button) {
-		    button.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        preference = findPreference("pref_dropbox_account");
+		if (null != preference) {
+		    preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     DropboxHelper.getInstance(getActivity().getApplicationContext()).invokeAuthActivity(getActivity().getResources().getString(R.string.app_key));
@@ -151,11 +212,16 @@ public class SettingsFragment extends PreferenceFragment implements
                 }
             });
         }
+
+        //backup dropbox
+        mPreferenceBackupDropboxProcessor = new PreferenceBackupDropboxProcessor(this);
+        mPreferenceLoadProcessors.put(mPreferenceBackupDropboxProcessor.getLoaderClass().getName(), mPreferenceBackupDropboxProcessor);
+        setupPrefDropboxBackupLoadService();
 	}
 
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
-        new CreateLocalBackupTask().execute();
+        //new CreateLocalBackupTask().execute();
 		return false;
 	}
 	
@@ -163,4 +229,90 @@ public class SettingsFragment extends PreferenceFragment implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 	    String key) {
 	}
+
+    private boolean checkInternetConnection() {
+        if (NetworkUtils.isNetworkAvailable(getActivity()))
+            return true;
+        else {
+            PreferenceRepository.displayMessage(this, getString(R.string.error_internet_not_available));
+            return false;
+        }
+    }
+
+    /**
+     * Dropbox backup using service
+     */
+    private void setupPrefDropboxBackupLoadService() {
+        PreferenceRepository.updateDropboxBackupPreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+
+        Preference pref = findPreference(PreferenceRepository.PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP);
+        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //check if internet is available
+                if (!checkInternetConnection())
+                    return true;
+
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                    else {
+
+                        // create local backup first
+                        DBStorageHelper storageHelper = new DBStorageHelper(getActivity());
+                        String backupResult = storageHelper.createLocalBackup();
+
+                        if (backupResult == null)
+                            PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_backup));
+                        else {
+                            mPreferenceBackupDropboxProcessor.preExecute();
+                            mLoaderServiceManager.startLoader(mPreferenceBackupDropboxProcessor.getLoaderClass().getName());
+                        }
+                    }
+
+                    return true;
+                }
+            }
+        });
+    }
+
+    private void doBindService(Activity activity) {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        mIsBound = activity.bindService(new Intent(activity,
+                LoaderService.class), mConnection, 0);
+    }
+
+    private void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            getActivity().unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(mLoaderServiceBroadcastReceiver, new IntentFilter(LoaderService.SERVICE_RESULT_INTENT_NAME));
+        mLoaderServiceManager = new LoaderServiceManager(activity);
+        doBindService(activity);
+    }
+
+    @Override
+    public void onDetach() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mLoaderServiceBroadcastReceiver);
+        doUnbindService();
+        super.onDetach();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        DropboxHelper.getInstance(getActivity().getApplicationContext()).refreshAccessToken();
+    }
 }

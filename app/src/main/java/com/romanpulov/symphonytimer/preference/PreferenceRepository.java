@@ -20,8 +20,8 @@ public final class PreferenceRepository {
     public static final long PREF_LOAD_LOADING = 1;
     public static final long PREF_LOAD_CURRENT_VALUE = 2;
 
-    public static final String PREF_KEY_BASIC_NOTE_CLOUD_BACKUP =  "pref_basic_note_cloud_backup";
-    public static final String PREF_KEY_BASIC_NOTE_CLOUD_BACKUP_LAST_LOADED =  "pref_basic_note_cloud_backup_last_loaded";
+    public static final String PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP =  "pref_dropbox_backup";
+    public static final String PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP_LAST_LOADED =  "pref_dropbox_backup_last_loaded";
 
     /**
      * Display message common routine
@@ -33,7 +33,7 @@ public final class PreferenceRepository {
     }
 
     public static void updateDropboxBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
-        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_BASIC_NOTE_CLOUD_BACKUP, PREF_KEY_BASIC_NOTE_CLOUD_BACKUP_LAST_LOADED, value);
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP, PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP_LAST_LOADED, value);
     }
 
     public static void updateLoadPreferenceSummary(PreferenceFragment preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
@@ -61,17 +61,17 @@ public final class PreferenceRepository {
      * @param context Context for preferences
      * @param loadedTime last loaded time
      */
-    public static void setCloudBackupLastLoadedTime(Context context, long loadedTime) {
-        setPreferenceLong(context, PreferenceRepository.PREF_KEY_BASIC_NOTE_CLOUD_BACKUP_LAST_LOADED, loadedTime);
+    public static void setDropboxBackupLastLoadedTime(Context context, long loadedTime) {
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP_LAST_LOADED, loadedTime);
     }
 
     /**
      * Sets last loaded backup time to current time
      * @param context Context for preferences
      */
-    public static void setCloudBackupLastLoadedCurrentTime(Context context) {
+    public static void setDropboxBackupLastLoadedCurrentTime(Context context) {
         long loadedTime = System.currentTimeMillis();
-        setCloudBackupLastLoadedTime(context, loadedTime);
+        setDropboxBackupLastLoadedTime(context, loadedTime);
     }
 
 

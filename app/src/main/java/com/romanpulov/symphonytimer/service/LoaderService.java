@@ -22,7 +22,7 @@ public class LoaderService extends IntentService {
     public static final String SERVICE_RESULT_LOADER_NAME = "LoaderServiceResult.LoaderName";
     public static final String SERVICE_RESULT_ERROR_MESSAGE = "LoaderServiceResult.ErrorMessage";
 
-    private static final boolean DEBUGGING = false;
+    private static final boolean DEBUGGING = true;
 
     private static void log(String message) {
         if (DEBUGGING)
@@ -77,6 +77,12 @@ public class LoaderService extends IntentService {
     public IBinder onBind(Intent intent) {
         log("onBind service");
         return mBinder;
+    }
+
+    @Override
+    public void onDestroy() {
+        log("Destroying service");
+        super.onDestroy();
     }
 
     public String getLoaderClassName() {

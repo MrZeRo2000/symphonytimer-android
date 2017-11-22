@@ -48,7 +48,7 @@
             />
 	</PreferenceCategory>
 	<PreferenceCategory
-	    android:title="@string/pref_cat_data_management"
+	    android:title="@string/pref_cat_local_data_management"
 	    android:summary="@string/pref_cat_summary_local_backup"
 	    >
 	    <Preference 
@@ -74,11 +74,21 @@
         </Preference>
     </PreferenceCategory>
 	<PreferenceCategory
-        android:title="@string/pref_cat_account"
+        android:title="@string/pref_cat_dropbox_data_management"
         >
         <Preference
-            android:key="pref_account_dropbox"
-            android:title="@string/pref_account_dropbox"
+            android:key="pref_dropbox_account"
+            android:title="@string/pref_dropbox_account"
+            />
+        <Preference
+            android:key="pref_dropbox_backup"
+            android:title="@string/pref_dropbox_backup"
+            android:summary="@string/pref_summary_dropbox_backup"
+            />
+        <Preference
+            android:key="pref_dropbox_restore"
+            android:title="@string/pref_dropbox_restore"
+            android:summary="@string/pref_summary_dropbox_restore"
             />
     </PreferenceCategory>
 

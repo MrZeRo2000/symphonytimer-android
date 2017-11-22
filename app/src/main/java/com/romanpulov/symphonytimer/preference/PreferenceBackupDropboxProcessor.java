@@ -2,6 +2,9 @@ package com.romanpulov.symphonytimer.preference;
 
 import android.preference.PreferenceFragment;
 
+import com.romanpulov.library.common.loader.core.Loader;
+import com.romanpulov.symphonytimer.loader.BackupDropboxUploader;
+
 /**
  * Backup to dropbox processor
  * Created by romanpulov on 21.11.2017.
@@ -18,6 +21,11 @@ public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcess
     @Override
     public void preExecute() {
         PreferenceRepository.updateDropboxBackupPreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_LOADING);
+    }
+
+    @Override
+    public Class<? extends Loader> getLoaderClass() {
+        return BackupDropboxUploader.class;
     }
 
     @Override
