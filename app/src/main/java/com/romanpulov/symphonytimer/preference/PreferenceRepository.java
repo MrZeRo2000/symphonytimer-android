@@ -20,8 +20,12 @@ public final class PreferenceRepository {
     public static final long PREF_LOAD_LOADING = 1;
     public static final long PREF_LOAD_CURRENT_VALUE = 2;
 
-    public static final String PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP =  "pref_dropbox_backup";
-    public static final String PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP_LAST_LOADED =  "pref_dropbox_backup_last_loaded";
+    public static final String PREF_KEY_DROPBOX_BACKUP =  "pref_dropbox_backup";
+    public static final String PREF_KEY_DROPBOX_BACKUP_LAST_LOADED =  "pref_dropbox_backup_last_loaded";
+
+    public static final String PREF_KEY_DROPBOX_RESTORE =  "pref_dropbpx_restore";
+    public static final String PREF_KEY_DROPBOX_RESTORE_LAST_LOADED =  "pref_dropbox_restore_last_loaded";
+
 
     /**
      * Display message common routine
@@ -33,7 +37,7 @@ public final class PreferenceRepository {
     }
 
     public static void updateDropboxBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
-        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP, PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP_LAST_LOADED, value);
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_BACKUP, PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, value);
     }
 
     public static void updateLoadPreferenceSummary(PreferenceFragment preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
@@ -62,7 +66,7 @@ public final class PreferenceRepository {
      * @param loadedTime last loaded time
      */
     public static void setDropboxBackupLastLoadedTime(Context context, long loadedTime) {
-        setPreferenceLong(context, PreferenceRepository.PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP_LAST_LOADED, loadedTime);
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, loadedTime);
     }
 
     /**
@@ -74,5 +78,12 @@ public final class PreferenceRepository {
         setDropboxBackupLastLoadedTime(context, loadedTime);
     }
 
+    public static void updateDropboxRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_RESTORE, PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, value);
+    }
 
+    public static void setDropboxRestoreDefaultPreferenceSummary(PreferenceFragment preferenceFragment) {
+        Preference pref = preferenceFragment.findPreference(PREF_KEY_DROPBOX_RESTORE);
+        pref.setSummary(R.string.pref_summary_dropbox_restore);
+    }
 }

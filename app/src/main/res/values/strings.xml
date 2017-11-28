@@ -72,6 +72,7 @@
     <string name="error_backup">Error creating backup</string>
     <string name="error_restore">Error restoring backup</string>
     <string name="error_dropbox_auth">Invalid access token. Please, authenticate</string>
+    <string name="error_dropbox_load_file_data">No information for file : %s</string>
     <string name="info_load_local_backup">Local backup has been restored successfully</string>
     <string name="action_not_allowed">This operation is not allowed</string>
     <string name="question_are_you_sure">Are you sure?</string>

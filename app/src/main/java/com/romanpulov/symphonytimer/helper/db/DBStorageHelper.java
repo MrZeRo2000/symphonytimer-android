@@ -14,6 +14,7 @@ import java.util.Map;
 import android.content.Context;
 import android.os.Environment;
 
+import com.romanpulov.library.common.io.ZipFileUtils;
 import com.romanpulov.library.common.storage.BackupUtils;
 
 public class DBStorageHelper {
@@ -133,5 +134,13 @@ public class DBStorageHelper {
      */
     public File[] getDatabaseBackupFiles()  {
         return mDatabaseBackupUtils.getBackupFiles();
+    }
+
+    /**
+     * Returns local backup Zip file name
+     * @return Zip file name
+     */
+    public static String getBackupZipFileName() {
+        return ZipFileUtils.getZipFileName(LOCAL_BACKUP_FILE_NAME);
     }
 }

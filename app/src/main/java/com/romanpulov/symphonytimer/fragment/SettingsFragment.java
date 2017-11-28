@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -16,6 +17,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.romanpulov.library.common.network.NetworkUtils;
@@ -26,6 +28,7 @@ import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupDropboxProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
+import com.romanpulov.symphonytimer.preference.PreferenceRestoreDropboxProcessor;
 import com.romanpulov.symphonytimer.service.LoaderService;
 import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 
@@ -37,6 +40,7 @@ public class SettingsFragment extends PreferenceFragment implements
 	Preference.OnPreferenceClickListener {
 
     private PreferenceBackupDropboxProcessor mPreferenceBackupDropboxProcessor;
+    private  PreferenceRestoreDropboxProcessor mPreferenceRestoreDropboxProcessor;
 
     private Map<String, PreferenceLoaderProcessor> mPreferenceLoadProcessors = new HashMap<>();
     private LoaderServiceManager mLoaderServiceManager;
@@ -217,6 +221,12 @@ public class SettingsFragment extends PreferenceFragment implements
         mPreferenceBackupDropboxProcessor = new PreferenceBackupDropboxProcessor(this);
         mPreferenceLoadProcessors.put(mPreferenceBackupDropboxProcessor.getLoaderClass().getName(), mPreferenceBackupDropboxProcessor);
         setupPrefDropboxBackupLoadService();
+
+        //restore dropbox
+        mPreferenceRestoreDropboxProcessor = new PreferenceRestoreDropboxProcessor(this);
+        mPreferenceLoadProcessors.put(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName(), mPreferenceRestoreDropboxProcessor);
+        setupPrefDropboxRestoreLoadService();
+
 	}
 
 	@Override
@@ -245,7 +255,7 @@ public class SettingsFragment extends PreferenceFragment implements
     private void setupPrefDropboxBackupLoadService() {
         PreferenceRepository.updateDropboxBackupPreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
-        Preference pref = findPreference(PreferenceRepository.PREF_KEY_BASIC_NOTE_DROPBOX_BACKUP);
+        Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_BACKUP);
         pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -277,6 +287,47 @@ public class SettingsFragment extends PreferenceFragment implements
             }
         });
     }
+
+    /**
+     * Dropbox restore using service
+     */
+    private void setupPrefDropboxRestoreLoadService() {
+        Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_RESTORE);
+
+        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //check if internet is available
+                if (!checkInternetConnection())
+                    return true;
+
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                    else {
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                        alert
+                                .setTitle(R.string.question_are_you_sure)
+                                .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mPreferenceRestoreDropboxProcessor.preExecute();
+                                        mLoaderServiceManager.startLoader(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName());
+                                    }
+                                })
+                                .setNegativeButton(R.string.caption_cancel, null)
+                                .show();
+                    }
+                }
+
+                return true;
+            }
+        });
+    }
+
 
     private void doBindService(Activity activity) {
         // Establish a connection with the service.  We use an explicit
