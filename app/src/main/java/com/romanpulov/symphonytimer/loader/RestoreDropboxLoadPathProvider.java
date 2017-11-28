@@ -5,6 +5,8 @@ import android.content.Context;
 import com.romanpulov.library.common.loader.core.ContextLoadPathProvider;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 
+import java.io.File;
+
 /**
  * Created by romanpulov on 27.11.2017.
  */
@@ -22,6 +24,6 @@ public class RestoreDropboxLoadPathProvider extends ContextLoadPathProvider {
 
     @Override
     public String getDestPath() {
-        return null;
+        return getContext().getCacheDir() + File.separator + DBStorageHelper.getBackupZipFileName();
     }
 }

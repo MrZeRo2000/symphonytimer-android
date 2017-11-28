@@ -23,7 +23,7 @@ public final class PreferenceRepository {
     public static final String PREF_KEY_DROPBOX_BACKUP =  "pref_dropbox_backup";
     public static final String PREF_KEY_DROPBOX_BACKUP_LAST_LOADED =  "pref_dropbox_backup_last_loaded";
 
-    public static final String PREF_KEY_DROPBOX_RESTORE =  "pref_dropbpx_restore";
+    public static final String PREF_KEY_DROPBOX_RESTORE =  "pref_dropbox_restore";
     public static final String PREF_KEY_DROPBOX_RESTORE_LAST_LOADED =  "pref_dropbox_restore_last_loaded";
 
 
