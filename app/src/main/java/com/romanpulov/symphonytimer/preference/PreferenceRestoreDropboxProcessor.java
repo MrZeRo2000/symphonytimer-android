@@ -6,7 +6,7 @@ import com.romanpulov.library.common.loader.core.Loader;
 import com.romanpulov.library.common.loader.file.FileLoader;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
-import com.romanpulov.symphonytimer.loader.RestoreDropboxFileDownloader;
+import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxFileDownloader;
 
 import java.io.File;
 

@@ -3,7 +3,7 @@ package com.romanpulov.symphonytimer.preference;
 import android.preference.PreferenceFragment;
 
 import com.romanpulov.library.common.loader.core.Loader;
-import com.romanpulov.symphonytimer.loader.BackupDropboxUploader;
+import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
 
 /**
  * Backup to dropbox processor

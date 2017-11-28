@@ -1,4 +1,4 @@
-package com.romanpulov.symphonytimer.loader;
+package com.romanpulov.symphonytimer.loader.dropbox;
 
 import android.content.Context;
 
