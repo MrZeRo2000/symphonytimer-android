@@ -41,16 +41,14 @@ public final class PreferenceRepository {
         Toast.makeText(preferenceFragment.getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
-    public static void updateDropboxBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
-        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_BACKUP, PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, value);
-    }
-
-    public static void updateLocalBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
-        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_LOCAL_BACKUP, PREF_KEY_LOCAL_BACKUP_LAST_LOADED, value);
-    }
-
-
-    public static void updateLoadPreferenceSummary(PreferenceFragment preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
+    /**
+     * Updates load status as summary
+     * @param preferenceFragment PreferenceFragment
+     * @param preferenceKey preference key
+     * @param preferenceLastLoadedKey preference key with last loaded time
+     * @param value value to set: PREF_LOAD_LOADING - loading in progress, PREV_LOAD_NEVER - never loaded, otherwise last loaded time
+     */
+    private static void updateLoadPreferenceSummary(PreferenceFragment preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
         Preference prefLoad = preferenceFragment.findPreference(preferenceKey);
 
         if (value == PREF_LOAD_LOADING)
@@ -66,75 +64,77 @@ public final class PreferenceRepository {
         }
     }
 
+    /**
+     * Sets preference long value
+     * @param context Context
+     * @param key key name
+     * @param value value to set
+     */
     private static void setPreferenceLong(Context context, String key, long value) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(key, value).apply();
     }
 
-    /**
-     * Sets last loaded backup time
-     * @param context Context for preferences
-     * @param loadedTime last loaded time
-     */
-    public static void setDropboxBackupLastLoadedTime(Context context, long loadedTime) {
-        setPreferenceLong(context, PreferenceRepository.PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, loadedTime);
+    // Local backup summary
+    public static void updateLocalBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_LOCAL_BACKUP, PREF_KEY_LOCAL_BACKUP_LAST_LOADED, value);
     }
 
-    /**
-     * Sets last loaded backup time to current time
-     * @param context Context for preferences
-     */
-    public static void setDropboxBackupLastLoadedCurrentTime(Context context) {
-        long loadedTime = System.currentTimeMillis();
-        setDropboxBackupLastLoadedTime(context, loadedTime);
-    }
-
-    /**
-     * Sets last loaded backup time
-     * @param context Context for preferences
-     * @param loadedTime last loaded time
-     */
-    public static void setDropboxRestoreLastLoadedTime(Context context, long loadedTime) {
-        setPreferenceLong(context, PreferenceRepository.PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, loadedTime);
-    }
-
-    /**
-     * Sets last loaded restore time to current time
-     * @param context Context for preferences
-     */
-    public static void setDropboxRestoreLastLoadedCurrentTime(Context context) {
-        long loadedTime = System.currentTimeMillis();
-        setDropboxRestoreLastLoadedTime(context, loadedTime);
-    }
-
-    public static void updateLocalRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
-        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_LOCAL_RESTORE, PREF_KEY_LOCAL_RESTORE_LAST_LOADED, value);
-    }
-
-    public static void updateDropboxRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
-        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_RESTORE, PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, value);
-    }
-
-    public static void setDropboxRestoreDefaultPreferenceSummary(PreferenceFragment preferenceFragment) {
-        Preference pref = preferenceFragment.findPreference(PREF_KEY_DROPBOX_RESTORE);
-        pref.setSummary(R.string.pref_summary_dropbox_restore);
-    }
-
+    // Local backup last loaded current time
     public static void setLocalBackupLastLoadedCurrentTime(Context context) {
         long loadedTime = System.currentTimeMillis();
         setLocalBackupLastLoadedTime(context, loadedTime);
     }
 
-    public static void setLocalBackupLastLoadedTime(Context context, long loadedTime) {
+    // Local backup last loaded time
+    private static void setLocalBackupLastLoadedTime(Context context, long loadedTime) {
         setPreferenceLong(context, PreferenceRepository.PREF_KEY_LOCAL_BACKUP_LAST_LOADED, loadedTime);
     }
 
+    // Local restore summary
+    public static void updateLocalRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_LOCAL_RESTORE, PREF_KEY_LOCAL_RESTORE_LAST_LOADED, value);
+    }
+
+    // Local restore last loaded current time
     public static void setLocalRestoreLastLoadedCurrentTime(Context context) {
         long loadedTime = System.currentTimeMillis();
         setLocalRestoreLastLoadedTime(context, loadedTime);
     }
 
-    public static void setLocalRestoreLastLoadedTime(Context context, long loadedTime) {
+    // Local restore last loaded time
+    private static void setLocalRestoreLastLoadedTime(Context context, long loadedTime) {
         setPreferenceLong(context, PreferenceRepository.PREF_KEY_LOCAL_RESTORE_LAST_LOADED, loadedTime);
     }
 
+    // Dropbox backup summary
+    public static void updateDropboxBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_BACKUP, PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, value);
+    }
+
+    // Dropbox backup last loaded current time
+    public static void setDropboxBackupLastLoadedCurrentTime(Context context) {
+        long loadedTime = System.currentTimeMillis();
+        setDropboxBackupLastLoadedTime(context, loadedTime);
+    }
+
+    // Dropbox backup last loaded time
+    private static void setDropboxBackupLastLoadedTime(Context context, long loadedTime) {
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, loadedTime);
+    }
+
+    // Dropbox restore summary
+    public static void updateDropboxRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_RESTORE, PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, value);
+    }
+
+    // Dropbox restore last loaded current time
+    public static void setDropboxRestoreLastLoadedCurrentTime(Context context) {
+        long loadedTime = System.currentTimeMillis();
+        setDropboxRestoreLastLoadedTime(context, loadedTime);
+    }
+
+    // Dropbox restore last loaded time
+    private static void setDropboxRestoreLastLoadedTime(Context context, long loadedTime) {
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, loadedTime);
+    }
 }
