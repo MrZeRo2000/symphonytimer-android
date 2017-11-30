@@ -26,9 +26,11 @@ import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupDropboxProcessor;
+import com.romanpulov.symphonytimer.preference.PreferenceBackupLocalProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 import com.romanpulov.symphonytimer.preference.PreferenceRestoreDropboxProcessor;
+import com.romanpulov.symphonytimer.preference.PreferenceRestoreLocalProcessor;
 import com.romanpulov.symphonytimer.service.LoaderService;
 import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 
@@ -40,7 +42,9 @@ public class SettingsFragment extends PreferenceFragment implements
 	Preference.OnPreferenceClickListener {
 
     private PreferenceBackupDropboxProcessor mPreferenceBackupDropboxProcessor;
-    private  PreferenceRestoreDropboxProcessor mPreferenceRestoreDropboxProcessor;
+    private PreferenceRestoreDropboxProcessor mPreferenceRestoreDropboxProcessor;
+    private PreferenceBackupLocalProcessor mPreferenceBackupLocalProcessor;
+    private PreferenceRestoreLocalProcessor  mPreferenceRestoreLocalProcessor;
 
     private Map<String, PreferenceLoaderProcessor> mPreferenceLoadProcessors = new HashMap<>();
     private LoaderServiceManager mLoaderServiceManager;
@@ -169,6 +173,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		}
 		
 		//local backup
+        /*
 		preference = findPreference("pref_local_backup");
 		if (null != preference) {
 			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -183,8 +188,10 @@ public class SettingsFragment extends PreferenceFragment implements
 				}
 			});
 		}
-		
+		*/
+
 		//local restore
+        /*
 		preference = findPreference("pref_local_restore");
 		if (null != preference) {
 			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -204,6 +211,7 @@ public class SettingsFragment extends PreferenceFragment implements
 				};
 			});
 		}
+		*/
 
 		//account dropbox
         preference = findPreference("pref_dropbox_account");
@@ -216,6 +224,16 @@ public class SettingsFragment extends PreferenceFragment implements
                 }
             });
         }
+
+        //backup local
+        mPreferenceBackupLocalProcessor = new PreferenceBackupLocalProcessor(this);
+        mPreferenceLoadProcessors.put(mPreferenceBackupLocalProcessor.getLoaderClass().getName(), mPreferenceBackupLocalProcessor);
+        setupPrefLocalBackupLoadService();
+
+        //restore local
+        mPreferenceRestoreLocalProcessor = new PreferenceRestoreLocalProcessor(this);
+        mPreferenceLoadProcessors.put(mPreferenceRestoreLocalProcessor.getLoaderClass().getName(), mPreferenceRestoreLocalProcessor);
+        setupPrefLocalRestoreLoadService();
 
         //backup dropbox
         mPreferenceBackupDropboxProcessor = new PreferenceBackupDropboxProcessor(this);
@@ -247,6 +265,71 @@ public class SettingsFragment extends PreferenceFragment implements
             PreferenceRepository.displayMessage(this, getString(R.string.error_internet_not_available));
             return false;
         }
+    }
+
+    /**
+     * Local backup using service
+     */
+    private void setupPrefLocalBackupLoadService() {
+        PreferenceRepository.updateLocalBackupPreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+
+        Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_BACKUP);
+        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                    else {
+                        mPreferenceBackupLocalProcessor.preExecute();
+                        mLoaderServiceManager.startLoader(mPreferenceBackupLocalProcessor.getLoaderClass().getName());
+                    }
+
+                    return true;
+                }
+            }
+        });
+    }
+
+    /**
+     * Local restore using service
+     */
+    private void setupPrefLocalRestoreLoadService() {
+        PreferenceRepository.updateLocalRestorePreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+
+        Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_RESTORE);
+
+        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                    else {
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                        alert
+                                .setTitle(R.string.question_are_you_sure)
+                                .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mPreferenceRestoreLocalProcessor.preExecute();
+                                        mLoaderServiceManager.startLoader(mPreferenceRestoreLocalProcessor.getLoaderClass().getName());
+                                    }
+                                })
+                                .setNegativeButton(R.string.caption_cancel, null)
+                                .show();
+                    }
+                }
+
+                return true;
+            }
+        });
     }
 
     /**
@@ -329,7 +412,6 @@ public class SettingsFragment extends PreferenceFragment implements
             }
         });
     }
-
 
     private void doBindService(Activity activity) {
         // Establish a connection with the service.  We use an explicit

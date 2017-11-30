@@ -26,6 +26,11 @@ public final class PreferenceRepository {
     public static final String PREF_KEY_DROPBOX_RESTORE =  "pref_dropbox_restore";
     public static final String PREF_KEY_DROPBOX_RESTORE_LAST_LOADED =  "pref_dropbox_restore_last_loaded";
 
+    public static final String PREF_KEY_LOCAL_BACKUP =  "pref_local_backup";
+    public static final String PREF_KEY_LOCAL_BACKUP_LAST_LOADED =  "pref_local_backup_last_loaded";
+
+    public static final String PREF_KEY_LOCAL_RESTORE =  "pref_local_restore";
+    public static final String PREF_KEY_LOCAL_RESTORE_LAST_LOADED =  "pref_local_restore_last_loaded";
 
     /**
      * Display message common routine
@@ -39,6 +44,11 @@ public final class PreferenceRepository {
     public static void updateDropboxBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
         updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_BACKUP, PREF_KEY_DROPBOX_BACKUP_LAST_LOADED, value);
     }
+
+    public static void updateLocalBackupPreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_LOCAL_BACKUP, PREF_KEY_LOCAL_BACKUP_LAST_LOADED, value);
+    }
+
 
     public static void updateLoadPreferenceSummary(PreferenceFragment preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
         Preference prefLoad = preferenceFragment.findPreference(preferenceKey);
@@ -96,6 +106,10 @@ public final class PreferenceRepository {
         setDropboxRestoreLastLoadedTime(context, loadedTime);
     }
 
+    public static void updateLocalRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
+        updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_LOCAL_RESTORE, PREF_KEY_LOCAL_RESTORE_LAST_LOADED, value);
+    }
+
     public static void updateDropboxRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
         updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_RESTORE, PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, value);
     }
@@ -104,4 +118,23 @@ public final class PreferenceRepository {
         Preference pref = preferenceFragment.findPreference(PREF_KEY_DROPBOX_RESTORE);
         pref.setSummary(R.string.pref_summary_dropbox_restore);
     }
+
+    public static void setLocalBackupLastLoadedCurrentTime(Context context) {
+        long loadedTime = System.currentTimeMillis();
+        setLocalBackupLastLoadedTime(context, loadedTime);
+    }
+
+    public static void setLocalBackupLastLoadedTime(Context context, long loadedTime) {
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_LOCAL_BACKUP_LAST_LOADED, loadedTime);
+    }
+
+    public static void setLocalRestoreLastLoadedCurrentTime(Context context) {
+        long loadedTime = System.currentTimeMillis();
+        setLocalRestoreLastLoadedTime(context, loadedTime);
+    }
+
+    public static void setLocalRestoreLastLoadedTime(Context context, long loadedTime) {
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_LOCAL_RESTORE_LAST_LOADED, loadedTime);
+    }
+
 }
