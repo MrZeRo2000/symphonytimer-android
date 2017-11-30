@@ -78,6 +78,24 @@ public final class PreferenceRepository {
         setDropboxBackupLastLoadedTime(context, loadedTime);
     }
 
+    /**
+     * Sets last loaded backup time
+     * @param context Context for preferences
+     * @param loadedTime last loaded time
+     */
+    public static void setDropboxRestoreLastLoadedTime(Context context, long loadedTime) {
+        setPreferenceLong(context, PreferenceRepository.PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, loadedTime);
+    }
+
+    /**
+     * Sets last loaded restore time to current time
+     * @param context Context for preferences
+     */
+    public static void setDropboxRestoreLastLoadedCurrentTime(Context context) {
+        long loadedTime = System.currentTimeMillis();
+        setDropboxRestoreLastLoadedTime(context, loadedTime);
+    }
+
     public static void updateDropboxRestorePreferenceSummary(PreferenceFragment preferenceFragment, long value) {
         updateLoadPreferenceSummary(preferenceFragment, PREF_KEY_DROPBOX_RESTORE, PREF_KEY_DROPBOX_RESTORE_LAST_LOADED, value);
     }

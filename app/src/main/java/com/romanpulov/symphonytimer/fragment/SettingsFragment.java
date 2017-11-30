@@ -292,6 +292,8 @@ public class SettingsFragment extends PreferenceFragment implements
      * Dropbox restore using service
      */
     private void setupPrefDropboxRestoreLoadService() {
+        PreferenceRepository.updateDropboxRestorePreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_RESTORE);
 
         pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
