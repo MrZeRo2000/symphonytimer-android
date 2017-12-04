@@ -86,7 +86,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             TIMER_HISTORY_TABLE_COLS[0] + " INTEGER PRIMARY KEY," +
             TIMER_HISTORY_TABLE_COLS[1] + " INTEGER NOT NULL,"  +
             TIMER_HISTORY_TABLE_COLS[2] + " INTEGER NOT NULL,"  +
-            TIMER_HISTORY_TABLE_COLS[3] + " INTEGER NOT NULL" +
+            TIMER_HISTORY_TABLE_COLS[3] + " INTEGER NOT NULL," +
             TIMER_HISTORY_TABLE_COLS[4] + " INTEGER NOT NULL" +
              ");";
 

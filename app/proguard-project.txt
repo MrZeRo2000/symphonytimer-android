@@ -32,3 +32,5 @@
 -dontwarn com.squareup.okhttp.**
 -dontwarn com.google.appengine.**
 -dontwarn javax.servlet.**
+
+-keepclassmembers class com.romanpulov.symphonytimer.loader.** { *; }
