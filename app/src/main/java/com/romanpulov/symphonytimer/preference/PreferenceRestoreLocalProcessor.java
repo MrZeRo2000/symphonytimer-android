@@ -11,6 +11,8 @@ import com.romanpulov.symphonytimer.loader.local.RestoreLocalLoader;
 
 public class PreferenceRestoreLocalProcessor implements PreferenceLoaderProcessor {
 
+    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_LOCAL_RESTORE;
+
     private final PreferenceFragment mPreferenceFragment;
 
     public PreferenceRestoreLocalProcessor(PreferenceFragment preferenceFragment) {
@@ -19,17 +21,17 @@ public class PreferenceRestoreLocalProcessor implements PreferenceLoaderProcesso
 
     @Override
     public void preExecute() {
-        PreferenceRepository.updateLocalRestorePreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_LOADING);
+        PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_LOADING);
     }
 
     @Override
     public void postExecute(String result) {
         if (result == null) {
             long loadedTime = System.currentTimeMillis();
-            PreferenceRepository.updateLocalRestorePreferenceSummary(mPreferenceFragment, loadedTime);
+            PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
         } else {
             PreferenceRepository.displayMessage(mPreferenceFragment, result);
-            PreferenceRepository.updateLocalRestorePreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+            PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
         }
     }
 

@@ -26,6 +26,6 @@ public class RestoreLocalLoader extends AbstractContextLoader {
         int loadResult = mDBStorageHelper.restoreLocalXmlBackup();
         if (loadResult != 0)
             throw new Exception(String.format(mContext.getString(R.string.error_load_local_backup), loadResult));
-        PreferenceRepository.setLocalRestoreLastLoadedCurrentTime(mContext);
+        PreferenceRepository.setPreferenceKeyLastLoadedCurrentTime(mContext, PreferenceRepository.PREF_KEY_LOCAL_RESTORE);
     }
 }

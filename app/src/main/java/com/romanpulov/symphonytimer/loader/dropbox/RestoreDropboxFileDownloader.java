@@ -18,6 +18,6 @@ public class RestoreDropboxFileDownloader extends DropboxFileDownloader {
     @Override
     public void load() throws Exception {
         super.load();
-        PreferenceRepository.setDropboxRestoreLastLoadedCurrentTime(mContext);
+        PreferenceRepository.setPreferenceKeyLastLoadedCurrentTime(mContext, PreferenceRepository.PREF_KEY_DROPBOX_RESTORE);
     }
 }

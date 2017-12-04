@@ -18,7 +18,6 @@ import android.preference.PreferenceManager;
 import android.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
 
 import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;
@@ -271,7 +270,7 @@ public class SettingsFragment extends PreferenceFragment implements
      * Local backup using service
      */
     private void setupPrefLocalBackupLoadService() {
-        PreferenceRepository.updateLocalBackupPreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_LOCAL_BACKUP, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_BACKUP);
         pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -298,7 +297,7 @@ public class SettingsFragment extends PreferenceFragment implements
      * Local restore using service
      */
     private void setupPrefLocalRestoreLoadService() {
-        PreferenceRepository.updateLocalRestorePreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_LOCAL_RESTORE, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_RESTORE);
 
@@ -336,7 +335,7 @@ public class SettingsFragment extends PreferenceFragment implements
      * Dropbox backup using service
      */
     private void setupPrefDropboxBackupLoadService() {
-        PreferenceRepository.updateDropboxBackupPreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_DROPBOX_BACKUP, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_BACKUP);
         pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -375,7 +374,7 @@ public class SettingsFragment extends PreferenceFragment implements
      * Dropbox restore using service
      */
     private void setupPrefDropboxRestoreLoadService() {
-        PreferenceRepository.updateDropboxRestorePreferenceSummary(this, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_DROPBOX_RESTORE, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_RESTORE);
 

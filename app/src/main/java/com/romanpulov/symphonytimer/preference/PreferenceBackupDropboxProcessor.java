@@ -12,6 +12,8 @@ import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
 
 public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcessor {
 
+    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_DROPBOX_BACKUP;
+
     private final PreferenceFragment mPreferenceFragment;
 
     public PreferenceBackupDropboxProcessor(PreferenceFragment preferenceFragment) {
@@ -20,7 +22,7 @@ public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcess
 
     @Override
     public void preExecute() {
-        PreferenceRepository.updateDropboxBackupPreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_LOADING);
+        PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_LOADING);
     }
 
     @Override
@@ -32,10 +34,10 @@ public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcess
     public void postExecute(String result) {
         if (result == null) {
             long loadedTime = System.currentTimeMillis();
-            PreferenceRepository.updateDropboxBackupPreferenceSummary(mPreferenceFragment, loadedTime);
+            PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
         } else {
             PreferenceRepository.displayMessage(mPreferenceFragment, result);
-            PreferenceRepository.updateDropboxBackupPreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+            PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
         }
     }
 }

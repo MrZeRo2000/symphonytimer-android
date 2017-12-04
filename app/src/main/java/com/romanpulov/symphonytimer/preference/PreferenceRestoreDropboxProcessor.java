@@ -16,6 +16,8 @@ import java.io.File;
 
 public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProcessor  {
 
+    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_DROPBOX_RESTORE;
+
     private final PreferenceFragment mPreferenceFragment;
 
     public PreferenceRestoreDropboxProcessor(PreferenceFragment preferenceFragment) {
@@ -24,7 +26,7 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
 
     @Override
     public void preExecute() {
-        PreferenceRepository.updateDropboxRestorePreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_LOADING);
+        PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_LOADING);
     }
 
     @Override
@@ -33,7 +35,7 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
 
         if (result != null) {
             PreferenceRepository.displayMessage(mPreferenceFragment, result);
-            PreferenceRepository.updateDropboxRestorePreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+            PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
         }
         else {
             FileLoader fileLoader = new RestoreDropboxFileDownloader(mPreferenceFragment.getActivity());;
@@ -48,18 +50,18 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
 
                 if (restoreResult != 0) {
                     restoreMessage = String.format(mPreferenceFragment.getString(R.string.error_load_local_backup), restoreResult);
-                    PreferenceRepository.updateDropboxRestorePreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+                    PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
                 }
                 else {
                     restoreMessage = mPreferenceFragment.getString(R.string.info_load_local_backup);
                     long loadedTime = System.currentTimeMillis();
-                    PreferenceRepository.updateDropboxRestorePreferenceSummary(mPreferenceFragment, loadedTime);
+                    PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
                 }
 
                 PreferenceRepository.displayMessage(mPreferenceFragment, restoreMessage);
 
             } else {
-                PreferenceRepository.updateDropboxRestorePreferenceSummary(mPreferenceFragment, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+                PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
                 PreferenceRepository.displayMessage(mPreferenceFragment, mPreferenceFragment.getString(R.string.error_restore));
             }
         }
@@ -69,4 +71,5 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
     public Class<? extends Loader> getLoaderClass() {
         return RestoreDropboxFileDownloader.class;
     }
+
 }

@@ -54,6 +54,6 @@ public class BackupDropboxUploader extends AbstractContextLoader {
             }
         }
 
-        PreferenceRepository.setDropboxBackupLastLoadedCurrentTime(mContext);
+        PreferenceRepository.setPreferenceKeyLastLoadedCurrentTime(mContext, PreferenceRepository.PREF_KEY_DROPBOX_BACKUP);
     }
 }
