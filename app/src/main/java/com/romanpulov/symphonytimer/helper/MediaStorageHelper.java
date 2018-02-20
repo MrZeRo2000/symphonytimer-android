@@ -10,7 +10,8 @@ import java.util.List;
 public class MediaStorageHelper {
     final public static int MEDIA_TYPE_IMAGE = 0;
     final public static int MEDIA_TYPE_SOUND = 1;
-    final private static String[] MEDIA_TAGS = {"IMG", "SND"};
+    final public static int MEDIA_TYPE_RECORD = 2;
+    final private static String[] MEDIA_TAGS = {"IMG", "SND", "REC"};
 
     private static MediaStorageHelper mediaStorageHelperInstance;
     private final File mDir;

@@ -18,6 +18,8 @@ import com.romanpulov.symphonytimer.helper.AlarmManagerHelper;
 import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
+import com.romanpulov.symphonytimer.helper.MediaRecorderHelper;
+import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.NotificationHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.helper.WakeConfigHelper;
@@ -56,6 +58,7 @@ public class TaskService extends Service implements Runnable {
 
     private Messenger mClientMessenger;
     private MediaPlayerHelper mMediaPlayerHelper;
+    private MediaRecorderHelper mMediaRecorderHelper;
 
     /**
      * Handler of incoming messages from clients.
@@ -85,6 +88,9 @@ public class TaskService extends Service implements Runnable {
                         //play sound
                         hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
 
+                        //record sound
+                        hostService.mMediaRecorderHelper.startRecordingThread();
+
                         //vibrate
                         VibratorHelper.vibrate(hostService);
                         break;
@@ -94,15 +100,28 @@ public class TaskService extends Service implements Runnable {
                         //stop sound
                         hostService.mMediaPlayerHelper.stop();
 
+                        //stop recording
+                        hostService.mMediaRecorderHelper.stopRecordingThread();
+
                         //play sound
                         hostService.mMediaPlayerHelper.startSoundFile(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFile());
+
+                        //record sound
+                        hostService.mMediaRecorderHelper.startRecordingThread();
+
                         break;
                     case MSG_TASK_TO_NOT_COMPLETED:
                         unconditionalLog("handleMessage to not completed");
+
                         //stop vibrating
                         VibratorHelper.cancel(hostService);
+
                         //stop sound
                         hostService.mMediaPlayerHelper.stop();
+
+                        //stop recording
+                        hostService.mMediaRecorderHelper.stopRecordingThread();
+
                         break;
                     case MSG_QUERY_DM_TASKS:
                         hostService.mClientMessenger = msg.replyTo;
@@ -263,6 +282,11 @@ public class TaskService extends Service implements Runnable {
             if (mMediaPlayerHelper == null)
                 mMediaPlayerHelper = new MediaPlayerHelper(this);
 
+            if (mMediaRecorderHelper == null) {
+                mMediaRecorderHelper = new MediaRecorderHelper(this);
+                mMediaRecorderHelper.setMediaRecordFile(MediaStorageHelper.getInstance(this).createMediaFile(MediaStorageHelper.MEDIA_TYPE_RECORD, 0));
+            }
+
             DMTasks newDMTasks;
             Parcelable newParcelableTasks;
             if ((intent != null) && (intent.getExtras() != null) && ((newParcelableTasks = intent.getExtras().getParcelable(DMTasks.class.toString()))) != null) {
@@ -299,6 +323,8 @@ public class TaskService extends Service implements Runnable {
         VibratorHelper.cancel(this);
         if (mMediaPlayerHelper != null)
             mMediaPlayerHelper.stop();
+        if (mMediaRecorderHelper != null)
+            mMediaRecorderHelper.stopRecordingThread();
 
         super.onDestroy();
     }
