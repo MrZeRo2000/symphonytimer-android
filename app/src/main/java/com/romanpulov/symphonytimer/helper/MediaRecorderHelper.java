@@ -82,9 +82,16 @@ public final class MediaRecorderHelper {
     private void stopRecording() {
         if (mIsRecording && (mMediaRecorder != null)) {
             try {
+                logContext(mContext, "Stopping");
                 mMediaRecorder.stop();
                 mMediaRecorder.release();
-                mMediaRecordFile.delete();
+
+                logContext(mContext, "Deleting file");
+                boolean deleteResult = mMediaRecordFile.delete();
+                if (deleteResult)
+                    logContext(mContext, "File deleted");
+                else
+                    logContext(mContext, "File delete failed");
             } catch (Exception e) {
                 e.printStackTrace();
             }
