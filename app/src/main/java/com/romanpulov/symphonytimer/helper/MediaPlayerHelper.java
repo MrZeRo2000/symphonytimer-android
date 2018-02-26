@@ -24,11 +24,21 @@ public class MediaPlayerHelper {
             mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         return mAudioManager;
     }
-	
+
+    private String mSoundFileName;
+
+    public void setSoundFileName(String soundFileName) {
+        mSoundFileName = soundFileName;
+    }
+
 	public MediaPlayerHelper(Context context){
 		mContext = context;
 		mIsMute = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_mute", false);
 	}
+
+	public void start() {
+	    startSoundFile(mSoundFileName);
+    }
 	
 	public void stop() {
         log("stop");
@@ -47,23 +57,23 @@ public class MediaPlayerHelper {
 		}
 	}
 	
-    public void toggleSound(String soundFile) {
+    public void toggleSound(String soundFileName) {
         if ((mMediaPlayer !=null) && (mMediaPlayer.isPlaying()))
             stop();
         else
-            startSoundFile(soundFile);
+            startSoundFile(soundFileName);
     }
 
-	public void startSoundFile(String soundFile) {
+	private void startSoundFile(String soundFileName) {
         if (mIsMute)
             return;
 
 		stop();
         log("startSoundFile");
-		if (null == soundFile) {
+		if (null == soundFileName) {
 			mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
 		} else {
-			Uri uri = UriHelper.fileNameToUri(mContext, soundFile);
+			Uri uri = UriHelper.fileNameToUri(mContext, soundFileName);
             if (uri == null)
                 mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
             else {

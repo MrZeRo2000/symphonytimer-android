@@ -293,7 +293,7 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
 
         /*
     	//play sound
-    	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFile());
+    	MediaPlayerHelper.getInstance(this).startSoundFile(dmTaskItem.getSoundFileName());
     	
     	//vibrate
   		VibratorHelper.vibrate(this);

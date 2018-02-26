@@ -20,7 +20,7 @@ public class DMTaskItem implements Parcelable {
 	private final long mId;
 	private final String mTitle;
 	private final long mMaxTimeSec;
-	private final String mSoundFile;
+	private final String mSoundFileName;
 	private OnTaskItemCompleted mTaskItemCompletedListener;
 	
 	private long mStartTime;
@@ -31,7 +31,7 @@ public class DMTaskItem implements Parcelable {
 		this.mId = id;
 		this.mTitle = title;
 		this.mMaxTimeSec = timeSec;		
-		this.mSoundFile = soundFile;
+		this.mSoundFileName = soundFile;
 	}
 
 	public DMTaskItem(long id, String title, long timeSec, long startTime, String soundFile) {
@@ -54,7 +54,7 @@ public class DMTaskItem implements Parcelable {
 		dest.writeString(mTitle);
 		dest.writeLong(mMaxTimeSec);
 		dest.writeLong(mStartTime);
-		dest.writeString(mSoundFile);
+		dest.writeString(mSoundFileName);
 	}
 	
 	private DMTaskItem(Parcel in) {
@@ -62,7 +62,7 @@ public class DMTaskItem implements Parcelable {
 		mTitle = in.readString();
 		mMaxTimeSec = in.readLong();
 		mStartTime = in.readLong();
-		mSoundFile = in.readString();
+		mSoundFileName = in.readString();
 	}	
 	
 	public static final Parcelable.Creator<DMTaskItem> CREATOR = new Parcelable.Creator<DMTaskItem>() {
@@ -86,7 +86,7 @@ public class DMTaskItem implements Parcelable {
             jo.put(FIELD_NAME_TITLE, mTitle);
             jo.put(FIELD_NAME_MAX_TIME_SEC, mMaxTimeSec);
             jo.put(FIELD_NAME_START_TIME, mStartTime);
-            jo.put(FIELD_NAME_SOUND_FILE, mSoundFile);
+            jo.put(FIELD_NAME_SOUND_FILE, mSoundFileName);
             return jo;
         } catch (JSONException e) {
             return null;
@@ -120,8 +120,8 @@ public class DMTaskItem implements Parcelable {
 		return mTitle;
 	}
 	
-	public String getSoundFile(){
-		return mSoundFile;
+	public String getSoundFileName(){
+		return mSoundFileName;
 	}
 	
 	public long getProgressInSec() {
