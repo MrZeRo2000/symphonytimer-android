@@ -18,4 +18,19 @@
         <item>20</item>
         <item>30</item>
     </string-array>
+    <string-array name="auto_timer_disable_entries">
+        <item>Off</item>
+        <item>3 seconds</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+    </string-array>
+    <string-array name="auto_timer_disable_entry_values">
+        <item>0</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+
 </resources>

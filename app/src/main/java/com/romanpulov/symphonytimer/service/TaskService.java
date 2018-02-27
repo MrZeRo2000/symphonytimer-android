@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,7 +10,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 
+import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.AlarmManagerHelper;
@@ -53,6 +56,31 @@ public class TaskService extends Service implements Runnable {
 
     private Messenger mClientMessenger;
     private TimerSignalHelper mTimerSignalHelper;
+
+    private int mAutoTimerDisableInterval = 0;
+
+    /**
+     * produces messages for passing to connected clients
+     */
+    static class MessageFactory {
+        public static Message createUpdateDMTasksMessage(DMTasks dmTasks) {
+            Message message = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
+
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(DMTasks.class.toString(), dmTasks.createParcelableCopy());
+            message.setData(bundle);
+
+            return message;
+        }
+
+        public static Message createMessageById(int messageId) {
+            return Message.obtain(null, messageId, 0, 0);
+        }
+
+        public static Message createUpdateDMProgressMessage() {
+            return createMessageById(TaskService.MSG_UPDATE_DM_PROGRESS);
+        }
+    }
 
     /**
      * Handler of incoming messages from clients.
@@ -112,7 +140,7 @@ public class TaskService extends Service implements Runnable {
                     case MSG_TASK_TO_NOT_COMPLETED:
                         unconditionalLog("handleMessage to not completed");
 
-                        hostService.mTimerSignalHelper.stop();
+                        //hostService.mTimerSignalHelper.stop();
 
                         //stop vibrating
                         //VibratorHelper.cancel(hostService);
@@ -127,10 +155,13 @@ public class TaskService extends Service implements Runnable {
                     case MSG_QUERY_DM_TASKS:
                         hostService.mClientMessenger = msg.replyTo;
                         if (hostService.mClientMessenger != null) {
+                            Message outMsg = MessageFactory.createUpdateDMTasksMessage( hostService.mDMTasks);
+                                    /*
                             Message outMsg = Message.obtain(null, TaskService.MSG_UPDATE_DM_TASKS, 0, 0);
                             Bundle bundle = new Bundle();
                             bundle.putParcelable(DMTasks.class.toString(), hostService.mDMTasks.createParcelableCopy());
                             outMsg.setData(bundle);
+                            */
                             try {
                                 hostService.mClientMessenger.send(outMsg);
                             } catch (RemoteException e) {
@@ -227,7 +258,8 @@ public class TaskService extends Service implements Runnable {
         }
 
         if (messageId != 0) {
-            Message msg = Message.obtain(null, messageId, 0, 0);
+            //Message msg = Message.obtain(null, messageId, 0, 0);
+            Message msg = MessageFactory.createMessageById(messageId);
             try {
                 log("processStatusChangeEvent: sending " + messageId);
                 mMessenger.send(msg);
@@ -262,36 +294,11 @@ public class TaskService extends Service implements Runnable {
         log("onStartCommand: dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
 
         if ((intent != null) && (intent.getAction() != null) && (intent.getAction().equals(ACTION_STOP_SERVICE))) {
-            log("stopping executor");
-            mScheduleExecutor.shutdown();
-
-            log("waiting for termination");
-            try {
-                if (!mScheduleExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    log("task did not terminate in 60 seconds");
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            log("stop foreground");
-            stopForeground(true);
-
-            stopSelf();
+            stopService();
         } else {
 
             if (mTimerSignalHelper == null)
                 mTimerSignalHelper = new TimerSignalHelper(this);
-
-            /*
-            if (mMediaPlayerHelper == null)
-                mMediaPlayerHelper = new MediaPlayerHelper(this);
-
-            if (mMediaRecorderHelper == null) {
-                mMediaRecorderHelper = new MediaRecorderHelper(this);
-                mMediaRecorderHelper.setMediaRecordFile(MediaStorageHelper.getInstance(this).createMediaFile(MediaStorageHelper.MEDIA_TYPE_RECORD, 0));
-            }
-            */
 
             DMTasks newDMTasks;
             Parcelable newParcelableTasks;
@@ -311,9 +318,44 @@ public class TaskService extends Service implements Runnable {
                 if (mScheduleExecutorTask == null)
                     mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
             }
+
+            String prefAutoTimerDisable = PreferenceManager.getDefaultSharedPreferences(this).getString("pref_auto_timer_disable", getString(R.string.pref_wake_before_default));
+            mAutoTimerDisableInterval = Integer.valueOf(prefAutoTimerDisable);
         }
 
         return START_STICKY;
+    }
+
+    /**
+     * Stops service by context
+     * @param context context
+     */
+    public static void stopService(Context context) {
+        Intent serviceIntent = new Intent(context, TaskService.class);
+        serviceIntent.setAction(TaskService.ACTION_STOP_SERVICE);
+        context.startService(serviceIntent);
+    }
+
+    /**
+     * stops service
+     */
+    private void stopService() {
+        log("stopping executor");
+        mScheduleExecutor.shutdown();
+
+        log("waiting for termination");
+        try {
+            if (!mScheduleExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                log("task did not terminate in 60 seconds");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        log("stop foreground");
+        stopForeground(true);
+
+        stopSelf();
     }
 
     @Override
@@ -329,14 +371,6 @@ public class TaskService extends Service implements Runnable {
 
         if (mTimerSignalHelper != null)
             mTimerSignalHelper.stop();
-
-        /*
-        VibratorHelper.cancel(this);
-        if (mMediaPlayerHelper != null)
-            mMediaPlayerHelper.stop();
-        if (mMediaRecorderHelper != null)
-            mMediaRecorderHelper.stopRecordingThread();
-        */
 
         super.onDestroy();
     }
@@ -366,42 +400,29 @@ public class TaskService extends Service implements Runnable {
 
             processStatusChangeEvent(statusChangeEvent);
 
-            /*
-            int newDMTasksStatus = mDMTasks.getStatus();
-            DMTaskItem newDMTasksItemCompleted = mDMTasks.getFirstTaskItemCompleted();
-            log ("newDMTasksItemCompleted = " + newDMTasksItemCompleted);
-
-            //detect message to generate
-            Message msg = null;
-            if ((mDMTasksStatus != DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED)) {
-                log("run to completed");
-                // to completed
-                msg = Message.obtain(null, TaskService.MSG_TASK_TO_COMPLETED, 0, 0);
-            } else if ((mDMTasksStatus == DMTasks.STATUS_COMPLETED) && (newDMTasksStatus == DMTasks.STATUS_COMPLETED) && (newDMTasksItemCompleted.getId() != mDMTasks.getFirstTaskItemCompleted().getId())) {
-                log("run update completed");
-                //update completed
-                msg = Message.obtain(null, TaskService.MSG_TASK_UPDATE_COMPLETED, 0, 0);
-            } else if ((mDMTasksStatus == DMTasks.STATUS_COMPLETED) && (newDMTasksStatus != DMTasks.STATUS_COMPLETED)) {
-                log("run to not completed");
-                //to not completed
-                msg = Message.obtain(null, TaskService.MSG_TASK_TO_NOT_COMPLETED, 0, 0);
-            }
-
-            if (msg != null) {
-                try {
-                    mMessenger.send(msg);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            mDMTasksStatus = newDMTasksStatus;
-            mDMTasksFirstItemCompleted = newDMTasksItemCompleted;
-            */
+            if (mTimerSignalHelper.isStatusOn())
+                log("Timer signal duration: " + mTimerSignalHelper.getDurationSeconds());
 
             if (mClientMessenger != null) {
-                Message msg = Message.obtain(null, TaskService.MSG_UPDATE_DM_PROGRESS, 0, 0);
+
+                if ((mAutoTimerDisableInterval > 0) && (mTimerSignalHelper.getDurationSeconds() >= mAutoTimerDisableInterval) && (mDMTasks.getItems().size() == 1)) {
+                    mDMTasks.remove(0);
+
+                    Message msg = MessageFactory.createUpdateDMTasksMessage(mDMTasks);
+                    try {
+                        log("Sending MSG_UPDATE_DM_TASKS - expired task");
+                        mClientMessenger.send(msg);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+
+                    // to handle situation when activity was unloaded after timer on
+                    stopService(this);
+                }
+
+                Message msg = MessageFactory.createUpdateDMProgressMessage();
                 try {
+                    log("Sending MSG_UPDATE_DM_PROGRESS");
                     mClientMessenger.send(msg);
                 } catch (RemoteException e) {
                     e.printStackTrace();

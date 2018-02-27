@@ -31,6 +31,10 @@ public class DMTasks implements Parcelable {
         return mDataItems.remove(item);
     }
 
+    public DMTaskItem remove(int location) {
+        return mDataItems.remove(0);
+    }
+
     public int size() {
         return mDataItems.size();
     }

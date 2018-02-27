@@ -21,6 +21,15 @@
 			android:summary="@string/pref_logging_summary"
 			android:defaultValue="false"
 			/>
+		<ListPreference
+            android:key="pref_auto_timer_disable"
+            android:title="@string/pref_auto_timer_disable"
+            android:dialogTitle="@string/pref_auto_timer_disable"
+            android:summary="@string/pref_auto_timer_disable_summary"
+            android:entries="@array/auto_timer_disable_entries"
+            android:entryValues="@array/auto_timer_disable_entry_values"
+            android:defaultValue="@string/pref_auto_timer_disable_default"
+            />
         <ListPreference
             android:key="pref_wake_before"
             android:title="@string/pref_wake_before"

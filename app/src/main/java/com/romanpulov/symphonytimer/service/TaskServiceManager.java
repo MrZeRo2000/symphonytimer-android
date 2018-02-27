@@ -103,8 +103,6 @@ public class TaskServiceManager {
     }
 
     public void updateServiceTasks(DMTasks tasks) {
-        Intent serviceIntent = new Intent(mContext, TaskService.class);
-
         //no more tasks
         if (mServiceBound && tasks.size() == 0) {
             log("updateServiceTasks: no more tasks");
@@ -112,12 +110,13 @@ public class TaskServiceManager {
             mServiceBound = false;
 
             //another idea of stopping service:
-            serviceIntent.setAction(TaskService.ACTION_STOP_SERVICE);
-            mContext.startService(serviceIntent);
+            TaskService.stopService(mContext);
 
             //mContext.stopService(serviceIntent);
             return;
         }
+
+        Intent serviceIntent = new Intent(mContext, TaskService.class);
 
         //tasks, not bound
         if ((!mServiceBound) && tasks.size() > 0) {

@@ -20,6 +20,22 @@ public final class TimerSignalHelper {
     private final MediaRecorderHelper mMediaRecorderHelper;
 
     private int mStatus = STATUS_OFF;
+    private long mStartTime;
+
+    public boolean isStatusOn() {
+        return mStatus == STATUS_ON;
+    }
+
+    public long getDuration() {
+        if (mStatus == STATUS_ON)
+            return System.currentTimeMillis() - mStartTime;
+        else
+            return 0;
+    }
+
+    public int getDurationSeconds() {
+        return (int)(getDuration() / 1000);
+    }
 
     public TimerSignalHelper(Context context) {
         mContext = context;
@@ -40,6 +56,7 @@ public final class TimerSignalHelper {
     public void start() {
         log("started");
         mStatus = STATUS_ON;
+        mStartTime = System.currentTimeMillis();
 
         mMediaPlayerHelper.start();
         VibratorHelper.vibrate(mContext);

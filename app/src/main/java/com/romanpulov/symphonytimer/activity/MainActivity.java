@@ -473,9 +473,14 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
     private void performUpdateDMTasks(DMTasks newTasks) {
         mDMTasks.unlock();
         if (newTasks != null) {
-            if (newTasks.size() > mDMTasks.size()) {
+            if (newTasks.size() != mDMTasks.size()) {
+                log("performUpdateDMTasks");
                 mDMTasks.replaceTasks(newTasks);
                 updateTimers();
+
+                // if tasks are expired by external reasons
+                if ((mDMTasks.size() == 0) && (mTaskServiceManager != null))
+                    mTaskServiceManager.updateServiceTasks(mDMTasks);
             }
         }
     }
