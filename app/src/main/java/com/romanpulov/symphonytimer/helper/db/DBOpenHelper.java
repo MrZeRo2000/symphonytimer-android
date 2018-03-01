@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 
 public class DBOpenHelper extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	public static final String DATABASE_NAME = "symphonytimerdb";
     public static final String TIMER_TABLE_NAME = "timer";
     public static final String TIMER_HISTORY_TABLE_NAME = "timer_history";
@@ -19,7 +19,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     	"time_sec", 
     	"sound_file", 
     	"image_name", 
-    	"order_id" 
+    	"order_id",
+        "auto_timer_disable"
     };
     public static final String[] TIMER_HISTORY_TABLE_COLS = new String[] {
     	"_id", 
@@ -79,6 +80,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                 TIMER_TABLE_COLS[3] + " TEXT,"  +
                 TIMER_TABLE_COLS[4] + " TEXT, "  +
                 TIMER_TABLE_COLS[5] + " INTEGER"  +
+                TIMER_TABLE_COLS[6] + " INTEGER"  +
                  ");";
 
     private static final String TIMER_HISTORY_TABLE_CREATE =
@@ -103,22 +105,25 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
-		if ((2 == oldVersion) && (newVersion >= 3)) {
-			db.execSQL("ALTER TABLE " + DBOpenHelper.TIMER_TABLE_NAME + " ADD order_id INTEGER");
-			db.execSQL("UPDATE " + DBOpenHelper.TIMER_TABLE_NAME + " SET order_id = _id");
-            db.execSQL(TIMER_HISTORY_TABLE_CREATE);
-		} else if (4 > oldVersion)  {
-			db.execSQL(TIMER_HISTORY_TABLE_CREATE);
-		} else if ((4 == oldVersion) && (5 == newVersion )) {
-            db.execSQL("ALTER TABLE " + DBOpenHelper.TIMER_HISTORY_TABLE_NAME + " ADD " + TIMER_HISTORY_TABLE_COLS[4] + " INTEGER");
-		}
-		else	{
-			db.execSQL("DROP TABLE IF EXISTS " + DBOpenHelper.TIMER_TABLE_NAME);
-			db.execSQL("DROP TABLE IF EXISTS " + DBOpenHelper.TIMER_HISTORY_TABLE_NAME);
-			onCreate(db);
-		}		
-	}	
+        switch(oldVersion) {
+            case 2:
+                db.execSQL("ALTER TABLE " + DBOpenHelper.TIMER_TABLE_NAME + " ADD order_id INTEGER");
+                db.execSQL("UPDATE " + DBOpenHelper.TIMER_TABLE_NAME + " SET order_id = _id");
+            case 3:
+                db.execSQL(TIMER_HISTORY_TABLE_CREATE);
+            case 4:
+                db.execSQL("ALTER TABLE " + DBOpenHelper.TIMER_HISTORY_TABLE_NAME + " ADD " + TIMER_HISTORY_TABLE_COLS[4] + " INTEGER");
+            case 5:
+                db.execSQL("ALTER TABLE " + DBOpenHelper.TIMER_TABLE_NAME + " ADD " + DBOpenHelper.TIMER_TABLE_COLS[6] + " INTEGER");
+                db.execSQL("UPDATE " + DBOpenHelper.TIMER_TABLE_NAME + " SET " + DBOpenHelper.TIMER_TABLE_COLS[6] + " = 0");
+            case 100:
+                break;
+            default:
+                db.execSQL("DROP TABLE IF EXISTS " + DBOpenHelper.TIMER_TABLE_NAME);
+                db.execSQL("DROP TABLE IF EXISTS " + DBOpenHelper.TIMER_HISTORY_TABLE_NAME);
+                onCreate(db);
+        }
+	}
 	
 }
 

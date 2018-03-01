@@ -13,6 +13,7 @@
     <string name="label_time_seconds">Seconds</string>
     <string name="label_sound">Sound</string>
     <string name="label_image">Image</string>
+    <string name="label_auto_timer_disable">Auto timer disable</string>
     <string name="sound">Sound</string>
     <string name="default_sound">Default sound</string>
     <string name="unknown_sound">Unknown sound</string>

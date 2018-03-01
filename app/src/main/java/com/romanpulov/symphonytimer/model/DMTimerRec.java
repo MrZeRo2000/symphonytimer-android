@@ -10,6 +10,7 @@ public class DMTimerRec implements Parcelable{
 	public String mSoundFile;
 	public String mImageName;
 	public long mOrderId;
+	public int mAutoTimerDisable;
 	
 	@Override
 	public int describeContents() {
@@ -26,6 +27,7 @@ public class DMTimerRec implements Parcelable{
 		dest.writeString(mSoundFile);
 		dest.writeString(mImageName);
 		dest.writeLong(mOrderId);
+		dest.writeInt(mAutoTimerDisable);
 	}
 	
 	private DMTimerRec(Parcel in) {
@@ -35,6 +37,7 @@ public class DMTimerRec implements Parcelable{
 		mSoundFile = in.readString();
 		mImageName = in.readString();
 		mOrderId = in.readLong();
+		mAutoTimerDisable = in.readInt();
 	}
 	
 	public DMTimerRec() {

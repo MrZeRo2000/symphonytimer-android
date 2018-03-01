@@ -234,11 +234,24 @@
 		    android:layout_margin="@dimen/activity_input_margin"
 		    android:src="@android:drawable/ic_delete"	    
 	    	android:onClick="onClearImageFileButtonClick"
-	    	/>    
-	</LinearLayout>	
+	    	/>
+	</LinearLayout>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_input_margin"
+        android:text="@string/label_auto_timer_disable"
+        />
+    <Spinner
+        android:id="@+id/auto_timer_disable_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_input_margin"
+        />
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/activity_dialog_height"
+        android:layout_marginTop="@dimen/activity_dialog_margin_top"
         >
         <View
             android:layout_width="match_parent"

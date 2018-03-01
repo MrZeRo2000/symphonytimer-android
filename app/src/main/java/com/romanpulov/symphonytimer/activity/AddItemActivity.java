@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.activity;
 
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.adapter.AutoTimerDisableAdapter;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.UriHelper;
@@ -17,7 +18,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.content.Intent;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -49,6 +52,9 @@ public class AddItemActivity extends ActionBarActivity {
     private SlideNumberPicker mHoursNumberPicker;
     private SlideNumberPicker mMinutesNumberPicker;
     private SlideNumberPicker mSecondsNumberPicker;
+
+    private Spinner mAutoTimerDisableSpinner;
+    private AutoTimerDisableAdapter mAutoTimerDisableAdapter;
 
     private MediaPlayerHelper mMediaPlayerHelper;
 
@@ -90,6 +96,13 @@ public class AddItemActivity extends ActionBarActivity {
         mMinutesNumberPicker = (SlideNumberPicker)findViewById(R.id.minutes_number_picker);
         mSecondsNumberPicker = (SlideNumberPicker)findViewById(R.id.seconds_number_picker);
 
+        mAutoTimerDisableSpinner =(Spinner)findViewById(R.id.auto_timer_disable_spinner);
+
+        mAutoTimerDisableAdapter = new AutoTimerDisableAdapter(this, android.R.layout.simple_spinner_item);
+        mAutoTimerDisableAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        mAutoTimerDisableSpinner.setAdapter(mAutoTimerDisableAdapter);
+
         editRec = getIntent().getExtras().getParcelable(EDIT_REC_NAME);
         updateEditRec();
 
@@ -107,6 +120,7 @@ public class AddItemActivity extends ActionBarActivity {
         mHoursNumberPicker.setValue((int) hours);
         mMinutesNumberPicker.setValue((int) minutes);
         mSecondsNumberPicker.setValue((int) seconds);
+        mAutoTimerDisableSpinner.setSelection(mAutoTimerDisableAdapter.getPositionByValue(editRec.mAutoTimerDisable));
 
         // update sound and image controls
         updateSoundImageFromFile(editRec.mSoundFile, editRec.mImageName);
@@ -150,6 +164,7 @@ public class AddItemActivity extends ActionBarActivity {
         long minutes = Long.valueOf(minutesString);
         long seconds = Long.valueOf(secondsString);
         rec.mTimeSec = hours * 3600 + minutes * 60 + seconds;
+        rec.mAutoTimerDisable = mAutoTimerDisableAdapter.getValueBySelection(mAutoTimerDisableSpinner.getSelectedItem().toString());
 
         if (0 == rec.mTimeSec) {
             throw new AddItemInputException(mTimeTextView, getResources().getString(R.string.error_time_zero));
