@@ -122,6 +122,7 @@ public class TaskService extends Service implements Runnable {
                     case MSG_TASK_UPDATE_COMPLETED:
                         unconditionalLog("handleMessage update completed");
 
+                        hostService.mTimerSignalHelper.setMultiple();
                         hostService.mTimerSignalHelper.changeSoundFileName(hostService.mDMTasksStatus.getFirstTaskItemCompleted().getSoundFileName());
 
                         //stop sound
@@ -406,7 +407,7 @@ public class TaskService extends Service implements Runnable {
             if (mClientMessenger != null) {
 
                 DMTaskItem completedTaskItem = mDMTasks.getFirstTaskItemCompleted();
-                if ((completedTaskItem != null) && (mDMTasks.getItems().size() == 1)) {
+                if ((completedTaskItem != null) && (mDMTasks.getItems().size() == 1) && (!mTimerSignalHelper.isMultiple())) {
 
                     // get auto timer disable interval, priority for individual setting
                     int autoTimerDisableInterval = completedTaskItem.getAutoTimerDisableInterval();

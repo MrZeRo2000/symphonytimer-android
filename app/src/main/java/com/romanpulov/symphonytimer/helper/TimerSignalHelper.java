@@ -20,10 +20,19 @@ public final class TimerSignalHelper {
     private final MediaRecorderHelper mMediaRecorderHelper;
 
     private int mStatus = STATUS_OFF;
+    private boolean mIsMultiple = false;
     private long mStartTime;
 
     public boolean isStatusOn() {
         return mStatus == STATUS_ON;
+    }
+
+    public boolean isMultiple() {
+        return mIsMultiple;
+    }
+
+    public void setMultiple() {
+        mIsMultiple = true;
     }
 
     public long getDuration() {
