@@ -12,6 +12,7 @@ public class DMTaskItem implements Parcelable {
     public final static String FIELD_NAME_MAX_TIME_SEC = "max_time_sec";
     public final static String FIELD_NAME_START_TIME = "start_time";
     public final static String FIELD_NAME_SOUND_FILE = "sound_file";
+    public final static String FIELD_NAME_AUTO_TIMER_DISABLE = "auto_timer_disable";
 	
 	public interface OnTaskItemCompleted {
 		void OnTaskItemCompletedEvent (DMTaskItem dmTaskItem);
@@ -21,21 +22,23 @@ public class DMTaskItem implements Parcelable {
 	private final String mTitle;
 	private final long mMaxTimeSec;
 	private final String mSoundFileName;
+	private final int mAutoTimerDisableInterval;
 	private OnTaskItemCompleted mTaskItemCompletedListener;
 	
 	private long mStartTime;
 	private long mCurrentTime;
 	private boolean mCompletedFlag = false;
 	
-	public DMTaskItem(long id, String title, long timeSec, String soundFile) {
+	public DMTaskItem(long id, String title, long timeSec, String soundFile, int autoTimerDisable) {
 		this.mId = id;
 		this.mTitle = title;
 		this.mMaxTimeSec = timeSec;		
 		this.mSoundFileName = soundFile;
+		this.mAutoTimerDisableInterval = autoTimerDisable;
 	}
 
-	public DMTaskItem(long id, String title, long timeSec, long startTime, String soundFile) {
-        this(id, title, timeSec, soundFile);
+	public DMTaskItem(long id, String title, long timeSec, long startTime, String soundFile, int autoTimerDisable) {
+        this(id, title, timeSec, soundFile, autoTimerDisable);
         mStartTime = startTime;
 	}
 	
@@ -55,6 +58,7 @@ public class DMTaskItem implements Parcelable {
 		dest.writeLong(mMaxTimeSec);
 		dest.writeLong(mStartTime);
 		dest.writeString(mSoundFileName);
+		dest.writeInt(mAutoTimerDisableInterval);
 	}
 	
 	private DMTaskItem(Parcel in) {
@@ -63,6 +67,7 @@ public class DMTaskItem implements Parcelable {
 		mMaxTimeSec = in.readLong();
 		mStartTime = in.readLong();
 		mSoundFileName = in.readString();
+		mAutoTimerDisableInterval = in.readInt();
 	}	
 	
 	public static final Parcelable.Creator<DMTaskItem> CREATOR = new Parcelable.Creator<DMTaskItem>() {
@@ -87,6 +92,7 @@ public class DMTaskItem implements Parcelable {
             jo.put(FIELD_NAME_MAX_TIME_SEC, mMaxTimeSec);
             jo.put(FIELD_NAME_START_TIME, mStartTime);
             jo.put(FIELD_NAME_SOUND_FILE, mSoundFileName);
+            jo.put(FIELD_NAME_AUTO_TIMER_DISABLE, mAutoTimerDisableInterval);
             return jo;
         } catch (JSONException e) {
             return null;
@@ -106,7 +112,8 @@ public class DMTaskItem implements Parcelable {
             long maxTimeSec = jo.getLong(FIELD_NAME_MAX_TIME_SEC);
             long startTime = jo.getLong(FIELD_NAME_START_TIME);
             String soundFile = jo.optString(FIELD_NAME_SOUND_FILE);
-            return new DMTaskItem(id, title, maxTimeSec, startTime, soundFile);
+            int autoTimerDisable = jo.getInt(FIELD_NAME_AUTO_TIMER_DISABLE);
+            return new DMTaskItem(id, title, maxTimeSec, startTime, soundFile, autoTimerDisable);
         } catch (JSONException e) {
             return null;
         }
@@ -144,7 +151,11 @@ public class DMTaskItem implements Parcelable {
 	
 	public long getCurrentTime() {
 		return mCurrentTime;
-	}	
+	}
+
+	public int getAutoTimerDisableInterval() {
+	    return mAutoTimerDisableInterval;
+    }
 	
 	public void startProcess() {
 		mStartTime = System.currentTimeMillis();
@@ -179,6 +190,7 @@ public class DMTaskItem implements Parcelable {
                 "maxTimeSec=" + mMaxTimeSec + "," +
                 "startTime=" + mStartTime + "," +
                 "currentTime=" + mCurrentTime + "," +
+                "autoTimerDisableInterval=" + mAutoTimerDisableInterval + "," +
 				"mTaskItemCompletedListener=" + mTaskItemCompletedListener + ")"
 				;
 	}

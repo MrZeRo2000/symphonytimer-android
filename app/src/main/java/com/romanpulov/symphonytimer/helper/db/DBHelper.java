@@ -91,7 +91,7 @@ public class DBHelper {
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], getMaxOrderId() + 1);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.mAutoTimerDisable);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.mAutoTimerDisableInterval);
 
 		return mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);
 	}
@@ -103,7 +103,7 @@ public class DBHelper {
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
-        cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.mAutoTimerDisable);
+        cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.mAutoTimerDisableInterval);
 
 		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.mId, null);
 	}
@@ -253,7 +253,7 @@ public class DBHelper {
 				dmTimerRec.mSoundFile = c.getString(3);
 				dmTimerRec.mImageName = c.getString(4);
 				dmTimerRec.mOrderId = c.getLong(5);
-				dmTimerRec.mAutoTimerDisable = c.getInt(6);
+				dmTimerRec.mAutoTimerDisableInterval = c.getInt(6);
 				
 				dmTimers.add(dmTimerRec);
 			}

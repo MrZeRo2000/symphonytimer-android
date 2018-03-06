@@ -30,8 +30,8 @@ public class SymphonyInstrumentedTest {
     public DMTasks getTestDMTasks() {
         DMTasks result = new DMTasks();
 
-        result.add(new DMTaskItem(1, "Test1", 111, 7777777, null));
-        result.add(new DMTaskItem(2, "Test2", 222, 8888888, "Sound 2"));
+        result.add(new DMTaskItem(1, "Test1", 111, 7777777, null, 0));
+        result.add(new DMTaskItem(2, "Test2", 222, 8888888, "Sound 2", 0));
 
         return result;
     }

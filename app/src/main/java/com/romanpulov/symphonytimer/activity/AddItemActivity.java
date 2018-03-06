@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.content.Intent;
 import android.view.Menu;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -120,7 +119,7 @@ public class AddItemActivity extends ActionBarActivity {
         mHoursNumberPicker.setValue((int) hours);
         mMinutesNumberPicker.setValue((int) minutes);
         mSecondsNumberPicker.setValue((int) seconds);
-        mAutoTimerDisableSpinner.setSelection(mAutoTimerDisableAdapter.getPositionByValue(editRec.mAutoTimerDisable));
+        mAutoTimerDisableSpinner.setSelection(mAutoTimerDisableAdapter.getPositionByValue(editRec.mAutoTimerDisableInterval));
 
         // update sound and image controls
         updateSoundImageFromFile(editRec.mSoundFile, editRec.mImageName);
@@ -164,7 +163,7 @@ public class AddItemActivity extends ActionBarActivity {
         long minutes = Long.valueOf(minutesString);
         long seconds = Long.valueOf(secondsString);
         rec.mTimeSec = hours * 3600 + minutes * 60 + seconds;
-        rec.mAutoTimerDisable = mAutoTimerDisableAdapter.getValueBySelection(mAutoTimerDisableSpinner.getSelectedItem().toString());
+        rec.mAutoTimerDisableInterval = mAutoTimerDisableAdapter.getValueBySelection(mAutoTimerDisableSpinner.getSelectedItem().toString());
 
         if (0 == rec.mTimeSec) {
             throw new AddItemInputException(mTimeTextView, getResources().getString(R.string.error_time_zero));

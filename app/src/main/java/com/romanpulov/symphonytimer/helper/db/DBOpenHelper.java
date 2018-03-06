@@ -79,7 +79,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                 TIMER_TABLE_COLS[2] + " INTEGER NOT NULL,"  +
                 TIMER_TABLE_COLS[3] + " TEXT,"  +
                 TIMER_TABLE_COLS[4] + " TEXT, "  +
-                TIMER_TABLE_COLS[5] + " INTEGER"  +
+                TIMER_TABLE_COLS[5] + " INTEGER, "  +
                 TIMER_TABLE_COLS[6] + " INTEGER"  +
                  ");";
 

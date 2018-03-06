@@ -405,19 +405,29 @@ public class TaskService extends Service implements Runnable {
 
             if (mClientMessenger != null) {
 
-                if ((mAutoTimerDisableInterval > 0) && (mTimerSignalHelper.getDurationSeconds() >= mAutoTimerDisableInterval) && (mDMTasks.getItems().size() == 1)) {
-                    mDMTasks.remove(0);
+                DMTaskItem completedTaskItem = mDMTasks.getFirstTaskItemCompleted();
+                if ((completedTaskItem != null) && (mDMTasks.getItems().size() == 1)) {
 
-                    Message msg = MessageFactory.createUpdateDMTasksMessage(mDMTasks);
-                    try {
-                        log("Sending MSG_UPDATE_DM_TASKS - expired task");
-                        mClientMessenger.send(msg);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                    // get auto timer disable interval, priority for individual setting
+                    int autoTimerDisableInterval = completedTaskItem.getAutoTimerDisableInterval();
+                    if (autoTimerDisableInterval == 0)
+                        autoTimerDisableInterval = mAutoTimerDisableInterval;
+                    log("Auto timer disable interval: " + autoTimerDisableInterval);
+
+                    if ((autoTimerDisableInterval > 0) && (mTimerSignalHelper.getDurationSeconds() >= autoTimerDisableInterval)) {
+                        mDMTasks.remove(completedTaskItem);
+
+                        Message msg = MessageFactory.createUpdateDMTasksMessage(mDMTasks);
+                        try {
+                            log("Sending MSG_UPDATE_DM_TASKS - expired task");
+                            mClientMessenger.send(msg);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+
+                        // to handle situation when activity was unloaded after timer on
+                        stopService(this);
                     }
-
-                    // to handle situation when activity was unloaded after timer on
-                    stopService(this);
                 }
 
                 Message msg = MessageFactory.createUpdateDMProgressMessage();
