@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
@@ -33,6 +34,7 @@ import com.romanpulov.symphonytimer.preference.PreferenceRestoreLocalProcessor;
 import com.romanpulov.symphonytimer.service.LoaderService;
 import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,6 +86,29 @@ public class SettingsFragment extends PreferenceFragment implements
             mBoundService = null;
         }
     };
+
+    private static class ListPreferenceSummaryHandler {
+        private final String mSummaryString;
+
+        public ListPreferenceSummaryHandler(String summaryString) {
+            mSummaryString = summaryString;
+        }
+
+        public Preference.OnPreferenceChangeListener newOnPreferenceChangeListener() {
+            return new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    ListPreference listPreference = (ListPreference)preference;
+                    int selectedIndex = Arrays.asList(listPreference.getEntryValues()).indexOf((CharSequence)newValue);
+                    if (selectedIndex > -1) {
+                        preference.setSummary(String.format(mSummaryString, listPreference.getEntries()[selectedIndex]));
+                    }
+
+                    return false;
+                }
+            };
+        }
+    }
 
     /*
 
@@ -212,6 +237,14 @@ public class SettingsFragment extends PreferenceFragment implements
 		}
 		*/
 
+        preference = findPreference("pref_wake_before");
+        ListPreferenceSummaryHandler preferenceWakeBeforeHandler = new ListPreferenceSummaryHandler(getString(R.string.pref_wake_before_summary));
+        preference.setOnPreferenceChangeListener(preferenceWakeBeforeHandler.newOnPreferenceChangeListener());
+
+        preference = findPreference("pref_auto_timer_disable");
+        ListPreferenceSummaryHandler preferenceAutoTimerDisableHandler = new ListPreferenceSummaryHandler(getString(R.string.pref_auto_timer_disable_summary));
+        preference.setOnPreferenceChangeListener(preferenceAutoTimerDisableHandler.newOnPreferenceChangeListener());
+
 		//account dropbox
         preference = findPreference("pref_dropbox_account");
 		if (null != preference) {
@@ -255,7 +288,7 @@ public class SettingsFragment extends PreferenceFragment implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 	    String key) {
-	}
+    }
 
     private boolean checkInternetConnection() {
         if (NetworkUtils.isNetworkAvailable(getActivity()))
