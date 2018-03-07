@@ -8,12 +8,15 @@ import com.romanpulov.library.common.loader.core.AbstractContextLoader;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
+import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
 
 /**
  * Loader to backup to Dropbox

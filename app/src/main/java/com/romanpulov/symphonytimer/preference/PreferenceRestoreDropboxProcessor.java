@@ -7,8 +7,11 @@ import com.romanpulov.library.common.loader.file.FileLoader;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxFileDownloader;
+import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 
 import java.io.File;
+
+import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
 
 /**
  * Created by romanpulov on 27.11.2017.
@@ -34,7 +37,10 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
         //PreferenceRepository.setDropboxRestoreDefaultPreferenceSummary(mPreferenceFragment);
 
         if (result != null) {
-            PreferenceRepository.displayMessage(mPreferenceFragment, result);
+            //PreferenceRepository.displayMessage(mPreferenceFragment, result);
+            String errorNotificationError = mPreferenceFragment.getActivity().getString(R.string.notification_load_operation_error, result);
+            LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), errorNotificationError, NOTIFICATION_ID_LOADER);
+
             PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
         }
         else {
@@ -58,11 +64,13 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
                     PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
                 }
 
-                PreferenceRepository.displayMessage(mPreferenceFragment, restoreMessage);
+                LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), restoreMessage, NOTIFICATION_ID_LOADER);
+                //PreferenceRepository.displayMessage(mPreferenceFragment, restoreMessage);
 
             } else {
                 PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
-                PreferenceRepository.displayMessage(mPreferenceFragment, mPreferenceFragment.getString(R.string.error_restore));
+                LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), mPreferenceFragment.getString(R.string.error_restore), NOTIFICATION_ID_LOADER);
+                //PreferenceRepository.displayMessage(mPreferenceFragment, mPreferenceFragment.getString(R.string.error_restore));
             }
         }
     }

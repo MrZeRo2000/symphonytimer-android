@@ -53,6 +53,8 @@ public class LoaderService extends IntentService {
                     errorMessage = "Failed to create loader : " + mLoaderClassName;
             } catch (Exception e) {
                 errorMessage = e.getMessage();
+                if (errorMessage == null)
+                    errorMessage = e.toString();
             }
             log("onHandleEvent completed");
             Intent resultIntent = new Intent(SERVICE_RESULT_INTENT_NAME);

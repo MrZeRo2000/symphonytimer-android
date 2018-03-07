@@ -13,6 +13,7 @@ import com.romanpulov.symphonytimer.model.DMTasks;
 import java.lang.ref.WeakReference;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_ONGOING;
 
 /**
  * Created by rpulov on 06.11.2016.
@@ -22,8 +23,6 @@ public class NotificationHelper {
     private void log(String message) {
         LoggerHelper.logContext(mContext.get(), "NotificationHelper", message);
     }
-
-    public static final int ONGOING_NOTIFICATION_ID = 1;
 
     private static NotificationHelper mNotificationHelper;
 
@@ -77,7 +76,8 @@ public class NotificationHelper {
                             .setContentTitle(mContext.get().getString(R.string.app_name))
                             .setContentText(dmTasks.getTaskTitles())
                             .setProgress(100, dmTasks.getExecutionPercent(), false)
-                            .setContentIntent(mContentIntent);
+                            .setContentIntent(mContentIntent)
+                    ;
             return builder.build();
         } else {
             log("No context");
@@ -95,13 +95,13 @@ public class NotificationHelper {
         if (mNotificationInfo.isModified()) {
             Notification notification = getNotification(dmTasks);
             if (notification != null)
-                mNotificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+                mNotificationManager.notify(NOTIFICATION_ID_ONGOING, notification);
         } else {
             log("No change, skipping notification");
         }
     }
 
     public void cancel() {
-        mNotificationManager.cancel(ONGOING_NOTIFICATION_ID);
+        mNotificationManager.cancel(NOTIFICATION_ID_ONGOING);
     }
 }

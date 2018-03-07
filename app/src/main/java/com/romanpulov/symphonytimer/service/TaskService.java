@@ -29,6 +29,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_ONGOING;
 import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_TO_COMPLETED;
 import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_TO_NOT_COMPLETED;
 import static com.romanpulov.symphonytimer.model.DMTasksStatus.STATUS_EVENT_UPDATE_COMPLETED;
@@ -314,7 +315,7 @@ public class TaskService extends Service implements Runnable {
             updateDMTasks(newDMTasks);
 
             if (mDMTasks != null) {
-                startForeground(NotificationHelper.ONGOING_NOTIFICATION_ID, NotificationHelper.getInstance(this).getNotification(mDMTasks));
+                startForeground(NOTIFICATION_ID_ONGOING, NotificationHelper.getInstance(this).getNotification(mDMTasks));
 
                 if (mScheduleExecutorTask == null)
                     mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
