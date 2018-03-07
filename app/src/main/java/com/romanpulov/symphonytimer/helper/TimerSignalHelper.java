@@ -2,6 +2,8 @@ package com.romanpulov.symphonytimer.helper;
 
 import android.content.Context;
 
+import java.io.File;
+
 /**
  * Helper class for managing timer signals - sound, vibration
  * Created by romanpulov on 26.02.2018.
@@ -50,6 +52,7 @@ public final class TimerSignalHelper {
         mContext = context;
         mMediaPlayerHelper = new MediaPlayerHelper(context);
         mMediaRecorderHelper = new MediaRecorderHelper(context);
+        mMediaRecorderHelper.setMediaRecordFile(new File("/dev/null"));
     }
 
     public void setSoundFileName(String soundFileName) {
@@ -69,6 +72,9 @@ public final class TimerSignalHelper {
 
         mMediaPlayerHelper.start();
         VibratorHelper.vibrate(mContext);
+
+        if (!mMediaRecorderHelper.isRecording())
+            mMediaRecorderHelper.startRecordingThread();
     }
 
     public void stop() {
@@ -77,5 +83,6 @@ public final class TimerSignalHelper {
 
         VibratorHelper.cancel(mContext);
         mMediaPlayerHelper.stop();
+        mMediaRecorderHelper.stopRecordingThread();
     }
 }

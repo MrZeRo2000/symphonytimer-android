@@ -5,6 +5,9 @@ import android.media.MediaRecorder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper class for MediaRecorder
@@ -16,14 +19,14 @@ public final class MediaRecorderHelper {
         LoggerHelper.logContext(context, "MediaRecorderHelper", message);
     }
 
-
     private final Context mContext;
     private MediaRecorder mMediaRecorder;
     private File mMediaRecordFile;
     private boolean mIsRecording = false;
-    private double mInitialAmplitude;
+    private double mInitialAmplitude = 0;
     private double mCurrentAmplitude;
-    private Thread mThread;
+    private double mMaxAmplitudeOffset = 0;
+    private ExecutorService mExecutor;
     private boolean mThreadNeedTerminate = false;
 
     private static double TO_DECIBELS(int value) {
@@ -33,8 +36,12 @@ public final class MediaRecorderHelper {
             return 20 * Math.log10(value);
     }
 
-    public double getMaxAmplitude() {
+    private double getMaxAmplitude() {
         return TO_DECIBELS(mMediaRecorder.getMaxAmplitude());
+    }
+
+    public double getMaxAmplitudeOffset() {
+        return mMaxAmplitudeOffset;
     }
 
     public boolean isRecording() {
@@ -53,6 +60,8 @@ public final class MediaRecorderHelper {
         if (mIsRecording || (mMediaRecordFile == null))
             return false;
 
+        logContext(mContext, "Starting recording");
+
         mMediaRecorder = new MediaRecorder();
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -63,8 +72,6 @@ public final class MediaRecorderHelper {
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
-            mInitialAmplitude = getMaxAmplitude();
-            logContext(mContext, "Initial amplitude : " + mInitialAmplitude);
             logContext(mContext, "writing to file : " + mMediaRecordFile.getAbsolutePath());
 
             mIsRecording = true;
@@ -83,6 +90,7 @@ public final class MediaRecorderHelper {
         if (mIsRecording && (mMediaRecorder != null)) {
             try {
                 logContext(mContext, "Stopping");
+
                 mMediaRecorder.stop();
                 mMediaRecorder.release();
 
@@ -104,6 +112,43 @@ public final class MediaRecorderHelper {
 
     public void startRecordingThread() {
         mThreadNeedTerminate = false;
+
+        if (mExecutor == null) {
+            logContext(mContext, "Creating new executor");
+            mExecutor = Executors.newSingleThreadExecutor();
+        }
+
+        mExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                startRecording();
+
+                while (!mThreadNeedTerminate) {
+                    try {
+                        mCurrentAmplitude = getMaxAmplitude();
+                        logContext(mContext, "Current amplitude : " + mCurrentAmplitude);
+
+                        if ((mInitialAmplitude == 0) && (mCurrentAmplitude > 0)) {
+                            mInitialAmplitude = mCurrentAmplitude;
+                            mMaxAmplitudeOffset = 0;
+                            logContext(mContext, "Initial amplitude : " + mInitialAmplitude);
+                        } else {
+                            if ((mCurrentAmplitude - mInitialAmplitude) > mMaxAmplitudeOffset) {
+                                mMaxAmplitudeOffset = mCurrentAmplitude - mInitialAmplitude;
+                                logContext(mContext, "Changed offset amplitude : " + mMaxAmplitudeOffset);
+                            }
+                        }
+
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                stopRecording();
+            }
+        });
+
+        /*
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -123,6 +168,7 @@ public final class MediaRecorderHelper {
             }
         });
         mThread.start();
+        */
     }
 
     public void stopRecordingThread() {
