@@ -90,11 +90,11 @@ public class SettingsFragment extends PreferenceFragment implements
     private static class ListPreferenceSummaryHandler {
         private final String mSummaryString;
 
-        public ListPreferenceSummaryHandler(String summaryString) {
+        ListPreferenceSummaryHandler(String summaryString) {
             mSummaryString = summaryString;
         }
 
-        public Preference.OnPreferenceChangeListener newOnPreferenceChangeListener() {
+        Preference.OnPreferenceChangeListener newOnPreferenceChangeListener() {
             return new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
