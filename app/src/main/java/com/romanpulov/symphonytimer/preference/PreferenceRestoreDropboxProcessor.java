@@ -34,45 +34,12 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
 
     @Override
     public void postExecute(String result) {
-        //PreferenceRepository.setDropboxRestoreDefaultPreferenceSummary(mPreferenceFragment);
-
-        if (result != null) {
-            //PreferenceRepository.displayMessage(mPreferenceFragment, result);
-            String errorNotificationError = mPreferenceFragment.getActivity().getString(R.string.notification_load_operation_error, result);
-            LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), errorNotificationError, NOTIFICATION_ID_LOADER);
-
+        if (result == null) {
+            long loadedTime = System.currentTimeMillis();
+            PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
+        }
+        else
             PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
-        }
-        else {
-            FileLoader fileLoader = new RestoreDropboxFileDownloader(mPreferenceFragment.getActivity());;
-            File file = new File(fileLoader.getLoadPathProvider().getDestPath());
-            if (file.exists()) {
-
-                DBStorageHelper dbStorageHelper = new DBStorageHelper(mPreferenceFragment.getActivity());
-
-                int restoreResult = dbStorageHelper.restoreLocalXmlBackup();
-
-                String restoreMessage;
-
-                if (restoreResult != 0) {
-                    restoreMessage = String.format(mPreferenceFragment.getString(R.string.error_load_local_backup), restoreResult);
-                    PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
-                }
-                else {
-                    restoreMessage = mPreferenceFragment.getString(R.string.info_load_local_backup);
-                    long loadedTime = System.currentTimeMillis();
-                    PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
-                }
-
-                LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), restoreMessage, NOTIFICATION_ID_LOADER);
-                //PreferenceRepository.displayMessage(mPreferenceFragment, restoreMessage);
-
-            } else {
-                PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
-                LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), mPreferenceFragment.getString(R.string.error_restore), NOTIFICATION_ID_LOADER);
-                //PreferenceRepository.displayMessage(mPreferenceFragment, mPreferenceFragment.getString(R.string.error_restore));
-            }
-        }
     }
 
     @Override
