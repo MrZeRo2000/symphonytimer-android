@@ -10,6 +10,10 @@ import android.util.Log;
 
 import com.romanpulov.library.common.loader.core.Loader;
 import com.romanpulov.library.common.loader.core.LoaderFactory;
+import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
+
+import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
 
 /**
  * Loader service
@@ -60,8 +64,12 @@ public class LoaderService extends IntentService {
             Intent resultIntent = new Intent(SERVICE_RESULT_INTENT_NAME);
             resultIntent.putExtra(SERVICE_RESULT_LOADER_NAME, mLoaderClassName);
 
-            if (errorMessage != null)
+            if (errorMessage != null) {
                 resultIntent.putExtra(SERVICE_RESULT_ERROR_MESSAGE, errorMessage);
+
+                String errorNotificationError = getString(R.string.notification_load_operation_error, errorMessage);
+                LoaderNotificationHelper.notify(this, errorNotificationError, NOTIFICATION_ID_LOADER);
+            }
 
             broadcastManager.sendBroadcast(resultIntent);
         }

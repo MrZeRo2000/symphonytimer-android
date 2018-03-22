@@ -38,16 +38,9 @@ public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcess
     @Override
     public void postExecute(String result) {
         if (result == null) {
-            LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), mPreferenceFragment.getActivity().getString(R.string.notification_dropbox_backup_completed), NOTIFICATION_ID_LOADER);
-
             long loadedTime = System.currentTimeMillis();
             PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, loadedTime);
-        } else {
-            //PreferenceRepository.displayMessage(mPreferenceFragment, result);
-            String errorNotificationError = mPreferenceFragment.getActivity().getString(R.string.notification_load_operation_error, result);
-            LoaderNotificationHelper.notify(mPreferenceFragment.getActivity(), errorNotificationError, NOTIFICATION_ID_LOADER);
-
+        } else
             PreferenceRepository.updatePreferenceKeySummary(mPreferenceFragment, PREF_KEY_NAME, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
-        }
     }
 }

@@ -59,7 +59,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 					"ORDER BY 2 DESC";
     
     public static final String TIMER_BACKUP_GET_QUERY = 
-    		"SELECT _id, title, time_sec, order_id FROM " + TIMER_TABLE_NAME;
+    		"SELECT _id, title, time_sec, order_id, auto_timer_disable FROM " + TIMER_TABLE_NAME;
     
     public static final String TIMER_HISTORY_BACKUP_GET_QUERY = 
     		"SELECT _id, timer_id, start_time, end_time, real_time FROM " + TIMER_HISTORY_TABLE_NAME;
