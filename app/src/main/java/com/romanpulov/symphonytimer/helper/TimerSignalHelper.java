@@ -19,7 +19,6 @@ public final class TimerSignalHelper {
 
     private final Context mContext;
     private final MediaPlayerHelper mMediaPlayerHelper;
-    private final MediaRecorderHelper mMediaRecorderHelper;
 
     private int mStatus = STATUS_OFF;
     private boolean mIsMultiple = false;
@@ -51,8 +50,6 @@ public final class TimerSignalHelper {
     public TimerSignalHelper(Context context) {
         mContext = context;
         mMediaPlayerHelper = new MediaPlayerHelper(context);
-        mMediaRecorderHelper = new MediaRecorderHelper(context);
-        mMediaRecorderHelper.setMediaRecordFile(new File("/dev/null"));
     }
 
     public void setSoundFileName(String soundFileName) {
@@ -72,9 +69,6 @@ public final class TimerSignalHelper {
 
         mMediaPlayerHelper.start();
         VibratorHelper.vibrate(mContext);
-
-        if (!mMediaRecorderHelper.isRecording())
-            mMediaRecorderHelper.startRecordingThread();
     }
 
     public void stop() {
@@ -83,6 +77,5 @@ public final class TimerSignalHelper {
 
         VibratorHelper.cancel(mContext);
         mMediaPlayerHelper.stop();
-        mMediaRecorderHelper.stopRecordingThread();
     }
 }
