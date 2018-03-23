@@ -3,15 +3,7 @@ package com.romanpulov.symphonytimer.preference;
 import android.preference.PreferenceFragment;
 
 import com.romanpulov.library.common.loader.core.Loader;
-import com.romanpulov.library.common.loader.file.FileLoader;
-import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
-import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxFileDownloader;
-import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
-
-import java.io.File;
-
-import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
+import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
 
 /**
  * Created by romanpulov on 27.11.2017.
@@ -44,7 +36,7 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
 
     @Override
     public Class<? extends Loader> getLoaderClass() {
-        return RestoreDropboxFileDownloader.class;
+        return RestoreDropboxDownloader.class;
     }
 
 }
