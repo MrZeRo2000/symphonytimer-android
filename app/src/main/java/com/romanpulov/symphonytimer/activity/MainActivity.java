@@ -300,6 +300,19 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
   		*/
     }
 
+    private void performDMTaskStatusChanged(int prevStatus) {
+        if ((prevStatus == DMTasks.STATUS_COMPLETED) && (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED)) {
+                /*
+                //stop vibrating
+                VibratorHelper.cancel(this);
+    			//stop sound
+        		MediaPlayerHelper.getInstance(this).stop();
+        		*/
+            //enable screen fading
+            getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
+        }
+    }
+
     private void performTimerAction(DMTimerRec dmTimerRec) {
     	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.mId);
 
@@ -327,18 +340,8 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
             int prevStatus = mDMTasks.getStatus();
 
     		mDMTasks.remove(taskItem);
-    		
-    		// inactive timer or no timers
-    		if ((prevStatus == DMTasks.STATUS_COMPLETED) && (mDMTasks.getStatus() != DMTasks.STATUS_COMPLETED)) {
-                /*
-                //stop vibrating
-                VibratorHelper.cancel(this);
-    			//stop sound
-        		MediaPlayerHelper.getInstance(this).stop();
-        		*/
-    			//enable screen fading
-    			getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
-    		}
+
+    		performDMTaskStatusChanged(prevStatus);
     	}
 
         mTaskServiceManager.updateServiceTasks(mDMTasks);
@@ -474,13 +477,20 @@ public class MainActivity extends ActionBarActivity implements ActionMode.Callba
         mDMTasks.unlock();
         if (newTasks != null) {
             if (newTasks.size() != mDMTasks.size()) {
+
+                boolean externalExpire = newTasks.size() < mDMTasks.size();
+                int prevStatus = mDMTasks.getStatus();
+
                 log("performUpdateDMTasks");
                 mDMTasks.replaceTasks(newTasks);
                 updateTimers();
 
                 // if tasks are expired by external reasons
-                if ((mDMTasks.size() == 0) && (mTaskServiceManager != null))
+                if (externalExpire && (mTaskServiceManager != null)) {
                     mTaskServiceManager.updateServiceTasks(mDMTasks);
+
+                    performDMTaskStatusChanged(prevStatus);
+                }
             }
         }
     }
