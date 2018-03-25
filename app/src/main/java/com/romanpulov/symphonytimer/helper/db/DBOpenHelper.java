@@ -9,11 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 
 public class DBOpenHelper extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 6;
-	public static final String DATABASE_NAME = "symphonytimerdb";
-    public static final String TIMER_TABLE_NAME = "timer";
-    public static final String TIMER_HISTORY_TABLE_NAME = "timer_history";
-    public static final String[] TIMER_TABLE_COLS = new String[] {
+	static final int DATABASE_VERSION = 6;
+	static final String DATABASE_NAME = "symphonytimerdb";
+    static final String TIMER_TABLE_NAME = "timer";
+    static final String TIMER_HISTORY_TABLE_NAME = "timer_history";
+    static final String[] TIMER_TABLE_COLS = new String[] {
     	"_id", 
     	"title", 
     	"time_sec", 
@@ -22,35 +22,35 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     	"order_id",
         "auto_timer_disable"
     };
-    public static final String[] TIMER_HISTORY_TABLE_COLS = new String[] {
+    static final String[] TIMER_HISTORY_TABLE_COLS = new String[] {
     	"_id", 
     	"timer_id", 
     	"start_time", 
     	"end_time",
 		"real_time"
     };
-    public static final String TIMER_HISTORY_SELECTION_CRITERIA = "start_time>? - ?";
-    public static final Long[] TIMER_HISTORY_SELECTION_VALUES = new Long[] {
+    static final String TIMER_HISTORY_SELECTION_CRITERIA = "start_time>? - ?";
+    static final Long[] TIMER_HISTORY_SELECTION_VALUES = new Long[] {
     	2592000000L, //"1000 * 60 * 60 * 24 * 30",
     	7776000000L, //"1000 * 60 * 60 * 24 * 30 * 3",
     	31536000000L //1000 * 60 * 60 * 24 * 365",
     };
     
-    public static final String MAX_ORDER_ID_COL = "max_order_id";
+    static final String MAX_ORDER_ID_COL = "max_order_id";
     
-    public static final String TIMER_HISTORY_TOP_QUERY =
+    static final String TIMER_HISTORY_TOP_QUERY =
     		"SELECT timer_id, COUNT(timer_id) exec_cnt, COUNT(timer_id) * 100 / (SELECT COUNT(timer_id) FROM timer_history) exec_perc " +
     		"FROM timer_history " +
     		"GROUP BY timer_id " +
     		"ORDER BY 2 DESC";
-    public static final String TIMER_HISTORY_TOP_QUERY_FILTER =
+    static final String TIMER_HISTORY_TOP_QUERY_FILTER =
     		"SELECT timer_id, COUNT(timer_id) exec_cnt " +
     		"FROM timer_history " +
     		"WHERE start_time>? - ?" +		
     		"GROUP BY timer_id " +
     		"ORDER BY 2 DESC";
 
-	public static final String TIMER_HISTORY_QUERY_FILTER =
+	static final String TIMER_HISTORY_QUERY_FILTER =
 			"SELECT timer_id, COUNT(timer_id) exec_cnt " +
 					"FROM timer_history " +
 					"WHERE start_time>? " +
@@ -58,13 +58,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 					"GROUP BY timer_id " +
 					"ORDER BY 2 DESC";
     
-    public static final String TIMER_BACKUP_GET_QUERY = 
+    static final String TIMER_BACKUP_GET_QUERY =
     		"SELECT _id, title, time_sec, order_id, auto_timer_disable FROM " + TIMER_TABLE_NAME;
     
-    public static final String TIMER_HISTORY_BACKUP_GET_QUERY = 
+    static final String TIMER_HISTORY_BACKUP_GET_QUERY =
     		"SELECT _id, timer_id, start_time, end_time, real_time FROM " + TIMER_HISTORY_TABLE_NAME;
     
-    public static final Map<String, String> TABLE_BACKUP_QUERIES;
+    static final Map<String, String> TABLE_BACKUP_QUERIES;
     static {
     	TABLE_BACKUP_QUERIES = new HashMap<> ();
     	TABLE_BACKUP_QUERIES.put(TIMER_TABLE_NAME, TIMER_BACKUP_GET_QUERY);

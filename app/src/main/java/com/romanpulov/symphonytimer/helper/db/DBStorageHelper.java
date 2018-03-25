@@ -20,7 +20,7 @@ import com.romanpulov.library.common.storage.BackupUtils;
 public class DBStorageHelper {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
     // database backup file name
-    private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb";
+    private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb_" + DBOpenHelper.DATABASE_VERSION;;
     // XML backup file name
 	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdata";
     // XML data file
