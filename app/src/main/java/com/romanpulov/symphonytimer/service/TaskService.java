@@ -140,9 +140,10 @@ public class TaskService extends Service implements Runnable {
 
                         break;
                     case MSG_TASK_TO_NOT_COMPLETED:
+                        //a task was stopped but there is another task running
                         unconditionalLog("handleMessage to not completed");
 
-                        //hostService.mTimerSignalHelper.stop();
+                        hostService.mTimerSignalHelper.stop();
 
                         //stop vibrating
                         //VibratorHelper.cancel(hostService);
@@ -190,13 +191,15 @@ public class TaskService extends Service implements Runnable {
     private DMTasksStatus mDMTasksStatus;
 
     private synchronized void updateDMTasks(DMTasks value) {
-        log("UpdateDMTasks: new value = " + value);
+        log("UpdateDMTasks: new value = " + value + ", mDMTasksStatus = " + mDMTasksStatus);
 
         // set new value
         mDMTasks = value;
 
         //persist to prefs
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putString(DMTasks.class.toString(), mDMTasks.toJSONString()).commit();
+
+        log("mDMTasksStatus = " + mDMTasksStatus);
 
         if (mDMTasksStatus == null) {
             //first assignment or after restore with redelivered intent
