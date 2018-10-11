@@ -1,10 +1,13 @@
 package com.romanpulov.symphonytimer.helper;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
@@ -24,11 +27,14 @@ public class NotificationHelper {
         LoggerHelper.logContext(mContext.get(), "NotificationHelper", message);
     }
 
+    private static String CHANNEL_LOW_IMPORTANCE = "Low importance channel";
+
     private static NotificationHelper mNotificationHelper;
 
     public static NotificationHelper getInstance(Context context) {
         if (mNotificationHelper == null) {
             mNotificationHelper = new NotificationHelper(context);
+            createNotificationChannel(context);
         }
         return mNotificationHelper;
     }
@@ -37,6 +43,24 @@ public class NotificationHelper {
     private final NotificationManager mNotificationManager;
     private final PendingIntent mContentIntent;
     private NotificationInfo mNotificationInfo;
+
+    private static void createNotificationChannel(Context context) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel defaultChannel = new NotificationChannel(
+                    CHANNEL_LOW_IMPORTANCE,
+                    CHANNEL_LOW_IMPORTANCE,
+                    NotificationManager.IMPORTANCE_LOW);
+            defaultChannel.setDescription(CHANNEL_LOW_IMPORTANCE);
+            defaultChannel.setSound(null, null);
+
+            // Register the successChannel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(defaultChannel);
+        }
+    }
 
     private static class NotificationInfo {
         private String mContent;
@@ -68,8 +92,8 @@ public class NotificationHelper {
 
     public Notification getNotification(DMTasks dmTasks) {
         if (mContext.get() != null) {
-            Notification.Builder builder =
-                    new Notification.Builder(mContext.get())
+            NotificationCompat.Builder builder =
+                    new NotificationCompat.Builder(mContext.get(), CHANNEL_LOW_IMPORTANCE)
                             .setSmallIcon(R.drawable.wait_notification)
                             .setAutoCancel(false)
                             .setOngoing(true)

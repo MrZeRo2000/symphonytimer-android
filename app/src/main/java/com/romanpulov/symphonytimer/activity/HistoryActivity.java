@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -21,7 +21,7 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 import java.util.Arrays;
 import java.util.List;
 
-public class HistoryActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
+public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNavigationListener {
     //storage
     public final static String TIMERS_NAME = "timers";
     private final static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";

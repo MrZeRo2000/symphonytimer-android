@@ -1,6 +1,6 @@
 package com.romanpulov.symphonytimer.adapter;
 
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -33,7 +33,7 @@ public class ListViewSelector {
         if (mSelectedItemPos == -1) {
             // for title to show correctly
             mSelectedItemPos = position;
-            ActionBarActivity activity = (ActionBarActivity) v.getContext();
+            AppCompatActivity activity = (AppCompatActivity) v.getContext();
             mActionMode = activity.startSupportActionMode(mActionModeCallback);
 
             if (mActionMode != null) {

@@ -9,7 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.app.DialogFragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -43,7 +43,7 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 import com.romanpulov.symphonytimer.service.TaskServiceManager;
 
 
-public class MainActivity extends ActionBarActivity implements ActionMode.Callback {
+public class MainActivity extends AppCompatActivity implements ActionMode.Callback {
     private void log(String message) {
         LoggerHelper.logContext(this, "MainActivity", message);
     }
