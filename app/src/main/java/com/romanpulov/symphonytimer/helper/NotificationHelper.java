@@ -27,7 +27,7 @@ public class NotificationHelper {
         LoggerHelper.logContext(mContext.get(), "NotificationHelper", message);
     }
 
-    private static String CHANNEL_LOW_IMPORTANCE = "Low importance channel";
+    private static String CHANNEL_DEFAULT_IMPORTANCE = "Default importance channel";
 
     private static NotificationHelper mNotificationHelper;
 
@@ -49,10 +49,10 @@ public class NotificationHelper {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel defaultChannel = new NotificationChannel(
-                    CHANNEL_LOW_IMPORTANCE,
-                    CHANNEL_LOW_IMPORTANCE,
-                    NotificationManager.IMPORTANCE_LOW);
-            defaultChannel.setDescription(CHANNEL_LOW_IMPORTANCE);
+                    CHANNEL_DEFAULT_IMPORTANCE,
+                    CHANNEL_DEFAULT_IMPORTANCE,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            defaultChannel.setDescription(CHANNEL_DEFAULT_IMPORTANCE);
             defaultChannel.setSound(null, null);
 
             // Register the successChannel with the system; you can't change the importance
@@ -93,7 +93,7 @@ public class NotificationHelper {
     public Notification getNotification(DMTasks dmTasks) {
         if (mContext.get() != null) {
             NotificationCompat.Builder builder =
-                    new NotificationCompat.Builder(mContext.get(), CHANNEL_LOW_IMPORTANCE)
+                    new NotificationCompat.Builder(mContext.get(), CHANNEL_DEFAULT_IMPORTANCE)
                             .setSmallIcon(R.drawable.wait_notification)
                             .setAutoCancel(false)
                             .setOngoing(true)
@@ -101,6 +101,7 @@ public class NotificationHelper {
                             .setContentText(dmTasks.getTaskTitles())
                             .setProgress(100, dmTasks.getExecutionPercent(), false)
                             .setContentIntent(mContentIntent)
+                            .setOnlyAlertOnce(true)
                     ;
             return builder.build();
         } else {
