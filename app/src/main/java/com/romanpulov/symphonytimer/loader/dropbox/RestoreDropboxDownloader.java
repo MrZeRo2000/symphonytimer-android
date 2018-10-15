@@ -28,20 +28,16 @@ public class RestoreDropboxDownloader extends DropboxFileDownloader {
         File file = new File(getLoadPathProvider().getDestPath());
 
         if (file.exists()) {
-
             DBStorageHelper dbStorageHelper = new DBStorageHelper(mContext);
-
-            int restoreResult = dbStorageHelper.restoreLocalXmlBackup();
+            String restoreResult = dbStorageHelper.restoreLocalBackup();
 
             String restoreMessage;
-
-            if (restoreResult != 0)
-                restoreMessage = String.format(mContext.getString(R.string.error_load_local_backup), restoreResult);
+            if (restoreResult == null)
+                restoreMessage = mContext.getString(R.string.error_load_local_backup);
             else
                 restoreMessage = mContext.getString(R.string.info_load_local_backup);
 
             LoaderNotificationHelper.notify(mContext, restoreMessage, NOTIFICATION_ID_LOADER);
-
         } else
             LoaderNotificationHelper.notify(mContext, mContext.getString(R.string.error_restore), NOTIFICATION_ID_LOADER);
 

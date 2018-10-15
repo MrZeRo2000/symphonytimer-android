@@ -53,10 +53,14 @@ public class DBStorageHelper {
      * @return backup file name
      */
 	public String createLocalBackup() {
+	    DBHelper.getInstance(mContext).closeDB();
+        String result = mDatabaseBackupUtils.createRollingLocalBackup();
+        DBHelper.getInstance(mContext).openDB();
 
-        mDatabaseBackupUtils.createRollingLocalBackup();
+        return result;
 
         // write XML file
+        /*
         File xmlFile = new File(mXMLFileName);
         try {
             FileWriter xmlFileWriter = new FileWriter(xmlFile);
@@ -80,7 +84,23 @@ public class DBStorageHelper {
         }
 
         return null;
+        */
 	}
+
+    /**
+     * Restores local backup
+     * @return Restored file name if successful
+     */
+    public String restoreLocalBackup() {
+        DBHelper dbHelper = DBHelper.getInstance(mContext);
+        dbHelper.closeDB();
+        String result = mDatabaseBackupUtils.restoreBackup();
+        dbHelper.openDB();
+        dbHelper.setDBDataChanged();
+
+        return result;
+    }
+
 
     /**
      * Restore from local backup and return error code:
@@ -89,7 +109,7 @@ public class DBStorageHelper {
      * 3 - XML data parse error
      * @return error code or 0 if successful
      */
-	public int restoreLocalXmlBackup() {
+	private int restoreLocalXmlBackup() {
         int result = 0;
 
         if (mXMLBackupUtils.restoreBackup() != null) {

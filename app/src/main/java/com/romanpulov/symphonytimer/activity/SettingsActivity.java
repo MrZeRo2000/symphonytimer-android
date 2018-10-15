@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 public class SettingsActivity extends AppCompatActivity {
     public final static int PERMISSION_REQUEST_LOCAL_BACKUP = 101;
+    public final static int PERMISSION_REQUEST_LOCAL_RESTORE = 102;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,9 @@ public class SettingsActivity extends AppCompatActivity {
             switch (requestCode) {
                 case PERMISSION_REQUEST_LOCAL_BACKUP:
                     settingsFragment.executeLocalBackup();
+                    break;
+                case PERMISSION_REQUEST_LOCAL_RESTORE:
+                    settingsFragment.executeLocalRestore();
                     break;
                 default:
                     super.onRequestPermissionsResult(requestCode, permissions, grantResults);

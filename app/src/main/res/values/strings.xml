@@ -71,7 +71,7 @@
     <string name="error_title_not_assigned">Title not assigned</string>
     <string name="error_time_zero">Time is zero</string>
     <string name="error_playing_sound">Error playing sound : %s</string>
-    <string name="error_load_local_backup">Error loading local backup, code = %d</string>
+    <string name="error_load_local_backup">Error loading local backup</string>
     <string name="error_internet_not_available">Internet connection is not available</string>
     <string name="error_load_process_running">Load process is already running</string>
     <string name="error_backup">Error creating backup</string>

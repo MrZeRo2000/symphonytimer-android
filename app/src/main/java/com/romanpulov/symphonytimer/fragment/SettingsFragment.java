@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.romanpulov.symphonytimer.activity.SettingsActivity.PERMISSION_REQUEST_LOCAL_RESTORE;
+
 public class SettingsFragment extends PreferenceFragment implements
 	SharedPreferences.OnSharedPreferenceChangeListener,
 	Preference.OnPreferenceClickListener {
@@ -341,6 +343,11 @@ public class SettingsFragment extends PreferenceFragment implements
         });
     }
 
+    public void executeLocalRestore() {
+        mPreferenceRestoreLocalProcessor.preExecute();
+        mLoaderServiceManager.startLoader(mPreferenceRestoreLocalProcessor.getLoaderClass().getName());
+    }
+
     /**
      * Local restore using service
      */
@@ -365,8 +372,10 @@ public class SettingsFragment extends PreferenceFragment implements
                                 .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        mPreferenceRestoreLocalProcessor.preExecute();
-                                        mLoaderServiceManager.startLoader(mPreferenceRestoreLocalProcessor.getLoaderClass().getName());
+                                        if (mWriteStorageRequestHelper.isPermissionGranted())
+                                            executeLocalRestore();
+                                        else
+                                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_LOCAL_RESTORE);
                                     }
                                 })
                                 .setNegativeButton(R.string.caption_cancel, null)

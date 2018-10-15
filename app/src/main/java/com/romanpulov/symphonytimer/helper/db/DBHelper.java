@@ -44,13 +44,13 @@ public class DBHelper {
 		openDB();
 	}
 	
-	private void openDB() {
+	public void openDB() {
 		if (null == mDB) {
 			mDB = mDBOpenHelper.getWritableDatabase();
 		}
 	}
-	
-	private void closeDB() {
+
+	public void closeDB() {
 		if (null != mDB) {
 			mDB.close();
 			mDB = null;
@@ -77,6 +77,10 @@ public class DBHelper {
 	
 	public void resetDBDataChanged() {
         this.mDBDataChanged = false;
+	}
+
+	public void setDBDataChanged() {
+		mDBDataChanged = true;
 	}
 	
 	public String getDatabasePathName() {
