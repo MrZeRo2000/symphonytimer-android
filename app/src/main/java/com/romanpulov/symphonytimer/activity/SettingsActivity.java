@@ -1,9 +1,12 @@
 package com.romanpulov.symphonytimer.activity;
 
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.fragment.SettingsFragment;
+import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
@@ -11,6 +14,8 @@ import android.view.View;
 import android.widget.ListView;
 
 public class SettingsActivity extends AppCompatActivity {
+    public final static int PERMISSION_REQUEST_LOCAL_BACKUP = 101;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,5 +39,21 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         return view;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        SettingsFragment settingsFragment = (SettingsFragment)getFragmentManager().findFragmentById(R.id.settingsfragment);
+
+        if ((settingsFragment != null) && (PermissionRequestHelper.isGrantResultSuccessful(grantResults))) {
+            switch (requestCode) {
+                case PERMISSION_REQUEST_LOCAL_BACKUP:
+                    settingsFragment.executeLocalBackup();
+                    break;
+                default:
+                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        } else
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

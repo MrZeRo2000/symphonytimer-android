@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -23,6 +24,8 @@ import android.support.v7.app.AlertDialog;
 import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.activity.SettingsActivity;
+import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
@@ -47,6 +50,8 @@ public class SettingsFragment extends PreferenceFragment implements
     private PreferenceRestoreDropboxProcessor mPreferenceRestoreDropboxProcessor;
     private PreferenceBackupLocalProcessor mPreferenceBackupLocalProcessor;
     private PreferenceRestoreLocalProcessor  mPreferenceRestoreLocalProcessor;
+
+    private PermissionRequestHelper mWriteStorageRequestHelper;
 
     private Map<String, PreferenceLoaderProcessor> mPreferenceLoadProcessors = new HashMap<>();
     private LoaderServiceManager mLoaderServiceManager;
@@ -171,6 +176,8 @@ public class SettingsFragment extends PreferenceFragment implements
 		sp.registerOnSharedPreferenceChangeListener(this);
 		
 		addPreferencesFromResource(R.xml.preferences);
+
+        mWriteStorageRequestHelper = new PermissionRequestHelper(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		
 		Preference preference;
 
@@ -300,6 +307,11 @@ public class SettingsFragment extends PreferenceFragment implements
         }
     }
 
+    public void executeLocalBackup() {
+        mPreferenceBackupLocalProcessor.preExecute();
+        mLoaderServiceManager.startLoader(mPreferenceBackupLocalProcessor.getLoaderClass().getName());
+    }
+
     /**
      * Local backup using service
      */
@@ -317,8 +329,10 @@ public class SettingsFragment extends PreferenceFragment implements
                     if (mLoaderServiceManager.isLoaderServiceRunning())
                         PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
                     else {
-                        mPreferenceBackupLocalProcessor.preExecute();
-                        mLoaderServiceManager.startLoader(mPreferenceBackupLocalProcessor.getLoaderClass().getName());
+                        if (mWriteStorageRequestHelper.isPermissionGranted())
+                            executeLocalBackup();
+                        else
+                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_LOCAL_BACKUP);
                     }
 
                     return true;

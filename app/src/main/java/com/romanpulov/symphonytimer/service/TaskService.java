@@ -18,7 +18,7 @@ import com.romanpulov.symphonytimer.helper.ActivityWakeHelper;
 import com.romanpulov.symphonytimer.helper.AlarmManagerHelper;
 import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
-import com.romanpulov.symphonytimer.helper.NotificationHelper;
+import com.romanpulov.symphonytimer.helper.ProgressNotificationHelper;
 import com.romanpulov.symphonytimer.helper.TimerSignalHelper;
 import com.romanpulov.symphonytimer.helper.WakeConfigHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
@@ -318,7 +318,7 @@ public class TaskService extends Service implements Runnable {
             updateDMTasks(newDMTasks);
 
             if (mDMTasks != null) {
-                startForeground(NOTIFICATION_ID_ONGOING, NotificationHelper.getInstance(this).getNotification(mDMTasks));
+                startForeground(NOTIFICATION_ID_ONGOING, ProgressNotificationHelper.getInstance(this).getNotification(mDMTasks));
 
                 if (mScheduleExecutorTask == null)
                     mScheduleExecutorTask = mScheduleExecutor.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
@@ -385,8 +385,8 @@ public class TaskService extends Service implements Runnable {
         try {
             log("run " + DateFormatterHelper.formatLog(System.currentTimeMillis()) + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus + ",alarm=" + mAlarm);
 
-            log("NotificationHelper notify");
-            NotificationHelper.getInstance(this).notify(mDMTasks);
+            log("ProgressNotificationHelper notify");
+            ProgressNotificationHelper.getInstance(this).notify(mDMTasks);
 
             int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
             //log(DMTasksStatus.statusEventAsString(statusChangeEvent));

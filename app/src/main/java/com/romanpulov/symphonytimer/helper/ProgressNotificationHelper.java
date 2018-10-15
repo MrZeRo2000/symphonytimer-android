@@ -22,21 +22,23 @@ import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFIC
  * Created by rpulov on 06.11.2016.
  */
 
-public class NotificationHelper {
+public class ProgressNotificationHelper {
     private void log(String message) {
-        LoggerHelper.logContext(mContext.get(), "NotificationHelper", message);
+        LoggerHelper.logContext(mContext.get(), "ProgressNotificationHelper", message);
     }
 
-    private static String CHANNEL_DEFAULT_IMPORTANCE = "Default importance channel";
+    private static String CHANNEL_PROGRESS_ID = "PROGRESS_CHANNEL";
+    private static String CHANNEL_PROGRESS_NAME = "Progress channel";
+    private static String CHANNEL_PROGRESS_DESCRIPTION = "Channel for progress notification";
 
-    private static NotificationHelper mNotificationHelper;
+    private static ProgressNotificationHelper mProgressNotificationHelper;
 
-    public static NotificationHelper getInstance(Context context) {
-        if (mNotificationHelper == null) {
-            mNotificationHelper = new NotificationHelper(context);
+    public static ProgressNotificationHelper getInstance(Context context) {
+        if (mProgressNotificationHelper == null) {
+            mProgressNotificationHelper = new ProgressNotificationHelper(context);
             createNotificationChannel(context);
         }
-        return mNotificationHelper;
+        return mProgressNotificationHelper;
     }
 
     private final WeakReference<Context> mContext;
@@ -49,10 +51,10 @@ public class NotificationHelper {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel defaultChannel = new NotificationChannel(
-                    CHANNEL_DEFAULT_IMPORTANCE,
-                    CHANNEL_DEFAULT_IMPORTANCE,
+                    CHANNEL_PROGRESS_ID,
+                    CHANNEL_PROGRESS_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT);
-            defaultChannel.setDescription(CHANNEL_DEFAULT_IMPORTANCE);
+            defaultChannel.setDescription(CHANNEL_PROGRESS_DESCRIPTION);
             defaultChannel.setSound(null, null);
 
             // Register the successChannel with the system; you can't change the importance
@@ -71,19 +73,19 @@ public class NotificationHelper {
             return mModified;
         }
 
-        public NotificationInfo(String content, int progress) {
+        NotificationInfo(String content, int progress) {
             mContent = content;
             mProgress = progress;
         }
 
-        public void updateNotificationInfo(String content, int progress) {
+        void updateNotificationInfo(String content, int progress) {
             mModified = !content.equals(mContent) || mProgress != progress;
             mContent = content;
             mProgress = progress;
         }
     }
 
-    private NotificationHelper(Context context) {
+    private ProgressNotificationHelper(Context context) {
         mContext = new WeakReference<>(context);
         mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(context, MainActivity.class);
@@ -93,7 +95,7 @@ public class NotificationHelper {
     public Notification getNotification(DMTasks dmTasks) {
         if (mContext.get() != null) {
             NotificationCompat.Builder builder =
-                    new NotificationCompat.Builder(mContext.get(), CHANNEL_DEFAULT_IMPORTANCE)
+                    new NotificationCompat.Builder(mContext.get(), CHANNEL_PROGRESS_ID)
                             .setSmallIcon(R.drawable.wait_notification)
                             .setAutoCancel(false)
                             .setOngoing(true)
