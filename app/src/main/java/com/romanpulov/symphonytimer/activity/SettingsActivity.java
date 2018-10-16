@@ -16,6 +16,8 @@ import android.widget.ListView;
 public class SettingsActivity extends AppCompatActivity {
     public final static int PERMISSION_REQUEST_LOCAL_BACKUP = 101;
     public final static int PERMISSION_REQUEST_LOCAL_RESTORE = 102;
+    public final static int PERMISSION_REQUEST_DROPBOX_BACKUP = 103;
+    public final static int PERMISSION_REQUEST_DROPBOX_RESTORE = 104;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,12 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 case PERMISSION_REQUEST_LOCAL_RESTORE:
                     settingsFragment.executeLocalRestore();
+                    break;
+                case PERMISSION_REQUEST_DROPBOX_BACKUP:
+                    settingsFragment.executeDropboxBackup();
+                    break;
+                case PERMISSION_REQUEST_DROPBOX_RESTORE:
+                    settingsFragment.executeDropboxRestore();
                     break;
                 default:
                     super.onRequestPermissionsResult(requestCode, permissions, grantResults);

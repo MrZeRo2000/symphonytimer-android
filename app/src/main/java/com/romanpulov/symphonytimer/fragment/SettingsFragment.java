@@ -28,7 +28,6 @@ import com.romanpulov.symphonytimer.activity.SettingsActivity;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupDropboxProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupLocalProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
@@ -41,8 +40,6 @@ import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.romanpulov.symphonytimer.activity.SettingsActivity.PERMISSION_REQUEST_LOCAL_RESTORE;
 
 public class SettingsFragment extends PreferenceFragment implements
 	SharedPreferences.OnSharedPreferenceChangeListener,
@@ -388,6 +385,19 @@ public class SettingsFragment extends PreferenceFragment implements
         });
     }
 
+    public void executeDropboxBackup() {
+        // create local backup first
+        DBStorageHelper storageHelper = new DBStorageHelper(getActivity());
+        String backupResult = storageHelper.createLocalBackup();
+
+        if (backupResult == null)
+            PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_backup));
+        else {
+            mPreferenceBackupDropboxProcessor.preExecute();
+            mLoaderServiceManager.startLoader(mPreferenceBackupDropboxProcessor.getLoaderClass().getName());
+        }
+    }
+
     /**
      * Dropbox backup using service
      */
@@ -407,24 +417,21 @@ public class SettingsFragment extends PreferenceFragment implements
                 else {
                     if (mLoaderServiceManager.isLoaderServiceRunning())
                         PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    else {
-
-                        // create local backup first
-                        DBStorageHelper storageHelper = new DBStorageHelper(getActivity());
-                        String backupResult = storageHelper.createLocalBackup();
-
-                        if (backupResult == null)
-                            PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_backup));
-                        else {
-                            mPreferenceBackupDropboxProcessor.preExecute();
-                            mLoaderServiceManager.startLoader(mPreferenceBackupDropboxProcessor.getLoaderClass().getName());
-                        }
-                    }
+                    else
+                        if (mWriteStorageRequestHelper.isPermissionGranted())
+                            executeDropboxBackup();
+                        else
+                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_DROPBOX_BACKUP);
 
                     return true;
                 }
             }
         });
+    }
+
+    public void executeDropboxRestore() {
+        mPreferenceRestoreDropboxProcessor.preExecute();
+        mLoaderServiceManager.startLoader(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName());
     }
 
     /**
@@ -455,8 +462,10 @@ public class SettingsFragment extends PreferenceFragment implements
                                 .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        mPreferenceRestoreDropboxProcessor.preExecute();
-                                        mLoaderServiceManager.startLoader(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName());
+                                        if (mWriteStorageRequestHelper.isPermissionGranted())
+                                            executeDropboxRestore();
+                                        else
+                                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_DROPBOX_RESTORE);
                                     }
                                 })
                                 .setNegativeButton(R.string.caption_cancel, null)
