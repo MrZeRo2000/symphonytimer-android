@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,8 @@ public class HistoryListFragment extends HistoryFragment {
 	private final List<DMTimerHistRec> mDMTimerHistList = new ArrayList<>();
 
     @Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_history_list, container, false);
 		mAdapter = new HistoryArrayAdapter(this.getActivity(), mDMTimerHistList, mDMTimers);
 		((ListView)rootView.findViewById(R.id.history_list_view)).setAdapter(mAdapter);

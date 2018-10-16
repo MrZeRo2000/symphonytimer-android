@@ -20,7 +20,6 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 
 public class DBHelper {
 	private static DBHelper mDBHelperInstance = null;	
-	private final Context mContext;
 	private SQLiteDatabase mDB;
 	private final DBOpenHelper mDBOpenHelper;
 	private boolean mDBDataChanged = false;
@@ -39,7 +38,6 @@ public class DBHelper {
 	}
 	
 	private DBHelper(Context context) {
-		this.mContext = context;
 		mDBOpenHelper = new DBOpenHelper(context);
 		openDB();
 	}
@@ -81,10 +79,6 @@ public class DBHelper {
 
 	public void setDBDataChanged() {
 		mDBDataChanged = true;
-	}
-	
-	public String getDatabasePathName() {
-		return mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString();
 	}
 	
 	public long insertTimer(DMTimerRec dmTimerRec) {
@@ -184,7 +178,7 @@ public class DBHelper {
 		sqlBuilder.append("CASE WHEN order_id = ").append(orderId_1).append(" THEN ").append(orderId_2).append(" ");
 		sqlBuilder.append("WHEN order_id = ").append(orderId_2).append(" THEN ").append(orderId_1).append(" ");
 		sqlBuilder.append("ELSE order_id END");
-		
+
 		String sql = sqlBuilder.toString();
 
 		mDB.execSQL(sql);

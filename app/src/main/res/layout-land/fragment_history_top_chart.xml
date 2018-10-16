@@ -6,6 +6,7 @@
              tools:context="com.romanpulov.symphonytimer.fragment.HistoryTopChartFragment">
     <Button
         android:id="@+id/scaleUpButton"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -16,6 +17,7 @@
 
     <Button
         android:id="@+id/scaleDownButton"
+        android:layout_alignStart="@+id/scaleUpButton"
         android:layout_alignLeft="@+id/scaleUpButton"
         android:layout_below="@+id/scaleUpButton"
         android:layout_width="40dp"
@@ -28,6 +30,7 @@
     <HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_toEndOf="@+id/scaleUpButton"
         android:layout_toRightOf="@+id/scaleUpButton"
         android:scrollbars="horizontal"
         android:paddingTop="10dp"

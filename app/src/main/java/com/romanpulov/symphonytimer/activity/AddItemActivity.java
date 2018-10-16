@@ -87,15 +87,15 @@ public class AddItemActivity extends AppCompatActivity {
 
         mMediaPlayerHelper = new MediaPlayerHelper(this);
 
-        mTitleEditText = (EditText)findViewById(R.id.title_edit_text);
-        mTimeTextView = (TextView)findViewById(R.id.time_text_view);
-        mSoundFileTextView = (TextView) findViewById(R.id.sound_file_text);
-        mImageFileButton = (ImageButton)findViewById(R.id.image_file_image_button);
-        mHoursNumberPicker = (SlideNumberPicker)findViewById(R.id.hours_number_picker);
-        mMinutesNumberPicker = (SlideNumberPicker)findViewById(R.id.minutes_number_picker);
-        mSecondsNumberPicker = (SlideNumberPicker)findViewById(R.id.seconds_number_picker);
+        mTitleEditText = findViewById(R.id.title_edit_text);
+        mTimeTextView = findViewById(R.id.time_text_view);
+        mSoundFileTextView = findViewById(R.id.sound_file_text);
+        mImageFileButton = findViewById(R.id.image_file_image_button);
+        mHoursNumberPicker = findViewById(R.id.hours_number_picker);
+        mMinutesNumberPicker = findViewById(R.id.minutes_number_picker);
+        mSecondsNumberPicker = findViewById(R.id.seconds_number_picker);
 
-        mAutoTimerDisableSpinner =(Spinner)findViewById(R.id.auto_timer_disable_spinner);
+        mAutoTimerDisableSpinner = findViewById(R.id.auto_timer_disable_spinner);
 
         mAutoTimerDisableAdapter = new AutoTimerDisableAdapter(this, android.R.layout.simple_spinner_item);
         mAutoTimerDisableAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,15 +21,15 @@ public abstract class HistoryChartFragment extends HistoryFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_history_top_chart, container, false);
-        mBarChart = (BarChart)rootView.findViewById(R.id.history_top_bar_chart);
+        mBarChart = rootView.findViewById(R.id.history_top_bar_chart);
         updateBarChart();
 
-        final Button scaleUpButton = (Button) rootView.findViewById(R.id.scaleUpButton);
-        final Button scaleDownButton = (Button) rootView.findViewById(R.id.scaleDownButton);
+        final Button scaleUpButton = rootView.findViewById(R.id.scaleUpButton);
+        final Button scaleDownButton = rootView.findViewById(R.id.scaleDownButton);
         Button.OnClickListener buttonClickListener = new Button.OnClickListener(){
             @Override
             public void onClick(View v) {

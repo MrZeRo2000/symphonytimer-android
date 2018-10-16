@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.activity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -74,10 +75,10 @@ public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNa
         }
 
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        @NonNull
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             HistoryFragment historyFragment = (HistoryFragment)super.instantiateItem(container, position);
-            if (historyFragment != null)
-                mFragmentTags[position] = historyFragment.getTag();
+            mFragmentTags[position] = historyFragment.getTag();
             return historyFragment;
         }
     }
@@ -108,7 +109,7 @@ public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNa
             mActionBar.setSelectedNavigationItem(savedInstanceState.getInt(HISTORY_NAVIGATION_INDEX));
         }
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = findViewById(R.id.pager);
         mAdapter = new HistoryPagerAdapter(getSupportFragmentManager()); 
         mViewPager.setAdapter(mAdapter);
     }

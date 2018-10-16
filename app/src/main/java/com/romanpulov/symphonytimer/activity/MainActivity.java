@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         */
 
 		//setup toolbar
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         });
         mListViewSelector = adapter.getListViewSelector();
 
-        mTimersListView = (ListView)findViewById(R.id.main_list_view);
+        mTimersListView = findViewById(R.id.main_list_view);
         mTimersListView.setAdapter(adapter);
 
         mTimersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

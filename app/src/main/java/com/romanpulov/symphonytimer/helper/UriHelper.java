@@ -1,7 +1,5 @@
 package com.romanpulov.symphonytimer.helper;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,12 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
 
 public final class UriHelper {
 

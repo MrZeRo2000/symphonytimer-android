@@ -2,8 +2,6 @@ package com.romanpulov.symphonytimer.helper;
 
 import android.content.Context;
 
-import java.io.File;
-
 /**
  * Helper class for managing timer signals - sound, vibration
  * Created by romanpulov on 26.02.2018.

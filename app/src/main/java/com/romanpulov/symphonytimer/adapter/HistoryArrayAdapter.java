@@ -1,8 +1,6 @@
 package com.romanpulov.symphonytimer.adapter;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.romanpulov.library.common.logger.DateFormatter;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
@@ -34,10 +31,10 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		public final TextView mTimeDetails;
 		
 		public ViewHolder(View view) {
-			mTitle = (TextView)view.findViewById(R.id.history_text_view);
-			mImage = (ImageView)view.findViewById(R.id.history_image_view);
-			mTime = (TextView)view.findViewById(R.id.history_time_view);
-			mTimeDetails = (TextView)view.findViewById(R.id.history_time_details_view);
+			mTitle = view.findViewById(R.id.history_text_view);
+			mImage = view.findViewById(R.id.history_image_view);
+			mTime = view.findViewById(R.id.history_time_view);
+			mTimeDetails = view.findViewById(R.id.history_time_details_view);
 		}
 	}
 

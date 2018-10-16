@@ -91,6 +91,8 @@
     <string name="button_minus">-</string>
     <string name="notification_dropbox_backup_completed">Dropbox backup has been completed</string>
     <string name="notification_load_operation_error">Load operation error : %s</string>
+    <!-- Hints -->
+    <string name="hint_timer_title">Timer title</string>
     <!-- Dropbox -->
     <string name="app_key">ml2bc3bur9qdrl7</string>
     <!-- Loader -->

@@ -14,20 +14,20 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     static final String TIMER_TABLE_NAME = "timer";
     static final String TIMER_HISTORY_TABLE_NAME = "timer_history";
     static final String[] TIMER_TABLE_COLS = new String[] {
-    	"_id", 
-    	"title", 
-    	"time_sec", 
-    	"sound_file", 
-    	"image_name", 
-    	"order_id",
+        "_id",
+        "title",
+        "time_sec",
+        "sound_file",
+        "image_name",
+        "order_id",
         "auto_timer_disable"
     };
     static final String[] TIMER_HISTORY_TABLE_COLS = new String[] {
-    	"_id", 
-    	"timer_id", 
-    	"start_time", 
-    	"end_time",
-		"real_time"
+        "_id",
+        "timer_id",
+        "start_time",
+        "end_time",
+        "real_time"
     };
     static final String TIMER_HISTORY_SELECTION_CRITERIA = "start_time>? - ?";
     static final Long[] TIMER_HISTORY_SELECTION_VALUES = new Long[] {

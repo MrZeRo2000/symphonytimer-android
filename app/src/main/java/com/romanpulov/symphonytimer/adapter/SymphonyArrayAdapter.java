@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -52,10 +51,10 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 		ViewHolder(View view, DMTimerRec item, int position) {
             mView = view;
             mPosition = position;
-			mTitleTextView = (TextView)view.findViewById(R.id.title_text_view);
-			mImageView = (ImageView)view.findViewById(R.id.image_image_view);
-			mProgressTextView = (TextView)view.findViewById(R.id.progress_text_view);
-			mProgressCircle = (ProgressCircle)view.findViewById(R.id.progress_circle);
+			mTitleTextView = view.findViewById(R.id.title_text_view);
+			mImageView = view.findViewById(R.id.image_image_view);
+			mProgressTextView = view.findViewById(R.id.progress_text_view);
+			mProgressCircle = view.findViewById(R.id.progress_circle);
 
             mView.setOnClickListener(this);
             mView.setOnLongClickListener(this);

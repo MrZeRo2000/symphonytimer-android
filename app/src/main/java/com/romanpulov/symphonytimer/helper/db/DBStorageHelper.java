@@ -4,8 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +18,7 @@ import com.romanpulov.library.common.storage.BackupUtils;
 public class DBStorageHelper {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
     // database backup file name
-    private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb_" + DBOpenHelper.DATABASE_VERSION;;
+    private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb_" + DBOpenHelper.DATABASE_VERSION;
     // XML backup file name
 	private static final String LOCAL_BACKUP_FILE_NAME = "symphonytimerdata";
     // XML data file

@@ -37,7 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
         View view  = super.onCreateView(parent, name, context, attrs);
 
         if (view != null) {
-            ListView preferencesListView = (ListView) view.findViewById(android.R.id.list);
+            ListView preferencesListView = view.findViewById(android.R.id.list);
             preferencesListView.setPadding(0, 0, 0, 0);
         }
 
