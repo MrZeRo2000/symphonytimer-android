@@ -20,8 +20,8 @@ public class ActivityWakeHelper {
     public final static int WAKE_LOCK_DURATION = 5000;
     public final static int WAKE_LOCK_OFFSET = 5000;
 
-    private final static String WAKE_LOG_TAG = "wake log tag";
-    private final static String PARTIAL_WAKE_LOG_TAG = "partial wake log tag";
+    private final static String WAKE_LOG_TAG = "symphonytimer:wake";
+    private final static String PARTIAL_WAKE_LOG_TAG = "symphonytimer:partial wake";
 
 
     private static PowerManager.WakeLock createWakeLock(Context context) {
@@ -39,11 +39,9 @@ public class ActivityWakeHelper {
     private static PowerManager.WakeLock createPartialWakeLock(Context context) {
         PowerManager pm = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
-        PowerManager.WakeLock wakeLock = pm.newWakeLock(
+        return pm.newWakeLock(
                 PowerManager.PARTIAL_WAKE_LOCK,
                 PARTIAL_WAKE_LOG_TAG);
-
-        return wakeLock;
     }
 
     /**
