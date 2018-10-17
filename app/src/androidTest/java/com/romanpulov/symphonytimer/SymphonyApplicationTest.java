@@ -1,32 +1,38 @@
 package com.romanpulov.symphonytimer;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import android.support.test.filters.SmallTest;
 
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
+
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.support.test.InstrumentationRegistry.getContext;
+import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by rpulov on 04.01.2016.
  */
-public class SymphonyApplicationTest extends ApplicationTestCase<Application> {
+@SmallTest
+public class SymphonyApplicationTest {
     private final static String TAG = "ApplicationTest";
-    public SymphonyApplicationTest() {
-        super(Application.class);
-    }
 
+    @Test
     public void testCase1() {
         assertTrue(true);
     }
 
+    @Test
     public void testCase2() {
 
-        List<LinkedHashMap<Long, Long>> list = DBHelper.getInstance(getContext()).getHistList(0, 2);
+        List<LinkedHashMap<Long, Long>> list = DBHelper.getInstance(getTargetContext()).getHistList(0, 2);
         assertEquals(2, list.size());
 
         LinkedHashMap<Long, Long> uList = new LinkedHashMap<>();
