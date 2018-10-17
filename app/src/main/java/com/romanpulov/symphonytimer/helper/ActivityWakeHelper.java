@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer.helper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
@@ -66,6 +67,7 @@ public class ActivityWakeHelper {
      * @param context Context
      * @param activityClass Activity to start
      */
+    @SuppressLint("WakelockTimeout")
     public static void wakeAndStartActivity(Context context, Class<?> activityClass) {
         PowerManager.WakeLock wakeLock = createWakeLock(context);
 
