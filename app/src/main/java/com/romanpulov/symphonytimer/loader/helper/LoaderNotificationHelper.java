@@ -64,7 +64,7 @@ public final class LoaderNotificationHelper {
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context, CHANNEL_LOADER_ID)
-                        .setSmallIcon(R.drawable.wait_notification)
+                        .setSmallIcon(R.drawable.wait_notification_white)
                         .setContentTitle(context.getString(R.string.app_name))
                         .setContentText(message)
                         .setSubText(DateFormat.getDateTimeInstance().format(new Date()))

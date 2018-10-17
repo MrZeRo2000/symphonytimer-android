@@ -96,7 +96,7 @@ public class ProgressNotificationHelper {
         if (mContext.get() != null) {
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(mContext.get(), CHANNEL_PROGRESS_ID)
-                            .setSmallIcon(R.drawable.wait_notification)
+                            .setSmallIcon(R.drawable.wait_notification_white)
                             .setAutoCancel(false)
                             .setOngoing(true)
                             .setContentTitle(mContext.get().getString(R.string.app_name))

@@ -13,22 +13,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	static final String DATABASE_NAME = "symphonytimerdb";
     static final String TIMER_TABLE_NAME = "timer";
     static final String TIMER_HISTORY_TABLE_NAME = "timer_history";
-    static final String[] TIMER_TABLE_COLS = new String[] {
-        "_id",
-        "title",
-        "time_sec",
-        "sound_file",
-        "image_name",
-        "order_id",
-        "auto_timer_disable"
-    };
-    static final String[] TIMER_HISTORY_TABLE_COLS = new String[] {
-        "_id",
-        "timer_id",
-        "start_time",
-        "end_time",
-        "real_time"
-    };
     static final String TIMER_HISTORY_SELECTION_CRITERIA = "start_time>? - ?";
     static final Long[] TIMER_HISTORY_SELECTION_VALUES = new Long[] {
     	2592000000L, //"1000 * 60 * 60 * 24 * 30",
@@ -58,10 +42,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 					"GROUP BY timer_id " +
 					"ORDER BY 2 DESC";
     
-    static final String TIMER_BACKUP_GET_QUERY =
+    private static final String TIMER_BACKUP_GET_QUERY =
     		"SELECT _id, title, time_sec, order_id, auto_timer_disable FROM " + TIMER_TABLE_NAME;
     
-    static final String TIMER_HISTORY_BACKUP_GET_QUERY =
+    private static final String TIMER_HISTORY_BACKUP_GET_QUERY =
     		"SELECT _id, timer_id, start_time, end_time, real_time FROM " + TIMER_HISTORY_TABLE_NAME;
     
     static final Map<String, String> TABLE_BACKUP_QUERIES;
@@ -71,27 +55,53 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     	TABLE_BACKUP_QUERIES.put(TIMER_HISTORY_TABLE_NAME, TIMER_HISTORY_BACKUP_GET_QUERY);
     }
 
-    
-    private static final String TIMER_TABLE_CREATE =
-                "CREATE TABLE " + TIMER_TABLE_NAME + " (" +
-                TIMER_TABLE_COLS[0] + " INTEGER PRIMARY KEY," +
-                TIMER_TABLE_COLS[1] + " TEXT UNIQUE NOT NULL,"  +
-                TIMER_TABLE_COLS[2] + " INTEGER NOT NULL,"  +
-                TIMER_TABLE_COLS[3] + " TEXT,"  +
-                TIMER_TABLE_COLS[4] + " TEXT, "  +
-                TIMER_TABLE_COLS[5] + " INTEGER, "  +
-                TIMER_TABLE_COLS[6] + " INTEGER"  +
-                 ");";
+    static final String[] TIMER_TABLE_COLS;
+    private static final String TIMER_TABLE_CREATE;
+    static
+    {
+        TIMER_TABLE_COLS = new String[] {
+            "_id",
+            "title",
+            "time_sec",
+            "sound_file",
+            "image_name",
+            "order_id",
+            "auto_timer_disable"
+        };
 
-    private static final String TIMER_HISTORY_TABLE_CREATE =
+        TIMER_TABLE_CREATE =
+            "CREATE TABLE " + TIMER_TABLE_NAME + " (" +
+            TIMER_TABLE_COLS[0] + " INTEGER PRIMARY KEY," +
+            TIMER_TABLE_COLS[1] + " TEXT UNIQUE NOT NULL,"  +
+            TIMER_TABLE_COLS[2] + " INTEGER NOT NULL,"  +
+            TIMER_TABLE_COLS[3] + " TEXT,"  +
+            TIMER_TABLE_COLS[4] + " TEXT, "  +
+            TIMER_TABLE_COLS[5] + " INTEGER, "  +
+            TIMER_TABLE_COLS[6] + " INTEGER"  +
+             ");";
+    }
+
+    static final String[] TIMER_HISTORY_TABLE_COLS;
+    private static final String TIMER_HISTORY_TABLE_CREATE;
+
+    static {
+        TIMER_HISTORY_TABLE_COLS = new String[] {
+            "_id",
+            "timer_id",
+            "start_time",
+            "end_time",
+            "real_time"
+        };
+
+        TIMER_HISTORY_TABLE_CREATE =
             "CREATE TABLE " + TIMER_HISTORY_TABLE_NAME + " (" +
             TIMER_HISTORY_TABLE_COLS[0] + " INTEGER PRIMARY KEY," +
             TIMER_HISTORY_TABLE_COLS[1] + " INTEGER NOT NULL,"  +
             TIMER_HISTORY_TABLE_COLS[2] + " INTEGER NOT NULL,"  +
             TIMER_HISTORY_TABLE_COLS[3] + " INTEGER NOT NULL," +
             TIMER_HISTORY_TABLE_COLS[4] + " INTEGER NOT NULL" +
-             ");";
-
+            ");";
+    }
     
 	DBOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
