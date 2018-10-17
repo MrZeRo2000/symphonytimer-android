@@ -7,6 +7,7 @@ import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.UriHelper;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 
+import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -27,9 +28,10 @@ import android.widget.Toast;
 import com.romanpulov.library.view.SlideNumberPicker;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 
-public class AddItemActivity extends AppCompatActivity {
+public class AddItemActivity extends AppCompatActivity implements OnSoundFileInfoDataListener {
     public static final String EDIT_REC_NAME = "rec";
 
     private static final String EDIT_SOUND_DATA = "EDIT_SOUND_DATA";
@@ -57,6 +59,12 @@ public class AddItemActivity extends AppCompatActivity {
 
     private MediaPlayerHelper mMediaPlayerHelper;
 
+    @Override
+    public void onSoundFileInfoData(File file) {
+        mEditSoundFile = file;
+        mSoundFileTextView.setText(getMediaFileTitle(file));
+    }
+
     private class AddItemInputException extends Exception {
 
         private static final long serialVersionUID = -6523044324262630252L;
@@ -67,7 +75,7 @@ public class AddItemActivity extends AppCompatActivity {
             return mItem;
         }
 
-        public AddItemInputException(TextView item, String message) {
+        AddItemInputException(TextView item, String message) {
             super(message);
             mItem = item;
         }
@@ -238,27 +246,37 @@ public class AddItemActivity extends AppCompatActivity {
         startActivityForResult(imageIntent, IMAGE_REQ_CODE);
     }
 
+    static class ProcessSoundUri extends AsyncTask<Uri, Void, File> {
+        private final WeakReference<Context> mContext;
+        private final int mMediaId;
+
+        ProcessSoundUri(Context context, int mediaId) {
+            mContext = new WeakReference<>(context);
+            mMediaId = mediaId;
+        }
+
+        @Override
+        protected File doInBackground(Uri... params) {
+            File file = MediaStorageHelper.getInstance(mContext.get().getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_SOUND, mMediaId);
+            UriHelper.uriSaveToFile(mContext.get().getApplicationContext(), params[0], file);
+            return file;
+        }
+
+        @Override
+        protected void onPostExecute(File file) {
+            super.onPostExecute(file);
+            if (mContext.get() instanceof OnSoundFileInfoDataListener) {
+                ((OnSoundFileInfoDataListener)(mContext.get())).onSoundFileInfoData(file);
+            }
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if ((requestCode == SOUND_REQ_CODE) && (resultCode == RESULT_OK)){
             mSoundFileTextView.setText(R.string.caption_loading);
 
-            class ProcessSoundUri extends AsyncTask<Uri, Void, Pair<File, String>> {
-                @Override
-                protected Pair<File, String> doInBackground(Uri... params) {
-                    File file = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_SOUND, (int)mEditId);
-                    UriHelper.uriSaveToFile(getApplicationContext(), params[0], file);
-                    return new Pair<>(file, getMediaFileTitle(file));
-                }
-
-                @Override
-                protected void onPostExecute(Pair<File, String> p) {
-                    super.onPostExecute(p);
-                    mEditSoundFile = p.first;
-                    mSoundFileTextView.setText(p.second);
-                }
-            }
-            new ProcessSoundUri().execute(data.getData());
+            new ProcessSoundUri(this, (int) mEditId).execute(data.getData());
         }
 
         if ((requestCode == IMAGE_REQ_CODE) && (resultCode == RESULT_OK)){
