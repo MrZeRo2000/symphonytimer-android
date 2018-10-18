@@ -3,7 +3,9 @@ package com.romanpulov.symphonytimer.helper;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Format date routines
@@ -11,11 +13,13 @@ import java.util.Locale;
  */
 
 public class DateFormatterHelper {
-    private static String LOG_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-    private static String TIME_FORMAT = "HH:mm:ss";
+    private static final String LOG_FILE_DATE_FORMAT = "yyyy-MM-dd";
+    private static final String LOG_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final String TIME_FORMAT = "HH:mm:ss";
 
     private static DateFormat mLogDateFormat;
     private static DateFormat mTimeFormat;
+    private static DateFormat mLogFileDateFormat;
 
     private static DateFormat getLogDateFormat() {
         if (mLogDateFormat == null)
@@ -29,6 +33,13 @@ public class DateFormatterHelper {
             mTimeFormat = new SimpleDateFormat(TIME_FORMAT, Locale.getDefault());
 
         return mTimeFormat;
+    }
+
+    private static DateFormat getLogFileDateFormat() {
+        if (mLogFileDateFormat == null)
+            mLogFileDateFormat = new SimpleDateFormat(LOG_FILE_DATE_FORMAT, Locale.getDefault());
+
+        return mLogFileDateFormat;
     }
 
     /**
@@ -63,8 +74,16 @@ public class DateFormatterHelper {
      * @param milliseconds date in milliseconds
      * @return formatted time string
      */
-
     public static String formatTimeLog(long milliseconds) {
         return getTimeFormat().format(new Date(milliseconds));
+    }
+
+    /**
+     * Format date for log file
+     * @param milliseconds date in milliseconds
+     * @return formatted date string
+     */
+    public static String formatLogFileDate(long milliseconds) {
+        return getLogFileDateFormat().format(new Date(milliseconds));
     }
 }

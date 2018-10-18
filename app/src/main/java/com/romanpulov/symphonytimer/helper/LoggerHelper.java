@@ -8,9 +8,6 @@ import android.util.Log;
 import com.romanpulov.library.common.logger.FileLogger;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Created by romanpulov on 25.11.2016.
@@ -19,7 +16,6 @@ import java.util.Locale;
 public class LoggerHelper {
     private static final String LOCAL_APP_FOLDER_NAME = "SymphonyTimer";
     private static final String LOG_FOLDER_NAME = "log";
-    private static final String LOG_FILE_DATE_FORMAT = "yyyy-MM-dd";
 
     private static LoggerHelper mInstance;
 
@@ -33,8 +29,6 @@ public class LoggerHelper {
     public static void clearInstance() {
         mInstance = null;
     }
-
-    private static final DateFormat mDateFormat = new SimpleDateFormat(LOG_FILE_DATE_FORMAT, Locale.getDefault());
 
     private static FileLogger mLogger;
     private static final File mLogFolder = prepareLogFolder();
@@ -50,7 +44,7 @@ public class LoggerHelper {
     private static void internalLog(String tag, String message) {
         if (mLogFolder != null) {
 
-            String logFileName = mLogFolder.getPath() + "/" + mDateFormat.format(System.currentTimeMillis()) + ".log";
+            String logFileName = mLogFolder.getPath() + "/" + DateFormatterHelper.formatLogFileDate(System.currentTimeMillis()) + ".log";
             if (mLogger == null) {
                 mLogger = new FileLogger(logFileName);
             } else if (!mLogger.getFileName().equals(logFileName)) {
