@@ -3,7 +3,7 @@
     <color name="colorPrimary">#FF444444</color>
     <color name="colorPrimaryDark">#FF111111</color>
     <color name="colorWindowBackground">#FF111111</color>
-    <color name="colorAction">#FF999999</color>
+    <color name="colorAction">#FFD68910</color>
     <color name="brightTextColor">#FFFFFFFF</color>
     <color name="stripBackgroundColor">#8833b5e5</color>
     <color name="chartScrollBackgroundColor">#99000000</color>
