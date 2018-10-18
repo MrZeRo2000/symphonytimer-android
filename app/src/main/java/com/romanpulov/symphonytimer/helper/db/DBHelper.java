@@ -117,7 +117,7 @@ public class DBHelper {
 		return mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
 	}
 	
-	private long getLongSQL(String sql) {
+	public long getLongSQL(String sql) {
 		Cursor c = mDB.rawQuery(sql, null);
 		
 		try {
@@ -134,6 +134,10 @@ public class DBHelper {
 			}	
 		}		
 	}
+
+    public void executeSQL(String sql) {
+        mDB.execSQL(sql);
+    }
 
     private List<String> getStringListSQL(String sql) {
         List<String> result = new ArrayList<>();

@@ -73,7 +73,7 @@
             android:name=".activity.HistoryActivity"
             android:label="@string/title_activity_history"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.CompatTransparent">
+            android:theme="@style/ToolBarTheme.CompatTransparent">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
