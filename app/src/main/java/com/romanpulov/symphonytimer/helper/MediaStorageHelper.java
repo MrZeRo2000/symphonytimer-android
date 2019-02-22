@@ -1,6 +1,8 @@
 package com.romanpulov.symphonytimer.helper;
 
 import android.content.Context;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -22,8 +24,12 @@ public class MediaStorageHelper {
         return mediaStorageHelperInstance;
     }
 
-    private MediaStorageHelper(Context context) {
-        mDir = context.getCacheDir();
+    private MediaStorageHelper(@NonNull Context context) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            mDir = context.getExternalCacheDir();
+        } else {
+            mDir = context.getCacheDir();
+        }
     }
 
     public File createMediaFile(int mediaType, int mediaId) {

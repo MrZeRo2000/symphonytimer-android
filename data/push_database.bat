@@ -1,1 +1,1 @@
-"C:\Users\rpulov\AppData\Local\Android\sdk\platform-tools\adb.exe" push D:\Work\AndroidStudioProjects\symphonytimer-android\data\symphonytimerdb data/data/com.romanpulov.symphonytimer/databases/symphonytimerdb 
+%LOCALAPPDATA%\Android\sdk\platform-tools\adb.exe push D:\Work\AndroidStudioProjects\symphonytimer-android\data\symphonytimerdb data/data/com.romanpulov.symphonytimer/databases/symphonytimerdb 

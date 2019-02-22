@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         updateTimers();
 
         AssetsHelper.listAssets(this, "pre_inst_images");
+        //AssetsHelper.copyAssets(this);
     }
 
     @Override

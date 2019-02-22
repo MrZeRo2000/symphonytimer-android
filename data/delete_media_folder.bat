@@ -1,0 +1,1 @@
+%LOCALAPPDATA%\Android\sdk\platform-tools\adb.exe shell rm -r storage/emulated/0/com.romanpulov.symphonytimer
