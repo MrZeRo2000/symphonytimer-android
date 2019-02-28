@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 public class AssetsHelper {
@@ -23,15 +22,16 @@ public class AssetsHelper {
     private static String PATH = "pre_inst_images";
     private static String PREF_NAME = "assets_private";
     private static String PREF_FIRST_RUN_PARAM_NAME = "is_first_run";
+    private static String DEST_PATH = "symphonytimer";
 
     private final Context mContext;
     private final AssetManager mAssetManager;
-    private final File mDestFolderFile;
+    private final File mDestFolderPathFile;
 
     public AssetsHelper(@NonNull Context context) {
         this.mContext = context.getApplicationContext();
         this.mAssetManager = mContext.getResources().getAssets();
-        this.mDestFolderFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        this.mDestFolderPathFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
     }
 
 	public List<String> getAssets() {
@@ -39,8 +39,10 @@ public class AssetsHelper {
 
         if (mAssetManager != null) {
             String[] list = null;
+            File destFolderFile = null;
             try {
                 list = mAssetManager.list(PATH);
+                destFolderFile = new File(mDestFolderPathFile.getAbsolutePath() + File.separator + DEST_PATH);
             } catch (IOException e) {
                 log(e.getMessage());
                 e.printStackTrace();
@@ -48,8 +50,12 @@ public class AssetsHelper {
 
             if (list != null) {
                 for (String s : list) {
-                    File destFile = new File(mDestFolderFile, s);
-                    if (!destFile.exists()) {
+                    if (destFolderFile.exists()) {
+                        File destFile = new File(destFolderFile, s);
+                        if (!destFile.exists()) {
+                            result.add(s);
+                        }
+                    } else {
                         result.add(s);
                     }
                 }
@@ -66,13 +72,15 @@ public class AssetsHelper {
                 try {
                     InputStream inStream = mAssetManager.open(PATH.concat(File.separator).concat(s));
 
-                    if (!mDestFolderFile.exists()) {
-                        if (!mDestFolderFile.mkdir()) {
+                    File destFolderFile = new File(mDestFolderPathFile.getAbsolutePath() + File.separator + DEST_PATH);
+
+                    if (!destFolderFile.exists()) {
+                        if (!destFolderFile.mkdirs()) {
                             return;
                         }
                     }
 
-                    File destFile = new File(mDestFolderFile, s);
+                    File destFile = new File(destFolderFile, s);
                     FileOutputStream outStream = new FileOutputStream(destFile);
                     try {
                         byte[] buf = new byte[1024];
