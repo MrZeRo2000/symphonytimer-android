@@ -11,6 +11,8 @@ import com.romanpulov.symphonytimer.helper.AssetsHelper;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.List;
+
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static org.junit.Assert.assertEquals;
@@ -33,16 +35,13 @@ public class AssetsTest {
     }
 
     @Test
-    public void testListAsset() {
-        //AssetsHelper.listAssets(getTargetContext(), "pre_inst_images");
-    }
-
-    @Test
-    public void testExternalStorage(){
+    public void testListAssets(){
         String storageState = Environment.getExternalStorageState();
-        if (storageState.equals(Environment.MEDIA_MOUNTED))
+        if (storageState.equals(Environment.MEDIA_MOUNTED)) {
             log("Storage State Mounted");
-
-        AssetsHelper.copyAssets(getTargetContext());
+            AssetsHelper assetsHelper = new AssetsHelper(getTargetContext());
+            List<String> assets = assetsHelper.getAssets();
+            assertEquals(6, assets.size());
+        }
     }
 }

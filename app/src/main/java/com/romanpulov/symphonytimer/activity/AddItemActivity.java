@@ -218,7 +218,7 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
     public void onSoundFileButtonClick(View v){
         mMediaPlayerHelper.stop();
         Intent soundIntent = new Intent();
-        soundIntent.setType("audio/*");
+        soundIntent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "audio/*");
         soundIntent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(soundIntent, SOUND_REQ_CODE);
     }
@@ -240,8 +240,8 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
 
     public void onImageFileImageButtonClick(View v) {
         Intent imageIntent = new Intent();
-        imageIntent.setType("image/*");
-        imageIntent.setAction(Intent.ACTION_GET_CONTENT);
+        imageIntent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        imageIntent.setAction(Intent.ACTION_PICK);
         startActivityForResult(imageIntent, IMAGE_REQ_CODE);
     }
 

@@ -26,7 +26,7 @@ public class MediaStorageHelper {
 
     private MediaStorageHelper(@NonNull Context context) {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            mDir = context.getExternalCacheDir();
+            mDir = context.getExternalFilesDir(null);
         } else {
             mDir = context.getCacheDir();
         }

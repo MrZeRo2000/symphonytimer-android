@@ -2,12 +2,14 @@ package com.romanpulov.symphonytimer.activity;
 
 import java.util.List;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.app.DialogFragment;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -29,6 +31,7 @@ import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
+import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.service.TaskService;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
@@ -57,9 +60,16 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 	public static final int CONTEXT_MENU_MOVE_UP = Menu.FIRST + 4;
 	public static final int CONTEXT_MENU_MOVE_DOWN = Menu.FIRST + 5;
 
+    public final static int PERMISSION_REQUEST_COPY_ASSETS = 101;
+
     private static final long LIST_CLICK_DELAY = 1000;
 	private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
 	
+    //assets
+    private AssetsHelper mAssetsHelper;
+    private List<String> mAssets;
+    private PermissionRequestHelper mWriteStorageRequestHelper;
+
 	//data
 	private final DMTimers mDMTimers = new DMTimers();
 	private final DMTasks mDMTasks = new DMTasks();
@@ -134,8 +144,32 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         loadTimers();
         updateTimers();
 
-        AssetsHelper.listAssets(this, "pre_inst_images");
-        //AssetsHelper.copyAssets(this);
+        mAssetsHelper = new AssetsHelper(this);
+        if (mAssetsHelper.isFirstRun()) {
+            mAssetsHelper.clearFirstRun();
+            mAssets = mAssetsHelper.getAssets();
+            if (!mAssets.isEmpty()) {
+                mWriteStorageRequestHelper = new PermissionRequestHelper(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                if (mWriteStorageRequestHelper.isPermissionGranted()) {
+                    mAssetsHelper.copyAssets(mAssets);
+                } else {
+                    mWriteStorageRequestHelper.requestPermission(PERMISSION_REQUEST_COPY_ASSETS);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (PermissionRequestHelper.isGrantResultSuccessful(grantResults)) {
+            switch (requestCode) {
+                case PERMISSION_REQUEST_COPY_ASSETS:
+                    if ((mAssetsHelper !=null) && (mAssets != null)) {
+                        mAssetsHelper.copyAssets(mAssets);
+                    }
+                    break;
+            }
+        }
     }
 
     @Override
