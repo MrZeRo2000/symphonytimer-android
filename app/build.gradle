@@ -42,7 +42,7 @@ android {
 dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.romanpulov.library.common:library:1.0.11'
-    implementation 'com.romanpulov.library.dropbox:library:1.0.7'
+    implementation 'com.romanpulov.library.dropbox:library:1.0.9'
     implementation 'com.romanpulov.library.view:library:1.0.19'
     // Unit testing dependencies
     androidTestImplementation 'com.android.support:support-annotations:28.0.0'
