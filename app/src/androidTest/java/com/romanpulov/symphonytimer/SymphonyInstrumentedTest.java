@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer;
 
-import android.support.test.runner.AndroidJUnit4;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;

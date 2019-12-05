@@ -2,9 +2,10 @@ package com.romanpulov.symphonytimer;
 
 import android.Manifest;
 import android.os.Environment;
-import android.support.test.filters.SmallTest;
-import android.support.test.rule.GrantPermissionRule;
 import android.util.Log;
+
+import androidx.test.filters.SmallTest;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.romanpulov.symphonytimer.helper.AssetsHelper;
 
@@ -13,8 +14,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +39,7 @@ public class AssetsTest {
         String storageState = Environment.getExternalStorageState();
         if (storageState.equals(Environment.MEDIA_MOUNTED)) {
             log("Storage State Mounted");
-            AssetsHelper assetsHelper = new AssetsHelper(getTargetContext());
+            AssetsHelper assetsHelper = new AssetsHelper(getApplicationContext());
             List<String> assets = assetsHelper.getAssets();
             assertEquals(6, assets.size());
         }

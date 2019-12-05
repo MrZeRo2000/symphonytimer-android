@@ -1,13 +1,13 @@
 package com.romanpulov.symphonytimer;
 
-import android.support.test.filters.SmallTest;
+
+import androidx.test.filters.SmallTest;
 
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 
 import org.junit.Test;
 
-import static android.support.test.InstrumentationRegistry.getContext;
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -22,7 +22,7 @@ public class DBStorageHelperBackupTest {
 
     @Test
     public void testCase2() {
-        DBStorageHelper dh = new DBStorageHelper(getTargetContext());
+        DBStorageHelper dh = new DBStorageHelper(getApplicationContext());
         dh.createLocalBackup();
     }
 }

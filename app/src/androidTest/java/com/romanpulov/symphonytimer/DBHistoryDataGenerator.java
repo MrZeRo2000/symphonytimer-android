@@ -12,7 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static androidx.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
 @SmallTest
 public class DBHistoryDataGenerator {
@@ -26,7 +26,7 @@ public class DBHistoryDataGenerator {
 
     @Before
     public void setUp() {
-        Context context = getTargetContext();
+        Context context = getApplicationContext();
         mDBHelper = DBHelper.getInstance(context);
     }
 
