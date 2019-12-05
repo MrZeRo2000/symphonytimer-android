@@ -4,19 +4,19 @@
     android:layout_height="fill_parent"    
     tools:context=".activity.HistoryActivity"  >
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary" />
     
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
     	android:id="@+id/pager"
         android:layout_below="@+id/toolbar"
     	android:layout_width="match_parent"
     	android:layout_height="match_parent">
-        <android.support.v4.view.PagerTitleStrip
+        <androidx.viewpager.widget.PagerTitleStrip
             android:id="@+id/pager_title_strip"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -25,5 +25,5 @@
             android:textColor="@color/brightTextColor"
             android:padding="@dimen/control_padding"
          />
-    </android.support.v4.view.ViewPager>
+    </androidx.viewpager.widget.ViewPager>
 </RelativeLayout>

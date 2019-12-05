@@ -1,8 +1,9 @@
 package com.romanpulov.symphonytimer.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.widget.ArrayAdapter;
+
+import androidx.fragment.app.Fragment;
 
 import com.romanpulov.symphonytimer.model.DMTimers;
 

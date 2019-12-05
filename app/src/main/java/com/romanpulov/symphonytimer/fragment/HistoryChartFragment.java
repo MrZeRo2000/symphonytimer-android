@@ -1,11 +1,12 @@
 package com.romanpulov.symphonytimer.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
 
 import com.romanpulov.library.view.BarChart;
 import com.romanpulov.symphonytimer.R;

@@ -1,8 +1,9 @@
 package com.romanpulov.symphonytimer;
 
 import android.content.Context;
-import android.support.test.filters.SmallTest;
 import android.util.Log;
+
+import androidx.test.filters.SmallTest;
 
 import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
@@ -11,7 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 
 @SmallTest
 public class DBHistoryDataGenerator {

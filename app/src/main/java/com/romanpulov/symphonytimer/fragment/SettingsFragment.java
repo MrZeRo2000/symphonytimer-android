@@ -18,8 +18,9 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;

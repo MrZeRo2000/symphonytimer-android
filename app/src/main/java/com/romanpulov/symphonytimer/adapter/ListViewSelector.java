@@ -1,9 +1,10 @@
 package com.romanpulov.symphonytimer.adapter;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
 import android.view.View;
 import android.widget.BaseAdapter;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 
 /**
  * Created by romanpulov on 11.11.2016.
