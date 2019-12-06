@@ -1,8 +1,7 @@
 package com.romanpulov.symphonytimer.helper;
 
 import android.content.Context;
-import android.os.Environment;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.util.Log;
 
 import com.romanpulov.library.common.logger.FileLogger;
@@ -31,7 +30,7 @@ public class LoggerHelper {
     }
 
     private static FileLogger mLogger;
-    private static final File mLogFolder = prepareLogFolder();
+    private final File mLogFolder;
 
     private final boolean mEnableLogging;
 
@@ -41,7 +40,7 @@ public class LoggerHelper {
 
     }
 
-    private static void internalLog(String tag, String message) {
+    private void internalLog(String tag, String message) {
         if (mLogFolder != null) {
 
             String logFileName = mLogFolder.getPath() + "/" + DateFormatterHelper.formatLogFileDate(System.currentTimeMillis()) + ".log";
@@ -57,7 +56,7 @@ public class LoggerHelper {
         Log.d(tag, message);
     }
 
-    public static void unconditionalLog(String tag, String message) {
+    public void unconditionalLog(String tag, String message) {
         internalLog(tag, message);
     }
 
@@ -68,21 +67,19 @@ public class LoggerHelper {
 
     private LoggerHelper(Context context) {
         mEnableLogging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_logging", false);
+        mLogFolder = prepareLogFolder(context);
     }
 
-    private static File prepareLogFolder() {
-        File appFolder = new File(Environment.getExternalStorageDirectory().toString() + "/" + LOCAL_APP_FOLDER_NAME);
-        if (!appFolder.exists())
-            if (!appFolder.mkdir())
+    private static File prepareLogFolder(Context context) {
+        File logFolder = context.getExternalFilesDir(LOG_FOLDER_NAME);
+        if (logFolder == null) {
+            logFolder = new File(context.getFilesDir(), LOG_FOLDER_NAME);
+        }
+
+        if (!logFolder.exists())
+            if (!logFolder.mkdir())
                 return null;
 
-        File logFolder = new File(appFolder.getPath() + "/" + LOG_FOLDER_NAME);
-        if (logFolder.exists())
-            return logFolder;
-        else
-            if (logFolder.mkdir())
-                return logFolder;
-            else
-                return null;
+        return logFolder;
     }
 }

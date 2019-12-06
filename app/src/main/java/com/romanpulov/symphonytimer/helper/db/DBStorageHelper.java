@@ -32,7 +32,11 @@ public class DBStorageHelper {
     private final String mXMLFileName;
 
     private String getLocalBackupFolderName() {
-        return Environment.getExternalStorageDirectory() + File.separator + LOCAL_BACKUP_FOLDER_NAME;
+        File f = mContext.getExternalFilesDir(LOCAL_BACKUP_FOLDER_NAME);
+        if (f == null) {
+            f = new File(mContext.getFilesDir(), LOCAL_BACKUP_FOLDER_NAME);
+        }
+        return f.getAbsolutePath();
     }
 	
 	public DBStorageHelper(Context context) {
