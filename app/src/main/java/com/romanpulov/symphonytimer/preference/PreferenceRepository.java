@@ -23,6 +23,9 @@ public final class PreferenceRepository {
     public static final long PREF_LOAD_LOADING = 1;
     public static final long PREF_LOAD_CURRENT_VALUE = 2;
 
+    public static final int PREF_CLOUD_ACCOUNT_TYPE_DROPBOX = 0;
+    public static final int PREF_CLOUD_ACCOUNT_TYPE_ONEDRIVE = 1;
+
     public static final String PREF_KEY_DROPBOX_BACKUP = "pref_dropbox_backup";
     private static final String PREF_KEY_DROPBOX_BACKUP_LAST_LOADED = "pref_dropbox_backup_last_loaded";
 
@@ -50,7 +53,16 @@ public final class PreferenceRepository {
      * @param message Message to display
      */
     public static void displayMessage(PreferenceFragmentCompat preferenceFragment, CharSequence message) {
-        Toast.makeText(preferenceFragment.getActivity(), message, Toast.LENGTH_SHORT).show();
+        displayMessage(preferenceFragment.getActivity(), message);
+    }
+
+    /**
+     * Display message common routine
+     * @param context Context
+     * @param message Message to display
+     */
+    public static void displayMessage(Context context, CharSequence message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     /**

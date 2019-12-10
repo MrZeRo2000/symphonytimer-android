@@ -26,6 +26,7 @@ import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.SettingsActivity;
+import com.romanpulov.symphonytimer.cloud.CloudAccountManagerFactory;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
@@ -176,7 +177,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sp.registerOnSharedPreferenceChangeListener(this);
 
         addPreferencesFromResource(R.xml.preferences);
@@ -208,21 +209,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             });
         }
 
+        /*
         preference = findPreference("pref_wake_before");
         ListPreferenceSummaryHandler preferenceWakeBeforeHandler = new ListPreferenceSummaryHandler(getString(R.string.pref_wake_before_summary));
         preference.setOnPreferenceChangeListener(preferenceWakeBeforeHandler.newOnPreferenceChangeListener());
+
 
         preference = findPreference("pref_auto_timer_disable");
         ListPreferenceSummaryHandler preferenceAutoTimerDisableHandler = new ListPreferenceSummaryHandler(getString(R.string.pref_auto_timer_disable_summary));
         preference.setOnPreferenceChangeListener(preferenceAutoTimerDisableHandler.newOnPreferenceChangeListener());
 
+         */
+
         //account dropbox
-        preference = findPreference("pref_dropbox_account");
+        preference = findPreference("pref_cloud_account");
         if (null != preference) {
             preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    DropboxHelper.getInstance(getActivity().getApplicationContext()).invokeAuthActivity(getActivity().getResources().getString(R.string.app_key));
+                    int cloudAccountType = sp.getInt("pref_cloud_account_type", -1);
+                    if (cloudAccountType == -1) {
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
+                    } else {
+                        CloudAccountManagerFactory.fromCloudAccountType(cloudAccountType).setupAccount(getActivity());
+                    }
+                    //DropboxHelper.getInstance(getActivity().getApplicationContext()).invokeAuthActivity(getActivity().getResources().getString(R.string.app_key));
                     return false;
                 }
             });
