@@ -227,7 +227,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    int cloudAccountType = sp.getInt("pref_cloud_account_type", -1);
+                    int cloudAccountType = Integer.valueOf(sp.getString("pref_cloud_account_type", "-1"));
                     if (cloudAccountType == -1) {
                         PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
                     } else {
