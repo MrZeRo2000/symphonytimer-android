@@ -34,20 +34,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        View view  = super.onCreateView(parent, name, context, attrs);
-
-        if (view != null) {
-            ListView preferencesListView = view.findViewById(android.R.id.list);
-            preferencesListView.setPadding(0, 0, 0, 0);
-        }
-
-        return view;
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        SettingsFragment settingsFragment = (SettingsFragment)getFragmentManager().findFragmentById(R.id.settingsfragment);
+        SettingsFragment settingsFragment = (SettingsFragment)getSupportFragmentManager().findFragmentById(R.id.settingsfragment);
 
         if ((settingsFragment != null) && (PermissionRequestHelper.isGrantResultSuccessful(grantResults))) {
             switch (requestCode) {

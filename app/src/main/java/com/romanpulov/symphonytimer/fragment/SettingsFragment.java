@@ -12,15 +12,15 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.app.DialogFragment;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.Preference.OnPreferenceClickListener;
+import androidx.preference.PreferenceManager;
+import androidx.fragment.app.DialogFragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;
@@ -42,7 +42,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SettingsFragment extends PreferenceFragment implements
+public class SettingsFragment extends PreferenceFragmentCompat implements
 	SharedPreferences.OnSharedPreferenceChangeListener,
 	Preference.OnPreferenceClickListener {
 
@@ -172,78 +172,41 @@ public class SettingsFragment extends PreferenceFragment implements
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		sp.registerOnSharedPreferenceChangeListener(this);
-		
-		addPreferencesFromResource(R.xml.preferences);
+	}
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.registerOnSharedPreferenceChangeListener(this);
+
+        addPreferencesFromResource(R.xml.preferences);
 
         mWriteStorageRequestHelper = new PermissionRequestHelper(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-		
-		Preference preference;
 
-		//reset data
-		preference = findPreference("pref_reset_data");
-		if (null != preference) {
-			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-				
-				@Override
-				public boolean onPreferenceClick(Preference arg0) {
-	    			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(null, R.string.question_are_you_sure);
-	    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
-	    			deleteDialog.show(getActivity().getFragmentManager(), null);
-					
-					return false;
-				}
-				
-			    private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
-					@Override
-					public void OnOkButtonClickEvent(DialogFragment dialog) {
-						DBHelper.getInstance(getActivity()).clearData();
-					}
-				};
-			});
-		}
-		
-		//local backup
-        /*
-		preference = findPreference("pref_local_backup");
-		if (null != preference) {
-			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
-					final String localBackupFileName = new DBStorageHelper(getActivity()).createLocalBackup();
-					if (null != localBackupFileName) {
-						Toast.makeText(getActivity(), localBackupFileName, Toast.LENGTH_SHORT).show();
-					}					
-					
-					return false;
-				}
-			});
-		}
-		*/
+        Preference preference;
 
-		//local restore
-        /*
-		preference = findPreference("pref_local_restore");
-		if (null != preference) {
-			preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-				@Override
-				public boolean onPreferenceClick(Preference preference) {
-	    			AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(null, R.string.question_are_you_sure);
-	    			deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
-	    			deleteDialog.show(getActivity().getFragmentManager(), null);
-					return false;
-				}
-				
-			    private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
-					@Override
-					public void OnOkButtonClickEvent(DialogFragment dialog) {
-                        new DBStorageHelper(getActivity()).restoreLocalXmlBackup();
-					}
-				};
-			});
-		}
-		*/
+        //reset data
+        preference = findPreference("pref_reset_data");
+        if (null != preference) {
+            preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(null, R.string.question_are_you_sure);
+                    deleteDialog.setOkButtonClick(onDeleteOkButtonClick);
+                    deleteDialog.show(getActivity().getSupportFragmentManager(), null);
+
+                    return false;
+                }
+
+                private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
+                    @Override
+                    public void OnOkButtonClickEvent(DialogFragment dialog) {
+                        DBHelper.getInstance(getActivity()).clearData();
+                    }
+                };
+            });
+        }
 
         preference = findPreference("pref_wake_before");
         ListPreferenceSummaryHandler preferenceWakeBeforeHandler = new ListPreferenceSummaryHandler(getString(R.string.pref_wake_before_summary));
@@ -253,10 +216,10 @@ public class SettingsFragment extends PreferenceFragment implements
         ListPreferenceSummaryHandler preferenceAutoTimerDisableHandler = new ListPreferenceSummaryHandler(getString(R.string.pref_auto_timer_disable_summary));
         preference.setOnPreferenceChangeListener(preferenceAutoTimerDisableHandler.newOnPreferenceChangeListener());
 
-		//account dropbox
+        //account dropbox
         preference = findPreference("pref_dropbox_account");
-		if (null != preference) {
-		    preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        if (null != preference) {
+            preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     DropboxHelper.getInstance(getActivity().getApplicationContext()).invokeAuthActivity(getActivity().getResources().getString(R.string.app_key));
@@ -284,10 +247,9 @@ public class SettingsFragment extends PreferenceFragment implements
         mPreferenceRestoreDropboxProcessor = new PreferenceRestoreDropboxProcessor(this);
         mPreferenceLoadProcessors.put(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName(), mPreferenceRestoreDropboxProcessor);
         setupPrefDropboxRestoreLoadService();
+    }
 
-	}
-
-	@Override
+    @Override
 	public boolean onPreferenceClick(Preference preference) {
         //new CreateLocalBackupTask().execute();
 		return false;

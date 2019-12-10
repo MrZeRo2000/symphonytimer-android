@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -384,6 +384,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
     
     protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     	if (RESULT_OK == resultCode) {    		
     		if ((null != data) && (null != data.getExtras())) {
     		    //retrieve data
@@ -446,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                         }
                     }
                 });
-                deleteDialog.show(getFragmentManager(), null);
+                deleteDialog.show(getSupportFragmentManager(), null);
                 return true;
             case R.id.action_move_up:
                 executeTimerAction(actionTimer, new TimerMoveUp());

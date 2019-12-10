@@ -1,6 +1,6 @@
 package com.romanpulov.symphonytimer.preference;
 
-import android.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.romanpulov.library.common.loader.core.Loader;
 import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
@@ -13,9 +13,9 @@ public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProces
 
     private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_DROPBOX_RESTORE;
 
-    private final PreferenceFragment mPreferenceFragment;
+    private final PreferenceFragmentCompat mPreferenceFragment;
 
-    public PreferenceRestoreDropboxProcessor(PreferenceFragment preferenceFragment) {
+    public PreferenceRestoreDropboxProcessor(PreferenceFragmentCompat preferenceFragment) {
         mPreferenceFragment = preferenceFragment;
     }
 

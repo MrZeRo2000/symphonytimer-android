@@ -1,6 +1,6 @@
 package com.romanpulov.symphonytimer.preference;
 
-import android.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.romanpulov.library.common.loader.core.Loader;
 import com.romanpulov.symphonytimer.loader.local.RestoreLocalLoader;
@@ -13,9 +13,9 @@ public class PreferenceRestoreLocalProcessor implements PreferenceLoaderProcesso
 
     private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_LOCAL_RESTORE;
 
-    private final PreferenceFragment mPreferenceFragment;
+    private final PreferenceFragmentCompat mPreferenceFragment;
 
-    public PreferenceRestoreLocalProcessor(PreferenceFragment preferenceFragment) {
+    public PreferenceRestoreLocalProcessor(PreferenceFragmentCompat preferenceFragment) {
         mPreferenceFragment = preferenceFragment;
     }
 

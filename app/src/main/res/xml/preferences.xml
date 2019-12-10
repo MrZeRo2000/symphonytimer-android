@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceCategory
-	    android:title="@string/pref_cat_settings" 
+	    android:title="@string/pref_cat_settings"
+		app:iconSpaceReserved="false"
 	    >    
 		<CheckBoxPreference
 		    android:key="pref_vibrate"
 		    android:title="@string/pref_vibrate"
             android:summary="@string/pref_summary_vibrate"
-		    android:defaultValue="true" 
+		    android:defaultValue="true"
+			app:iconSpaceReserved="false"
 		    />
 		<CheckBoxPreference
 			android:key="pref_mute"
 			android:title="@string/pref_mute"
             android:summary="@string/pref_summary_mute"
 			android:defaultValue="false"
+			app:iconSpaceReserved="false"
 			/>
 		<CheckBoxPreference
 			android:key="pref_logging"
 			android:title="@string/pref_logging"
 			android:summary="@string/pref_logging_summary"
 			android:defaultValue="false"
+			app:iconSpaceReserved="false"
 			/>
 		<ListPreference
             android:key="pref_auto_timer_disable"
@@ -29,6 +34,7 @@
             android:entries="@array/auto_timer_disable_entries"
             android:entryValues="@array/auto_timer_disable_entry_values"
             android:defaultValue="@string/pref_auto_timer_disable_default"
+			app:iconSpaceReserved="false"
             />
         <ListPreference
             android:key="pref_wake_before"
@@ -38,33 +44,39 @@
             android:entries="@array/wake_before_entries"
             android:entryValues="@array/wake_before_entry_values"
             android:defaultValue="@string/pref_wake_before_default"
+			app:iconSpaceReserved="false"
             />
 	</PreferenceCategory>
 	<PreferenceCategory
 		android:title="@string/pref_cat_interface"
+		app:iconSpaceReserved="false"
 		>
 		<CheckBoxPreference
 			android:key="pref_bitmap_background"
 			android:title="@string/pref_bitmap_background"
 			android:summary="@string/pref_bitmap_background_summary"
 			android:defaultValue="false"
+			app:iconSpaceReserved="false"
 			/>
         <CheckBoxPreference
             android:key="pref_full_history_info"
             android:title="@string/pref_full_history_info"
             android:summary="@string/pref_full_history_info_summary"
             android:defaultValue="false"
+			app:iconSpaceReserved="false"
             />
 	</PreferenceCategory>
 	<PreferenceCategory
 	    android:title="@string/pref_cat_local_data_management"
 	    android:summary="@string/pref_cat_summary_local_backup"
+		app:iconSpaceReserved="false"
 	    >
 	    <Preference 
 	        android:key="pref_local_backup"
 	        android:title="@string/pref_local_backup"
 	        android:summary="@string/pref_summary_local_backup"
 	        android:selectable="true"
+			app:iconSpaceReserved="false"
 	        >        
 	    </Preference>
 	    <Preference 
@@ -72,6 +84,7 @@
 	        android:title="@string/pref_local_restore"
 	        android:summary="@string/pref_summary_local_restore"
 	        android:selectable="true"
+			app:iconSpaceReserved="false"
 	        >        
 	    </Preference>
         <Preference
@@ -79,25 +92,30 @@
             android:title="@string/pref_reset_data"
             android:summary="@string/pref_summary_reset_data"
             android:selectable="true"
+			app:iconSpaceReserved="false"
             >
         </Preference>
     </PreferenceCategory>
 	<PreferenceCategory
         android:title="@string/pref_cat_dropbox_data_management"
+		app:iconSpaceReserved="false"
         >
         <Preference
             android:key="pref_dropbox_account"
             android:title="@string/pref_dropbox_account"
+			app:iconSpaceReserved="false"
             />
         <Preference
             android:key="pref_dropbox_backup"
             android:title="@string/pref_dropbox_backup"
             android:summary="@string/pref_summary_dropbox_backup"
+			app:iconSpaceReserved="false"
             />
         <Preference
             android:key="pref_dropbox_restore"
             android:title="@string/pref_dropbox_restore"
             android:summary="@string/pref_summary_dropbox_restore"
+			app:iconSpaceReserved="false"
             />
     </PreferenceCategory>
 

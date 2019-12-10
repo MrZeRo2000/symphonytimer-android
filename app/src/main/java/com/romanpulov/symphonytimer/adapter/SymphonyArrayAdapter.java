@@ -12,7 +12,7 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

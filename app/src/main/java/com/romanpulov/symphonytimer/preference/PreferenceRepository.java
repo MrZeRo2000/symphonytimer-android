@@ -1,10 +1,11 @@
 package com.romanpulov.symphonytimer.preference;
 
 import android.content.Context;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import android.widget.Toast;
+
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.romanpulov.symphonytimer.R;
 
@@ -48,7 +49,7 @@ public final class PreferenceRepository {
      * @param preferenceFragment PreferenceFragment
      * @param message Message to display
      */
-    public static void displayMessage(PreferenceFragment preferenceFragment, CharSequence message) {
+    public static void displayMessage(PreferenceFragmentCompat preferenceFragment, CharSequence message) {
         Toast.makeText(preferenceFragment.getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
@@ -59,7 +60,7 @@ public final class PreferenceRepository {
      * @param preferenceLastLoadedKey preference key with last loaded time
      * @param value value to set: PREF_LOAD_LOADING - loading in progress, PREV_LOAD_NEVER - never loaded, otherwise last loaded time
      */
-    private static void updateLoadPreferenceSummary(PreferenceFragment preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
+    private static void updateLoadPreferenceSummary(PreferenceFragmentCompat preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
         Preference prefLoad = preferenceFragment.findPreference(preferenceKey);
 
         if (value == PREF_LOAD_LOADING)
@@ -91,7 +92,7 @@ public final class PreferenceRepository {
      * @param preferenceKey preference key
      * @param value value to set
      */
-    public static void updatePreferenceKeySummary(PreferenceFragment preferenceFragment, String preferenceKey, long value) {
+    public static void updatePreferenceKeySummary(PreferenceFragmentCompat preferenceFragment, String preferenceKey, long value) {
         updateLoadPreferenceSummary(preferenceFragment, preferenceKey, PREF_KEYS_LAST_LOADED.get(preferenceKey), value);
     }
 
