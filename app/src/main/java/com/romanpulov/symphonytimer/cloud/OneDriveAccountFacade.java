@@ -5,14 +5,16 @@ import android.content.DialogInterface;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.onedrive.OneDriveHelper;
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.loader.onedrive.BackupOneDriveUploader;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import static com.romanpulov.library.onedrive.OneDriveHelper.ONEDRIVE_ACTION_LOGIN;
 import static com.romanpulov.library.onedrive.OneDriveHelper.ONEDRIVE_ACTION_LOGOUT;
 
-public class OneDriveAccountManager extends AbstractCloudAccountManager {
+public class OneDriveAccountFacade extends AbstractCloudAccountFacade {
 
     private static class OneDriveActionHandler implements OneDriveHelper.OnOneDriveActionListener {
         @Override
@@ -108,5 +110,15 @@ public class OneDriveAccountManager extends AbstractCloudAccountManager {
                 })
                 .show();
 
+    }
+
+    @Override
+    public AbstractCloudAccountManager getAccountManager(Activity activity) {
+        return new OneDriveCloudAccountManager(activity);
+    }
+
+    @Override
+    public String getBackupLoaderClassName() {
+        return BackupOneDriveUploader.class.getName();
     }
 }

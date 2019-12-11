@@ -11,7 +11,7 @@ import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
 
 public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProcessor  {
 
-    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_DROPBOX_RESTORE;
+    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_CLOUD_RESTORE;
 
     private final PreferenceFragmentCompat mPreferenceFragment;
 

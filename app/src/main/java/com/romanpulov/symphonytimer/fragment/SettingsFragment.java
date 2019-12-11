@@ -22,15 +22,17 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.SettingsActivity;
-import com.romanpulov.symphonytimer.cloud.CloudAccountManagerFactory;
+import com.romanpulov.symphonytimer.cloud.AbstractCloudAccountFacade;
+import com.romanpulov.symphonytimer.cloud.CloudAccountFacadeFactory;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.preference.PreferenceBackupDropboxProcessor;
+import com.romanpulov.symphonytimer.preference.PreferenceBackupCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupLocalProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
@@ -43,11 +45,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.romanpulov.symphonytimer.preference.PreferenceRepository.PREF_KEY_CLOUD_ACCOUNT_TYPE;
+
 public class SettingsFragment extends PreferenceFragmentCompat implements
 	SharedPreferences.OnSharedPreferenceChangeListener,
 	Preference.OnPreferenceClickListener {
 
-    private PreferenceBackupDropboxProcessor mPreferenceBackupDropboxProcessor;
+    private PreferenceBackupCloudProcessor mPreferenceBackupCloudProcessor;
     private PreferenceRestoreDropboxProcessor mPreferenceRestoreDropboxProcessor;
     private PreferenceBackupLocalProcessor mPreferenceBackupLocalProcessor;
     private PreferenceRestoreLocalProcessor  mPreferenceRestoreLocalProcessor;
@@ -231,7 +235,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                     if (cloudAccountType == -1) {
                         PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
                     } else {
-                        CloudAccountManagerFactory.fromCloudAccountType(cloudAccountType).setupAccount(getActivity());
+                        CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType).setupAccount(getActivity());
                     }
                     //DropboxHelper.getInstance(getActivity().getApplicationContext()).invokeAuthActivity(getActivity().getResources().getString(R.string.app_key));
                     return false;
@@ -250,8 +254,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         setupPrefLocalRestoreLoadService();
 
         //backup dropbox
-        mPreferenceBackupDropboxProcessor = new PreferenceBackupDropboxProcessor(this);
-        mPreferenceLoadProcessors.put(mPreferenceBackupDropboxProcessor.getLoaderClass().getName(), mPreferenceBackupDropboxProcessor);
+        mPreferenceBackupCloudProcessor = new PreferenceBackupCloudProcessor(this);
+        mPreferenceLoadProcessors.put(mPreferenceBackupCloudProcessor.getLoaderClass().getName(), mPreferenceBackupCloudProcessor);
         setupPrefDropboxBackupLoadService();
 
         //restore dropbox
@@ -367,40 +371,85 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         if (backupResult == null)
             PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_backup));
         else {
-            mPreferenceBackupDropboxProcessor.preExecute();
-            mLoaderServiceManager.startLoader(mPreferenceBackupDropboxProcessor.getLoaderClass().getName());
+            mPreferenceBackupCloudProcessor.preExecute();
+            mLoaderServiceManager.startLoader(mPreferenceBackupCloudProcessor.getLoaderClass().getName());
+        }
+    }
+
+    public void executeCloudBackup(int cloudAccountType) {
+        final AbstractCloudAccountFacade cloudAccountFacade = CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType);
+
+        if (cloudAccountFacade != null) {
+            final AbstractCloudAccountManager accountManager = cloudAccountFacade.getAccountManager(getActivity());
+            if (accountManager != null) {
+                mPreferenceBackupCloudProcessor.preExecute();
+
+                accountManager.setOnAccountSetupListener(new AbstractCloudAccountManager.OnAccountSetupListener() {
+                    @Override
+                    public void onAccountSetupSuccess() {
+                        DBStorageHelper storageHelper = new DBStorageHelper(getActivity());
+                        String backupResult = storageHelper.createLocalBackup();
+
+                        if (backupResult == null)
+                            PreferenceRepository.displayMessage(getActivity(), getString(R.string.error_backup));
+                        else {
+                            mPreferenceBackupCloudProcessor.preExecute();
+                            mLoaderServiceManager.startLoader(cloudAccountFacade.getBackupLoaderClassName());
+                        }
+                    }
+
+                    @Override
+                    public void onAccountSetupFailure(String errorText) {
+                        PreferenceRepository.displayMessage(getActivity(), errorText);
+                        mPreferenceBackupCloudProcessor.postExecute(errorText);
+                    }
+                });
+
+                accountManager.setupAccount();
+            }
         }
     }
 
     /**
-     * Dropbox backup using service
+     * Cloud backup using service
      */
     private void setupPrefDropboxBackupLoadService() {
-        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_DROPBOX_BACKUP, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_CLOUD_BACKUP, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
-        Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_BACKUP);
-        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                //check if internet is available
-                if (!checkInternetConnection())
-                    return true;
+        final Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_BACKUP);
+        if (pref != null) {
+            pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    //check if cloud account type is set up
+                    int cloudAccountType = -1;
+                    final Preference prefCloudAccountType = findPreference(PREF_KEY_CLOUD_ACCOUNT_TYPE);
+                    if (prefCloudAccountType != null) {
+                        cloudAccountType = prefCloudAccountType.getSharedPreferences().getInt(prefCloudAccountType.getKey(), -1);
+                        if (cloudAccountType == -1) {
+                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
+                            return true;
+                        }
+                    }
 
-                if (mLoaderServiceManager == null)
-                    return true;
-                else {
-                    if (mLoaderServiceManager.isLoaderServiceRunning())
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    else
-                        if (mWriteStorageRequestHelper.isPermissionGranted())
-                            executeDropboxBackup();
-                        else
-                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_DROPBOX_BACKUP);
+                    //check if internet is available
+                    if (!checkInternetConnection())
+                        return true;
 
-                    return true;
+                    if (mLoaderServiceManager == null)
+                        return true;
+                    else {
+                        if (mLoaderServiceManager.isLoaderServiceRunning()) {
+                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                        } else {
+                            executeCloudBackup(cloudAccountType);
+                        }
+
+                        return true;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void executeDropboxRestore() {
@@ -412,9 +461,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
      * Dropbox restore using service
      */
     private void setupPrefDropboxRestoreLoadService() {
-        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_DROPBOX_RESTORE, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_CLOUD_RESTORE, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
-        Preference pref = findPreference(PreferenceRepository.PREF_KEY_DROPBOX_RESTORE);
+        Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_RESTORE);
 
         pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override

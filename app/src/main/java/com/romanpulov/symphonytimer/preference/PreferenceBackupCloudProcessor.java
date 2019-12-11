@@ -6,17 +6,17 @@ import com.romanpulov.library.common.loader.core.Loader;
 import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
 
 /**
- * Backup to dropbox processor
+ * Backup to cloud processor
  * Created by romanpulov on 21.11.2017.
  */
 
-public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcessor {
+public class PreferenceBackupCloudProcessor implements PreferenceLoaderProcessor {
 
-    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_DROPBOX_BACKUP;
+    private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_CLOUD_BACKUP;
 
     private final PreferenceFragmentCompat mPreferenceFragment;
 
-    public PreferenceBackupDropboxProcessor(PreferenceFragmentCompat preferenceFragment) {
+    public PreferenceBackupCloudProcessor(PreferenceFragmentCompat preferenceFragment) {
         mPreferenceFragment = preferenceFragment;
     }
 
@@ -27,7 +27,7 @@ public class PreferenceBackupDropboxProcessor implements PreferenceLoaderProcess
 
     @Override
     public Class<? extends Loader> getLoaderClass() {
-        return BackupDropboxUploader.class;
+        return null;
     }
 
     @Override

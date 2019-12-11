@@ -50,6 +50,18 @@ public class DBStorageHelper {
                 LOCAL_BACKUP_DB_FILE_NAME);
 	}
 
+    public static boolean restoreFromBackupPath(Context context, String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            DBStorageHelper dbStorageHelper = new DBStorageHelper(context);
+            String restoreResult = dbStorageHelper.restoreLocalBackup();
+
+            return  restoreResult != null;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Creates local backup and returns backup file name if successful     *
      * @return backup file name

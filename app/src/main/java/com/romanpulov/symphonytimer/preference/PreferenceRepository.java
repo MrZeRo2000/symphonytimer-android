@@ -23,14 +23,17 @@ public final class PreferenceRepository {
     public static final long PREF_LOAD_LOADING = 1;
     public static final long PREF_LOAD_CURRENT_VALUE = 2;
 
+
+    public static final String PREF_KEY_CLOUD_ACCOUNT_TYPE = "pref_cloud_account_type";
+
     public static final int PREF_CLOUD_ACCOUNT_TYPE_DROPBOX = 0;
     public static final int PREF_CLOUD_ACCOUNT_TYPE_ONEDRIVE = 1;
 
-    public static final String PREF_KEY_DROPBOX_BACKUP = "pref_dropbox_backup";
-    private static final String PREF_KEY_DROPBOX_BACKUP_LAST_LOADED = "pref_dropbox_backup_last_loaded";
+    public static final String PREF_KEY_CLOUD_BACKUP = "pref_cloud_backup";
+    private static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_dropbox_cloud_last_loaded";
 
-    public static final String PREF_KEY_DROPBOX_RESTORE =  "pref_dropbox_restore";
-    private static final String PREF_KEY_DROPBOX_RESTORE_LAST_LOADED =  "pref_dropbox_restore_last_loaded";
+    public static final String PREF_KEY_CLOUD_RESTORE =  "pref_cloud_restore";
+    private static final String PREF_KEY_CLOUD_RESTORE_LAST_LOADED =  "pref_cloud_restore_last_loaded";
 
     public static final String PREF_KEY_LOCAL_BACKUP =  "pref_local_backup";
     private static final String PREF_KEY_LOCAL_BACKUP_LAST_LOADED =  "pref_local_backup_last_loaded";
@@ -41,8 +44,8 @@ public final class PreferenceRepository {
     private static final Map<String, String> PREF_KEYS_LAST_LOADED = new HashMap<>();
     static
     {
-        PREF_KEYS_LAST_LOADED.put(PREF_KEY_DROPBOX_BACKUP, PREF_KEY_DROPBOX_BACKUP_LAST_LOADED);
-        PREF_KEYS_LAST_LOADED.put(PREF_KEY_DROPBOX_RESTORE, PREF_KEY_DROPBOX_RESTORE_LAST_LOADED);
+        PREF_KEYS_LAST_LOADED.put(PREF_KEY_CLOUD_BACKUP, PREF_KEY_CLOUD_BACKUP_LAST_LOADED);
+        PREF_KEYS_LAST_LOADED.put(PREF_KEY_CLOUD_RESTORE, PREF_KEY_CLOUD_RESTORE_LAST_LOADED);
         PREF_KEYS_LAST_LOADED.put(PREF_KEY_LOCAL_BACKUP, PREF_KEY_LOCAL_BACKUP_LAST_LOADED);
         PREF_KEYS_LAST_LOADED.put(PREF_KEY_LOCAL_RESTORE, PREF_KEY_LOCAL_RESTORE_LAST_LOADED);
     }

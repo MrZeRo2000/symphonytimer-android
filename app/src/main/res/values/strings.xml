@@ -68,10 +68,10 @@
     <string name="pref_cloud_account_type">Account Type</string>
     <string name="pref_cloud_account_type_default">0</string>
     <string name="pref_cloud_account">Account</string>
-    <string name="pref_dropbox_backup">Backup</string>
-    <string name="pref_summary_dropbox_backup">Backup current data to Dropbox account</string>
-    <string name="pref_dropbox_restore">Restore</string>
-    <string name="pref_summary_dropbox_restore">Restore current data from Dropbox account</string>
+    <string name="pref_cloud_backup">Backup</string>
+    <string name="pref_summary_cloud_backup">Backup current data to cloud account</string>
+    <string name="pref_cloud_restore">Restore</string>
+    <string name="pref_summary_cloud_restore">Restore current data from cloud account</string>
 
     <string name="error_action_timer">Error during timer action: %s</string>
     <string name="error_title_not_assigned">Title not assigned</string>
@@ -92,6 +92,7 @@
 
 
     <string name="info_load_local_backup">Local backup has been restored successfully</string>
+    <string name="info_load_cloud_backup">Cloud backup has been restored successfully</string>
     <string name="action_not_allowed">This operation is not allowed</string>
     <string name="question_are_you_sure">Are you sure?</string>
     <string name="title_activity_image_selection">ImageSelectionActivity</string>
@@ -103,6 +104,7 @@
     <string name="button_plus">+</string>
     <string name="button_minus">-</string>
     <string name="notification_dropbox_backup_completed">Dropbox backup has been completed</string>
+    <string name="notification_onedrive_backup_completed">OneDrive backup has been completed</string>
     <string name="notification_load_operation_error">Load operation error : %s</string>
     <string name="notification_onedrive_successfully_logged_in">Successfully logged in to OneDrive</string>
     <string name="notification_onedrive_successfully_logged_out">Successfully logged out from OneDrive</string>

@@ -11,9 +11,9 @@ import java.io.File;
  * Created by romanpulov on 27.11.2017.
  */
 
-public class RestoreDropboxLoadPathProvider extends ContextLoadPathProvider {
+public class RestoreCloudLoadPathProvider extends ContextLoadPathProvider {
 
-    public RestoreDropboxLoadPathProvider(Context context) {
+    public RestoreCloudLoadPathProvider(Context context) {
         super(context);
     }
 
