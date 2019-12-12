@@ -269,7 +269,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         //mPreferenceLoadProcessors.put(mPreferenceRestoreCloudProcessor.getLoaderClass().getName(), mPreferenceRestoreCloudProcessor);
         mPreferenceLoadProcessors.put(RestoreDropboxDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         mPreferenceLoadProcessors.put(RestoreOneDriveDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
-        setupPrefDropboxRestoreLoadService();
+        setupPrefCloudRestoreLoadService();
     }
 
     @Override
@@ -418,6 +418,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
+    private int getCloudAccountType() {
+        int result = -1;
+        final Preference prefCloudAccountType = findPreference(PREF_KEY_CLOUD_ACCOUNT_TYPE);
+        if (prefCloudAccountType != null) {
+            result = Integer.parseInt(prefCloudAccountType.getSharedPreferences().getString(prefCloudAccountType.getKey(), "-1"));
+        }
+        return result;
+    }
+
     /**
      * Cloud backup using service
      */
@@ -430,14 +439,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     //check if cloud account type is set up
-                    int cloudAccountType = -1;
-                    final Preference prefCloudAccountType = findPreference(PREF_KEY_CLOUD_ACCOUNT_TYPE);
-                    if (prefCloudAccountType != null) {
-                        cloudAccountType = Integer.parseInt(prefCloudAccountType.getSharedPreferences().getString(prefCloudAccountType.getKey(), "-1"));
-                        if (cloudAccountType == -1) {
-                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
-                            return true;
-                        }
+                    final int cloudAccountType = getCloudAccountType();
+                    if (cloudAccountType == -1) {
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
+                        return true;
                     }
 
                     //check if internet is available
@@ -460,53 +465,87 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
+    //to delete
     public void executeDropboxRestore() {
         mPreferenceRestoreCloudProcessor.preExecute();
         mLoaderServiceManager.startLoader(mPreferenceRestoreCloudProcessor.getLoaderClass().getName());
     }
 
+    public void executeCloudRestore(int cloudAccountType) {
+        final AbstractCloudAccountFacade cloudAccountFacade = CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType);
+
+        if (cloudAccountFacade != null) {
+            final AbstractCloudAccountManager accountManager = cloudAccountFacade.getAccountManager(getActivity());
+            if (accountManager != null) {
+                mPreferenceRestoreCloudProcessor.preExecute();
+
+                accountManager.setOnAccountSetupListener(new AbstractCloudAccountManager.OnAccountSetupListener() {
+                    @Override
+                    public void onAccountSetupSuccess() {
+                        mPreferenceRestoreCloudProcessor.preExecute();
+                        mLoaderServiceManager.startLoader(cloudAccountFacade.getRestoreLoaderClassName());
+                    }
+
+                    @Override
+                    public void onAccountSetupFailure(String errorText) {
+                        PreferenceRepository.displayMessage(getActivity(), errorText);
+                        mPreferenceRestoreCloudProcessor.postExecute(errorText);
+                    }
+                });
+
+                accountManager.setupAccount();
+            }
+        }
+    }
+
+
     /**
      * Dropbox restore using service
      */
-    private void setupPrefDropboxRestoreLoadService() {
+    private void setupPrefCloudRestoreLoadService() {
         PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_CLOUD_RESTORE, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_RESTORE);
-
-        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                //check if internet is available
-                if (!checkInternetConnection())
-                    return true;
-
-                if (mLoaderServiceManager == null)
-                    return true;
-                else {
-
-                    if (mLoaderServiceManager.isLoaderServiceRunning())
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    else {
-                        final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                        alert
-                                .setTitle(R.string.question_are_you_sure)
-                                .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (mWriteStorageRequestHelper.isPermissionGranted())
-                                            executeDropboxRestore();
-                                        else
-                                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_DROPBOX_RESTORE);
-                                    }
-                                })
-                                .setNegativeButton(R.string.caption_cancel, null)
-                                .show();
+        if (pref != null) {
+            pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    //check if cloud account type is set up
+                    final int cloudAccountType = getCloudAccountType();
+                    if (cloudAccountType == -1) {
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
+                        return true;
                     }
-                }
 
-                return true;
-            }
-        });
+                    //check if internet is available
+                    if (!checkInternetConnection())
+                        return true;
+
+                    if (mLoaderServiceManager == null)
+                        return true;
+                    else {
+
+                        if (mLoaderServiceManager.isLoaderServiceRunning())
+                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                        else {
+                            final AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                            alert
+                                    .setTitle(R.string.question_are_you_sure)
+                                    .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            executeCloudRestore(cloudAccountType);
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.caption_cancel, null)
+                                    .show();
+                        }
+                    }
+
+                    return true;
+                }
+            });
+        }
     }
 
     private void doBindService(Activity activity) {

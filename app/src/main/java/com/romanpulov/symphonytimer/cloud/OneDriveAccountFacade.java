@@ -9,12 +9,17 @@ import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.onedrive.OneDriveHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.loader.onedrive.BackupOneDriveUploader;
+import com.romanpulov.symphonytimer.loader.onedrive.RestoreOneDriveDownloader;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import static com.romanpulov.library.onedrive.OneDriveHelper.ONEDRIVE_ACTION_LOGIN;
 import static com.romanpulov.library.onedrive.OneDriveHelper.ONEDRIVE_ACTION_LOGOUT;
 
 public class OneDriveAccountFacade extends AbstractCloudAccountFacade {
+    @Override
+    public String getRestoreLoaderClassName() {
+        return RestoreOneDriveDownloader.class.getName();
+    }
 
     private static class OneDriveActionHandler implements OneDriveHelper.OnOneDriveActionListener {
         @Override

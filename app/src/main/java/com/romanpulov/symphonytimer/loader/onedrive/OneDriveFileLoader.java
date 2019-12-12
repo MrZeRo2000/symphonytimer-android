@@ -1,4 +1,4 @@
-package com.romanpulov.violetnote.loader.onedrive;
+package com.romanpulov.symphonytimer.loader.onedrive;
 
 import android.content.Context;
 

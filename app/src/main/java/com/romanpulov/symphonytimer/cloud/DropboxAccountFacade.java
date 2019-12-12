@@ -6,6 +6,7 @@ import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
+import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
 
 public class DropboxAccountFacade extends AbstractCloudAccountFacade {
     @Override
@@ -16,6 +17,11 @@ public class DropboxAccountFacade extends AbstractCloudAccountFacade {
     @Override
     public AbstractCloudAccountManager getAccountManager(Activity activity) {
         return new DropboxCloudAccountManager(activity);
+    }
+
+    @Override
+    public String getRestoreLoaderClassName() {
+        return RestoreDropboxDownloader.class.getName();
     }
 
     @Override
