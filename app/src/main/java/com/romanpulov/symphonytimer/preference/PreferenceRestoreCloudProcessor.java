@@ -9,13 +9,13 @@ import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
  * Created by romanpulov on 27.11.2017.
  */
 
-public class PreferenceRestoreDropboxProcessor implements PreferenceLoaderProcessor  {
+public class PreferenceRestoreCloudProcessor implements PreferenceLoaderProcessor  {
 
     private static final String PREF_KEY_NAME = PreferenceRepository.PREF_KEY_CLOUD_RESTORE;
 
     private final PreferenceFragmentCompat mPreferenceFragment;
 
-    public PreferenceRestoreDropboxProcessor(PreferenceFragmentCompat preferenceFragment) {
+    public PreferenceRestoreCloudProcessor(PreferenceFragmentCompat preferenceFragment) {
         mPreferenceFragment = preferenceFragment;
     }
 

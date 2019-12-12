@@ -32,11 +32,15 @@ import com.romanpulov.symphonytimer.cloud.CloudAccountFacadeFactory;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
+import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
+import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
+import com.romanpulov.symphonytimer.loader.onedrive.BackupOneDriveUploader;
+import com.romanpulov.symphonytimer.loader.onedrive.RestoreOneDriveDownloader;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupLocalProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
-import com.romanpulov.symphonytimer.preference.PreferenceRestoreDropboxProcessor;
+import com.romanpulov.symphonytimer.preference.PreferenceRestoreCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRestoreLocalProcessor;
 import com.romanpulov.symphonytimer.service.LoaderService;
 import com.romanpulov.symphonytimer.service.LoaderServiceManager;
@@ -52,7 +56,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 	Preference.OnPreferenceClickListener {
 
     private PreferenceBackupCloudProcessor mPreferenceBackupCloudProcessor;
-    private PreferenceRestoreDropboxProcessor mPreferenceRestoreDropboxProcessor;
+    private PreferenceRestoreCloudProcessor mPreferenceRestoreCloudProcessor;
     private PreferenceBackupLocalProcessor mPreferenceBackupLocalProcessor;
     private PreferenceRestoreLocalProcessor  mPreferenceRestoreLocalProcessor;
 
@@ -253,14 +257,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         mPreferenceLoadProcessors.put(mPreferenceRestoreLocalProcessor.getLoaderClass().getName(), mPreferenceRestoreLocalProcessor);
         setupPrefLocalRestoreLoadService();
 
-        //backup dropbox
+        //backup cloud
         mPreferenceBackupCloudProcessor = new PreferenceBackupCloudProcessor(this);
-        mPreferenceLoadProcessors.put(mPreferenceBackupCloudProcessor.getLoaderClass().getName(), mPreferenceBackupCloudProcessor);
-        setupPrefDropboxBackupLoadService();
+        //mPreferenceLoadProcessors.put(mPreferenceBackupCloudProcessor.getLoaderClass().getName(), mPreferenceBackupCloudProcessor);
+        mPreferenceLoadProcessors.put(BackupDropboxUploader.class.getName(), mPreferenceBackupCloudProcessor);
+        mPreferenceLoadProcessors.put(BackupOneDriveUploader.class.getName(), mPreferenceBackupCloudProcessor);
+        setupPrefCloudBackupLoadService();
 
         //restore dropbox
-        mPreferenceRestoreDropboxProcessor = new PreferenceRestoreDropboxProcessor(this);
-        mPreferenceLoadProcessors.put(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName(), mPreferenceRestoreDropboxProcessor);
+        mPreferenceRestoreCloudProcessor = new PreferenceRestoreCloudProcessor(this);
+        //mPreferenceLoadProcessors.put(mPreferenceRestoreCloudProcessor.getLoaderClass().getName(), mPreferenceRestoreCloudProcessor);
+        mPreferenceLoadProcessors.put(RestoreDropboxDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
+        mPreferenceLoadProcessors.put(RestoreOneDriveDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         setupPrefDropboxRestoreLoadService();
     }
 
@@ -413,7 +421,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     /**
      * Cloud backup using service
      */
-    private void setupPrefDropboxBackupLoadService() {
+    private void setupPrefCloudBackupLoadService() {
         PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_CLOUD_BACKUP, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         final Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_BACKUP);
@@ -425,7 +433,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                     int cloudAccountType = -1;
                     final Preference prefCloudAccountType = findPreference(PREF_KEY_CLOUD_ACCOUNT_TYPE);
                     if (prefCloudAccountType != null) {
-                        cloudAccountType = prefCloudAccountType.getSharedPreferences().getInt(prefCloudAccountType.getKey(), -1);
+                        cloudAccountType = Integer.parseInt(prefCloudAccountType.getSharedPreferences().getString(prefCloudAccountType.getKey(), "-1"));
                         if (cloudAccountType == -1) {
                             PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
                             return true;
@@ -453,8 +461,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     }
 
     public void executeDropboxRestore() {
-        mPreferenceRestoreDropboxProcessor.preExecute();
-        mLoaderServiceManager.startLoader(mPreferenceRestoreDropboxProcessor.getLoaderClass().getName());
+        mPreferenceRestoreCloudProcessor.preExecute();
+        mLoaderServiceManager.startLoader(mPreferenceRestoreCloudProcessor.getLoaderClass().getName());
     }
 
     /**

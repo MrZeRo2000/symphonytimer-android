@@ -11,9 +11,9 @@ import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
 
 
-public class RestoreOneDriveFileLoader extends com.romanpulov.violetnote.loader.onedrive.OneDriveFileLoader {
+public class RestoreOneDriveDownloader extends com.romanpulov.violetnote.loader.onedrive.OneDriveFileLoader {
 
-    public RestoreOneDriveFileLoader(Context context) {
+    public RestoreOneDriveDownloader(Context context) {
         super(context, new RestoreCloudLoadPathProvider(context));
     }
 
