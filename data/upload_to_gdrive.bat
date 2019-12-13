@@ -1,0 +1,1 @@
+C:\WinApp\gdrive-windows-x64.exe upload -p 0B_ig-JZY-e2-UWJseko1bVAyVmc  D:\prj\AndroidStudioProjects\symphonytimer-android\app\release\%1

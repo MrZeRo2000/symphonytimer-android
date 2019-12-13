@@ -64,7 +64,7 @@
     <string name="pref_local_restore">Local restore</string>
     <string name="pref_summary_local_restore">Restore current data from local SD card</string>
     <string name="pref_cat_dropbox_backup">DropBox backup</string>
-    <string name="pref_cat_cloud_data_management">Dropbox data management</string>
+    <string name="pref_cat_cloud_data_management">Cloud data management</string>
     <string name="pref_cloud_account_type">Account Type</string>
     <string name="pref_cloud_account_type_default">0</string>
     <string name="pref_cloud_account">Account</string>

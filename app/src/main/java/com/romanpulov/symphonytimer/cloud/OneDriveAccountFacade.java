@@ -14,6 +14,7 @@ import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import static com.romanpulov.library.onedrive.OneDriveHelper.ONEDRIVE_ACTION_LOGIN;
 import static com.romanpulov.library.onedrive.OneDriveHelper.ONEDRIVE_ACTION_LOGOUT;
+import static com.romanpulov.symphonytimer.cloud.OneDriveAccountRepository.ONE_DRIVE_APP_ID;
 
 public class OneDriveAccountFacade extends AbstractCloudAccountFacade {
     @Override
@@ -99,7 +100,7 @@ public class OneDriveAccountFacade extends AbstractCloudAccountFacade {
                 .setPositiveButton(R.string.caption_login, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        OneDriveHelper oneDriveHelper = OneDriveHelper.getInstance();
+                        OneDriveHelper oneDriveHelper = OneDriveHelper.getInstance(ONE_DRIVE_APP_ID);
                         oneDriveHelper.setOnOneDriveActionListener(oneDriveActionHandler);
                         oneDriveHelper.createClient(activity);
                     }
@@ -108,7 +109,7 @@ public class OneDriveAccountFacade extends AbstractCloudAccountFacade {
                 .setNegativeButton(R.string.caption_logout, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        OneDriveHelper oneDriveHelper = OneDriveHelper.getInstance();
+                        OneDriveHelper oneDriveHelper = OneDriveHelper.getInstance(ONE_DRIVE_APP_ID);
                         oneDriveHelper.setOnOneDriveActionListener(oneDriveActionHandler);
                         oneDriveHelper.logout(activity);
                     }

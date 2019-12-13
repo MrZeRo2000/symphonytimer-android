@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static com.romanpulov.symphonytimer.cloud.OneDriveAccountRepository.ONE_DRIVE_APP_ID;
+
 public class OneDriveFileLoader extends FileLoader {
     private final OneDriveHelper mOneDriveHelper;
 
@@ -45,6 +47,6 @@ public class OneDriveFileLoader extends FileLoader {
 
     public OneDriveFileLoader(Context context, LoadPathProvider loadPathProvider) {
         super(context, loadPathProvider);
-        mOneDriveHelper = OneDriveHelper.getInstance();
+        mOneDriveHelper = OneDriveHelper.getInstance(ONE_DRIVE_APP_ID);
     }
 }
