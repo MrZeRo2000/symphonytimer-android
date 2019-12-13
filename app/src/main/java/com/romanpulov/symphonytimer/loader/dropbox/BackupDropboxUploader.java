@@ -42,7 +42,7 @@ public class BackupDropboxUploader extends AbstractContextLoader {
 
         DbxClientV2 client = mDropboxHelper.getClient();
 
-        File[] files = mDBStorageHelper.getXMLBackupFiles();
+        File[] files = mDBStorageHelper.getDatabaseBackupFiles();
         for (File f : files) {
             String remoteFileName = f.getName();
             InputStream inputStream = new FileInputStream(f);

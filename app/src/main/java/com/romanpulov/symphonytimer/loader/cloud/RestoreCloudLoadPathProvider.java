@@ -1,9 +1,10 @@
-package com.romanpulov.symphonytimer.loader.dropbox;
+package com.romanpulov.symphonytimer.loader.cloud;
 
 import android.content.Context;
 
 import com.romanpulov.library.common.loader.core.ContextLoadPathProvider;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
+import com.romanpulov.symphonytimer.loader.dropbox.DropboxLoaderRepository;
 
 import java.io.File;
 

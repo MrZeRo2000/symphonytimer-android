@@ -32,7 +32,7 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
 
     @Override
     public void load() throws Exception {
-        final File[] files = mDBStorageHelper.getXMLBackupFiles();
+        final File[] files = mDBStorageHelper.getDatabaseBackupFiles();
         final AtomicReference<Exception> mException = new AtomicReference<>();
         final AtomicReference<Integer> mFileCounter = new AtomicReference<>();
         mFileCounter.set(files.length);

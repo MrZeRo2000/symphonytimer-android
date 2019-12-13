@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
-import com.romanpulov.symphonytimer.loader.dropbox.RestoreCloudLoadPathProvider;
+import com.romanpulov.symphonytimer.loader.cloud.RestoreCloudLoadPathProvider;
 import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
