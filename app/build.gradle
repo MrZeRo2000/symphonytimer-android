@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 14
-        versionName "0.7.4"
+        versionName "0.7.5"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -22,7 +22,7 @@ android {
         //rename to debug for debugging with ProGuard rules
         debug {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
-            minifyEnabled false
+            minifyEnabled true
             debuggable true
             zipAlignEnabled true
             jniDebuggable true

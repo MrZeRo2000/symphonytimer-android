@@ -314,10 +314,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                     if (mLoaderServiceManager.isLoaderServiceRunning())
                         PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
                     else {
-                        if (mWriteStorageRequestHelper.isPermissionGranted())
-                            executeLocalBackup();
-                        else
-                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_LOCAL_BACKUP);
+                        executeLocalBackup();
                     }
 
                     return true;
@@ -355,10 +352,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                                 .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if (mWriteStorageRequestHelper.isPermissionGranted())
-                                            executeLocalRestore();
-                                        else
-                                            mWriteStorageRequestHelper.requestPermission(SettingsActivity.PERMISSION_REQUEST_LOCAL_RESTORE);
+                                        executeLocalRestore();
                                     }
                                 })
                                 .setNegativeButton(R.string.caption_cancel, null)

@@ -34,3 +34,5 @@
 -dontwarn javax.servlet.**
 
 -keepclassmembers class com.romanpulov.symphonytimer.loader.** { *; }
+-keepclassmembers class com.onedrive.sdk.extensions.** { *; }
+
