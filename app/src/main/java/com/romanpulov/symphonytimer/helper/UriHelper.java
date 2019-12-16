@@ -34,9 +34,6 @@ public final class UriHelper {
                 }
             }
         }
-        catch (FileNotFoundException e) {
-            return  false;
-        }
         catch (IOException e) {
             return false;
         }

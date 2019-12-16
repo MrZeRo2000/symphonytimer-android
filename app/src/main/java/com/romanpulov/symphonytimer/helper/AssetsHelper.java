@@ -20,10 +20,10 @@ public class AssetsHelper {
         LoggerHelper.logContext(mContext, "AssetsHelper", message);
     }
 
-    private static String PATH = "pre_inst_images";
-    private static String PREF_NAME = "assets_private";
-    private static String PREF_FIRST_RUN_PARAM_NAME = "is_first_run";
-    private static String DEST_PATH = "symphonytimer";
+    private static final String PATH = "pre_inst_images";
+    private static final String PREF_NAME = "assets_private";
+    private static final String PREF_FIRST_RUN_PARAM_NAME = "is_first_run";
+    private static final String DEST_PATH = "symphonytimer";
 
     private final Context mContext;
     private final AssetManager mAssetManager;

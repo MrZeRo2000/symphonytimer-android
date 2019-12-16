@@ -167,23 +167,21 @@ public class DBHelper {
 	} 
 	
 	private long getPrevOrderId(long orderId) {
-		String sql = "SELECT MAX(order_id) FROM " + DBOpenHelper.TIMER_TABLE_NAME + " WHERE order_id<" + String.valueOf(orderId);
+		String sql = "SELECT MAX(order_id) FROM " + DBOpenHelper.TIMER_TABLE_NAME + " WHERE order_id<" + orderId;
 		return getLongSQL(sql);
 	}
 	
 	private long getNextOrderId(long orderId) {
-		String sql = "SELECT MIN(order_id) FROM " + DBOpenHelper.TIMER_TABLE_NAME + " WHERE order_id>" + String.valueOf(orderId);
+		String sql = "SELECT MIN(order_id) FROM " + DBOpenHelper.TIMER_TABLE_NAME + " WHERE order_id>" + orderId;
 		return getLongSQL(sql);
 	}
 	
 	private void exchangeOrderId(long orderId_1, long orderId_2) {
-		StringBuilder sqlBuilder = new StringBuilder();
-		sqlBuilder.append("UPDATE ").append(DBOpenHelper.TIMER_TABLE_NAME).append(" SET order_id = ");
-		sqlBuilder.append("CASE WHEN order_id = ").append(orderId_1).append(" THEN ").append(orderId_2).append(" ");
-		sqlBuilder.append("WHEN order_id = ").append(orderId_2).append(" THEN ").append(orderId_1).append(" ");
-		sqlBuilder.append("ELSE order_id END");
 
-		String sql = sqlBuilder.toString();
+		String sql = "UPDATE " + DBOpenHelper.TIMER_TABLE_NAME + " SET order_id = " +
+				"CASE WHEN order_id = " + orderId_1 + " THEN " + orderId_2 + " " +
+				"WHEN order_id = " + orderId_2 + " THEN " + orderId_1 + " " +
+				"ELSE order_id END";
 
 		mDB.execSQL(sql);
 	}	
@@ -207,8 +205,8 @@ public class DBHelper {
 	}
 	
 	public long deleteTimer(long id) {
-		mDB.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1] + "=" + String.valueOf(id), null);
-		return mDB.delete(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS[0] + "=" + String.valueOf(id), null);
+		mDB.delete(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1] + "=" + id, null);
+		return mDB.delete(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS[0] + "=" + id, null);
 	}
 
 	/* No longer needed

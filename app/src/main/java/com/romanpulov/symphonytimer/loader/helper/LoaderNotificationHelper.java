@@ -24,9 +24,9 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public final class LoaderNotificationHelper {
 
-    private static String CHANNEL_LOADER_ID = "LOADER_CHANNEL";
-    private static String CHANNEL_LOADER_NAME = "Loader channel";
-    private static String CHANNEL_LOADER_DESCRIPTION = "Channel for loader notifications";
+    private static final String CHANNEL_LOADER_ID = "LOADER_CHANNEL";
+    private static final String CHANNEL_LOADER_NAME = "Loader channel";
+    private static final String CHANNEL_LOADER_DESCRIPTION = "Channel for loader notifications";
 
     private static boolean mNotificationChannelNeeded = true;
 

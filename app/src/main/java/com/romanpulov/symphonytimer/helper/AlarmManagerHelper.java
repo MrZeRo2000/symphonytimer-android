@@ -21,9 +21,9 @@ public class AlarmManagerHelper {
         LoggerHelper.logContext(context, "AlarmManagerHelper", message);
     }
 
-    public static int ALARM_TYPE_EXACT = 0;
-    public static int ALARM_TYPE_REPEATING = 1;
-    public static int ALARM_TYPE_ADVANCE = 2;
+    public static final int ALARM_TYPE_EXACT = 0;
+    public static final int ALARM_TYPE_REPEATING = 1;
+    public static final int ALARM_TYPE_ADVANCE = 2;
 
     private void cancelTimeAlarm(Context context, Class<?> intentClass, int requestCode) {
         Intent intent = new Intent(context, intentClass);

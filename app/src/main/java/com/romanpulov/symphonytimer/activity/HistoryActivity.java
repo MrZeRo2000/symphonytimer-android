@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.view.Menu;
@@ -30,7 +31,7 @@ import com.romanpulov.symphonytimer.model.DMTimers;
 import java.util.Arrays;
 import java.util.List;
 
-public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNavigationListener, AdapterView.OnItemSelectedListener {
+public class HistoryActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     //storage
     public final static String TIMERS_NAME = "timers";
     private final static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";
@@ -68,20 +69,19 @@ public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNa
 
     }
 
-    private class HistoryPagerAdapter extends FragmentPagerAdapter {
+    private class HistoryPagerAdapter extends FragmentStatePagerAdapter {
         final String[] mFragmentTags;
 
         HistoryPagerAdapter(FragmentManager fm) {
-            super(fm);
+            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             mFragmentTags = new String[getCount()];
         }
 
         @Override
+        @NonNull
         public Fragment getItem(int index) {
-            //HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mActionBar.getSelectedNavigationIndex());
             HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mSelectedHistoryIndex);
-            if (historyFragment != null)
-                historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
+            historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
             return historyFragment;
         }
 
@@ -118,7 +118,10 @@ public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        mDMTimers = this.getIntent().getExtras().getParcelable(HistoryActivity.TIMERS_NAME);
+        Bundle bundle = this.getIntent().getExtras();
+        if (bundle != null) {
+            mDMTimers = bundle.getParcelable(HistoryActivity.TIMERS_NAME);
+        }
 
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 
@@ -131,26 +134,6 @@ public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNa
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
             actionBar.setIcon(R.drawable.tuba);
         }
-
-        /*
-        mActionBar = this.getSupportActionBar();
-        if (mActionBar != null) {
-            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-            mActionBar.setHomeButtonEnabled(true);
-            //mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setIcon(R.drawable.tuba);
-            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        }
-        */
-
-        //ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.history_filter, android.R.layout.simple_spinner_item);
-        //spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        /*
-        mActionBar.setListNavigationCallbacks(spinnerAdapter, this);  
-        if (null != savedInstanceState) {
-            mActionBar.setSelectedNavigationItem(savedInstanceState.getInt(HISTORY_NAVIGATION_INDEX));
-        }
-        */
 
         if (null != savedInstanceState) {
             mSelectedHistoryIndex = savedInstanceState.getInt(HISTORY_NAVIGATION_INDEX);
@@ -177,18 +160,8 @@ public class HistoryActivity extends AppCompatActivity implements ActionBar.OnNa
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(HISTORY_NAVIGATION_INDEX, mSelectedHistoryIndex);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        for (int i = 0; i < mAdapter.getCount(); i++) {
-            HistoryFragment historyFragment = (HistoryFragment)getSupportFragmentManager().findFragmentByTag(mAdapter.mFragmentTags[i]);
-            if (historyFragment != null)
-                historyFragment.setHistoryFilterId(itemPosition);
-        }
-        return false;
     }
 }

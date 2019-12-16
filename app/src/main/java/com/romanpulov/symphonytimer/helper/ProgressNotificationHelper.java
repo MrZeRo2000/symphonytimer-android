@@ -27,9 +27,9 @@ public class ProgressNotificationHelper {
         LoggerHelper.logContext(mContext.get(), "ProgressNotificationHelper", message);
     }
 
-    private static String CHANNEL_PROGRESS_ID = "PROGRESS_CHANNEL";
-    private static String CHANNEL_PROGRESS_NAME = "Progress channel";
-    private static String CHANNEL_PROGRESS_DESCRIPTION = "Channel for progress notification";
+    private static final String CHANNEL_PROGRESS_ID = "PROGRESS_CHANNEL";
+    private static final String CHANNEL_PROGRESS_NAME = "Progress channel";
+    private static final String CHANNEL_PROGRESS_DESCRIPTION = "Channel for progress notification";
 
     private static ProgressNotificationHelper mProgressNotificationHelper;
 

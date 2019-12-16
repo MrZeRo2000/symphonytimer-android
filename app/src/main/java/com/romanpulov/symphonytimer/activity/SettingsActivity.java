@@ -1,12 +1,9 @@
 package com.romanpulov.symphonytimer.activity;
 
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.fragment.SettingsFragment;
-import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 

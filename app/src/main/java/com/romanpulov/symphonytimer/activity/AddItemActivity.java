@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -197,7 +198,7 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (null != mEditSoundFile) {
             outState.putString(EDIT_SOUND_DATA, mEditSoundFile.getPath());
@@ -208,7 +209,7 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         final String soundFile = savedInstanceState.getString(EDIT_SOUND_DATA);
         final String imageFile = savedInstanceState.getString(EDIT_IMAGE_DATA);

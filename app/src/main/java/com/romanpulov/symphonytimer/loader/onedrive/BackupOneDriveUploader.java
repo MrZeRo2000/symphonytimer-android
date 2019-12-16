@@ -15,6 +15,7 @@ import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,7 +29,7 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
 
     private final OneDriveHelper mOneDriveHelper;
     private final DBStorageHelper mDBStorageHelper;
-    private CountDownLatch mLocker = new CountDownLatch(1);
+    private final CountDownLatch mLocker = new CountDownLatch(1);
 
     public BackupOneDriveUploader(Context context) {
         super(context);
@@ -40,7 +41,7 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
     public void load() throws Exception {
         final File[] files = mDBStorageHelper.getDatabaseBackupFiles();
 
-        log("Got backup files:" + files.toString());
+        log("Got backup files:" + Arrays.toString(files));
 
         final AtomicReference<Exception> mException = new AtomicReference<>();
         final AtomicReference<Integer> mFileCounter = new AtomicReference<>();

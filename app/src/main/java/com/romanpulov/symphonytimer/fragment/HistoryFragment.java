@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer.fragment;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.romanpulov.symphonytimer.model.DMTimers;
@@ -15,17 +16,14 @@ public class HistoryFragment extends Fragment {
     protected int mHistoryFilterId = -1;
 	protected ArrayAdapter<?> mAdapter;
 
+	@NonNull
     public static <T extends HistoryFragment> T newInstance(Class<T> historyFragmentClass, DMTimers dmTimers, int historyFilterId) {
         T fragment;
         try {
             fragment = historyFragmentClass.newInstance();
-        } catch (java.lang.InstantiationException e) {
+        } catch (java.lang.InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
-            return null;
-        }
-        catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e.getMessage());
         }
         Bundle args = new Bundle();
         args.putParcelable(ARG_TIMERS, dmTimers);
