@@ -20,9 +20,9 @@ android {
         }
 
         //rename to debug for debugging with ProGuard rules
-        debug {
+        debugTest {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
-            minifyEnabled true
+            minifyEnabled false
             debuggable true
             zipAlignEnabled true
             jniDebuggable true

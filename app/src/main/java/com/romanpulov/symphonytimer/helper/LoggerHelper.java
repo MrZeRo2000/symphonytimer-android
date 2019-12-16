@@ -65,6 +65,13 @@ public class LoggerHelper {
             getInstance(context).log(tag, message);
     }
 
+    public static void unconditionalLogContext(Context context, String tag, String message) {
+        if (context != null) {
+            getInstance(context).unconditionalLog(tag, message);
+        }
+    }
+
+
     private LoggerHelper(Context context) {
         mEnableLogging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_logging", false);
         mLogFolder = prepareLogFolder(context);

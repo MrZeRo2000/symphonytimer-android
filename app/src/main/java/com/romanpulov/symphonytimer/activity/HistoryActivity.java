@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -61,7 +60,8 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        setSelectedHistoryIndex(position);
+        //setSelectedHistoryIndex(position);
+        mAdapter.setSelectedHistoryIndex(position);
     }
 
     @Override
@@ -71,16 +71,19 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
 
     private class HistoryPagerAdapter extends FragmentStatePagerAdapter {
         final String[] mFragmentTags;
+        final HistoryFragment[] mFragments;
 
         HistoryPagerAdapter(FragmentManager fm) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             mFragmentTags = new String[getCount()];
+            mFragments = new HistoryFragment[getCount()];
         }
 
         @Override
         @NonNull
         public Fragment getItem(int index) {
             HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mSelectedHistoryIndex);
+            mFragments[index] = historyFragment;
             historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
             return historyFragment;
         }
@@ -104,12 +107,31 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
             }
         }
 
+        /*
         @Override
         @NonNull
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             HistoryFragment historyFragment = (HistoryFragment)super.instantiateItem(container, position);
             mFragmentTags[position] = historyFragment.getTag();
+            mFragments[position] = historyFragment;
             return historyFragment;
+        }
+
+         */
+
+        private void setSelectedHistoryIndex(int position) {
+            /*
+            for (Fragment fragment: getSupportFragmentManager().getFragments()) {
+                ((HistoryFragment)fragment).setHistoryFilterId(position);
+            }
+
+             */
+            for (Fragment fragment: mFragments) {
+                if (fragment != null) {
+                    ((HistoryFragment) fragment).setHistoryFilterId(position);
+                }
+            }
+
         }
     }
 

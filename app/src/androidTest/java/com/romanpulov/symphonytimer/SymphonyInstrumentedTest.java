@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -22,6 +23,10 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class SymphonyInstrumentedTest {
+
+    private void unconditionalLog(String tag, String message) {
+        LoggerHelper.unconditionalLogContext(getApplicationContext(), tag, message);
+    }
 
     @Test
     public void first() {
@@ -51,18 +56,18 @@ public class SymphonyInstrumentedTest {
             ja.put(jio);
         }
 
-        LoggerHelper.unconditionalLog("testJSON", ja.toString());
+        unconditionalLog("testJSON", ja.toString());
         jo.put("DMTasks", ja);
-        LoggerHelper.unconditionalLog("testJSON", jo.toString());
+        unconditionalLog("testJSON", jo.toString());
 
         String jsonString = jo.toString();
 
         JSONObject joo = new JSONObject(jsonString);
         JSONArray joa = joo.optJSONArray("DMTasks");
         for (int i = 0; i< joa.length(); i++) {
-            LoggerHelper.unconditionalLog("testJSON", joa.get(i).toString());
-            LoggerHelper.unconditionalLog("testJSON", "id=" +((JSONObject)joa.get(i)).optInt("id"));
-            LoggerHelper.unconditionalLog("testJSON", "title=" +((JSONObject)joa.get(i)).optString("title"));
+            unconditionalLog("testJSON", joa.get(i).toString());
+            unconditionalLog("testJSON", "id=" +((JSONObject)joa.get(i)).optInt("id"));
+            unconditionalLog("testJSON", "title=" +((JSONObject)joa.get(i)).optString("title"));
         }
 
     }
@@ -73,12 +78,12 @@ public class SymphonyInstrumentedTest {
 
         //writing
         String tasksString = tasks.toJSONString();
-        LoggerHelper.unconditionalLog("testDMTasksJSON", "DMTasks=" + tasks);
-        LoggerHelper.unconditionalLog("testDMTasksJSON", "JSON=" + tasksString);
+        unconditionalLog("testDMTasksJSON", "DMTasks=" + tasks);
+        unconditionalLog("testDMTasksJSON", "JSON=" + tasksString);
 
         //reading
         DMTasks newTasks = DMTasks.fromJSONString(tasksString);
-        LoggerHelper.unconditionalLog("testDMTasksJSON", "Restored DMTasks=" + newTasks);
+        unconditionalLog("testDMTasksJSON", "Restored DMTasks=" + newTasks);
 
         //validation
         assertEquals(tasks.size(), newTasks.size());
@@ -88,12 +93,12 @@ public class SymphonyInstrumentedTest {
 
         //writing
         String emptyTasksString = emptyTasks.toString();
-        LoggerHelper.unconditionalLog("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
-        LoggerHelper.unconditionalLog("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
+        unconditionalLog("testDMTasksJSON", "Empty DMTasks=" + emptyTasks);
+        unconditionalLog("testDMTasksJSON", "Empty JSON=" + emptyTasksString);
 
         //reading
         DMTasks newEmptyTasks = DMTasks.fromJSONString(emptyTasksString);
-        LoggerHelper.unconditionalLog("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
+        unconditionalLog("testDMTasksJSON", "Restored Empty DMTasks=" + newEmptyTasks);
 
         //validation
         assertEquals(emptyTasks.size(), newEmptyTasks.size());

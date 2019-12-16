@@ -23,6 +23,10 @@ import static org.junit.Assert.assertTrue;
 public class SymphonyApplicationTest {
     private final static String TAG = "ApplicationTest";
 
+    private void unconditionalLog(String message) {
+        LoggerHelper.unconditionalLogContext(getApplicationContext(), TAG, message);
+    }
+
     @Test
     public void testCase1() {
         assertTrue(true);
@@ -42,15 +46,15 @@ public class SymphonyApplicationTest {
             }
         }
 
-        LoggerHelper.unconditionalLog(TAG, "uList=" + uList);
+        unconditionalLog("uList=" + uList);
 
         for (HashMap<Long, Long> item : list) {
-            LoggerHelper.unconditionalLog(TAG, "next series");
+            unconditionalLog("next series");
             for (Map.Entry<Long, Long> argumentItem : uList.entrySet()) {
                 Long key = argumentItem.getKey();
                 Long value = item.get(argumentItem.getKey());
                 long lValue = value == null ? 0 : value;
-                LoggerHelper.unconditionalLog(TAG, "Key=" + key + ", Value=" + lValue);
+                unconditionalLog("Key=" + key + ", Value=" + lValue);
             }
         }
 

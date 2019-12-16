@@ -1,5 +1,9 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.content.Context;
+
+import androidx.annotation.NonNull;
+
 import com.romanpulov.library.view.BarChart;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
@@ -14,6 +18,21 @@ import java.util.Map;
  * Created on 04.01.2016.
  */
 public class HistoryDynamicsChartFragment extends HistoryChartFragment {
+    private int mHistColor0;
+    private int mHistColor1;
+    private int mColor0;
+    private int mColor1;
+
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mHistColor0 = getResources().getColor(R.color.chartGradientHist0Color);
+        mHistColor1 = getResources().getColor(R.color.chartGradientHistColor);
+        mColor0 = getResources().getColor(R.color.chartGradient0Color);
+        mColor1 = getResources().getColor(R.color.chartGradientColor);
+    }
+
     @Override
     protected void updateSeries() {
         //calc data
@@ -32,13 +51,13 @@ public class HistoryDynamicsChartFragment extends HistoryChartFragment {
             BarChart.Series series = getBarChart().addSeries();
             if (isHist)
                 series.setGradientColors(
-                        getResources().getColor(R.color.chartGradientHist0Color),
-                        getResources().getColor(R.color.chartGradientHistColor)
+                        mHistColor0,
+                        mHistColor1
                 );
             else
                 series.setGradientColors(
-                        getResources().getColor(R.color.chartGradient0Color),
-                        getResources().getColor(R.color.chartGradientColor)
+                        mColor0,
+                        mColor1
                 );
             int position = 1;
             for (Map.Entry<Long, Long> argumentItem : uList.entrySet()) {
