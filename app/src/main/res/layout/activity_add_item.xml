@@ -28,6 +28,7 @@
 	    android:layout_margin="@dimen/activity_input_margin"
 	    android:inputType="textCapWords"
         android:imeOptions="actionDone"
+		android:importantForAutofill="no"
         android:hint="@string/hint_timer_title"
         />
 
