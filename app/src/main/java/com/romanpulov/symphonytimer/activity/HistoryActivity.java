@@ -44,23 +44,14 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
 
     private DMTimers mDMTimers;
 
-    private ViewPager mViewPager;
     private HistoryPagerAdapter mAdapter;
 
     private int mSelectedHistoryIndex;
 
-    private void setSelectedHistoryIndex(int position) {
-        mSelectedHistoryIndex = position;
-        for (int i = 0; i < mAdapter.getCount(); i++) {
-            HistoryFragment historyFragment = (HistoryFragment)getSupportFragmentManager().findFragmentByTag(mAdapter.mFragmentTags[i]);
-            if (historyFragment != null)
-                historyFragment.setHistoryFilterId(position);
-        }
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         //setSelectedHistoryIndex(position);
+        mSelectedHistoryIndex = position;
         mAdapter.setSelectedHistoryIndex(position);
     }
 
@@ -84,7 +75,8 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
         public Fragment getItem(int index) {
             HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mSelectedHistoryIndex);
             mFragments[index] = historyFragment;
-            historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
+            //historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
+            historyFragment.setHistoryFilterId(mSelectedHistoryIndex);
             return historyFragment;
         }
 
@@ -107,31 +99,12 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
             }
         }
 
-        /*
-        @Override
-        @NonNull
-        public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            HistoryFragment historyFragment = (HistoryFragment)super.instantiateItem(container, position);
-            mFragmentTags[position] = historyFragment.getTag();
-            mFragments[position] = historyFragment;
-            return historyFragment;
-        }
-
-         */
-
         private void setSelectedHistoryIndex(int position) {
-            /*
-            for (Fragment fragment: getSupportFragmentManager().getFragments()) {
-                ((HistoryFragment)fragment).setHistoryFilterId(position);
-            }
-
-             */
             for (Fragment fragment: mFragments) {
                 if (fragment != null) {
                     ((HistoryFragment) fragment).setHistoryFilterId(position);
                 }
             }
-
         }
     }
 
@@ -161,9 +134,9 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
             mSelectedHistoryIndex = savedInstanceState.getInt(HISTORY_NAVIGATION_INDEX);
         }
 
-        mViewPager = findViewById(R.id.pager);
-        mAdapter = new HistoryPagerAdapter(getSupportFragmentManager()); 
-        mViewPager.setAdapter(mAdapter);
+        ViewPager viewPager = findViewById(R.id.pager);
+        mAdapter = new HistoryPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(mAdapter);
     }
 
     @Override
