@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.romanpulov.symphonytimer.cloud.OneDriveAccountRepository.ONE_DRIVE_APP_ID;
 import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
 
 public class BackupOneDriveUploader extends AbstractContextLoader {
@@ -33,7 +32,7 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
 
     public BackupOneDriveUploader(Context context) {
         super(context);
-        mOneDriveHelper = OneDriveHelper.getInstance(ONE_DRIVE_APP_ID);
+        mOneDriveHelper = OneDriveHelper.getInstance();
         mDBStorageHelper = new DBStorageHelper(context);
     }
 

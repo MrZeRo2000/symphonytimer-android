@@ -112,6 +112,8 @@
     <string name="hint_timer_title">Timer title</string>
     <!-- Dropbox -->
     <string name="app_key">ml2bc3bur9qdrl7</string>
+    <!-- OneDrive -->
+    <string name="onedrive_client_id">53b9437b-4686-4200-9af4-72859d3d8b8b</string>
     <!-- Loader -->
     <string name="pref_message_last_loaded_never">Last loaded: Never</string>
     <string name="pref_message_last_loaded_format">Last loaded: %s</string>

@@ -7,13 +7,11 @@ import com.onedrive.sdk.extensions.Item;
 import com.romanpulov.library.onedrive.OneDriveHelper;
 import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 
-import static com.romanpulov.symphonytimer.cloud.OneDriveAccountRepository.ONE_DRIVE_APP_ID;
-
 public class OneDriveCloudAccountManager extends AbstractCloudAccountManager<OneDriveHelper> {
 
     @Override
     protected OneDriveHelper createAccountHolder() {
-        return OneDriveHelper.getInstance(ONE_DRIVE_APP_ID);
+        return OneDriveHelper.getInstance();
     }
 
     @Override
