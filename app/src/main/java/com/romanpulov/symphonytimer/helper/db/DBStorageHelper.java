@@ -4,8 +4,8 @@ import java.io.File;
 
 import android.content.Context;
 
-import com.romanpulov.library.common.io.ZipFileUtils;
-import com.romanpulov.library.common.storage.BackupUtils;
+import com.romanpulov.jutilscore.io.ZipFileUtils;
+import com.romanpulov.jutilscore.storage.BackupUtils;
 
 public class DBStorageHelper {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
