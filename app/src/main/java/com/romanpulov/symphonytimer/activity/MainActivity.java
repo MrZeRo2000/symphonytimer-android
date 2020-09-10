@@ -5,6 +5,7 @@ import java.util.List;
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -150,11 +151,16 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             mAssetsHelper.clearFirstRun();
             mAssets = mAssetsHelper.getAssets();
             if (!mAssets.isEmpty()) {
-                mWriteStorageRequestHelper = new PermissionRequestHelper(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                if (mWriteStorageRequestHelper.isPermissionGranted()) {
-                    mAssetsHelper.copyAssets(mAssets);
+                //for Android 10+ permissions are not required
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    mAssetsHelper.copyAssetsContent(mAssets);
                 } else {
-                    mWriteStorageRequestHelper.requestPermission(PERMISSION_REQUEST_COPY_ASSETS);
+                    mWriteStorageRequestHelper = new PermissionRequestHelper(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    if (mWriteStorageRequestHelper.isPermissionGranted()) {
+                        mAssetsHelper.copyAssetsContent(mAssets);
+                    } else {
+                        mWriteStorageRequestHelper.requestPermission(PERMISSION_REQUEST_COPY_ASSETS);
+                    }
                 }
             }
         }

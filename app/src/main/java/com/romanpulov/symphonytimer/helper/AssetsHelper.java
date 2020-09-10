@@ -4,14 +4,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 
@@ -112,6 +117,83 @@ public class AssetsHelper {
                         e.printStackTrace();
                     }
             }
+        }
+    }
+
+    public void copyAssetsContent(List<String> assets) {
+        if (mAssetManager != null) {
+            Intent mediaScannerIntent = null;
+
+            for (String s : assets) {
+                try {
+
+                    OutputStream outStream = null;
+                    File destFile = null;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentResolver resolver = mContext.getContentResolver();
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, s);
+                        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+                        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + DEST_PATH);
+                        Uri imageUri = resolver.insert(MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), contentValues);
+                        if (imageUri != null) {
+                            outStream = resolver.openOutputStream(imageUri);
+                        }
+                    } else {
+                        File destFolderFile = new File(mDestFolderPathFile.getAbsolutePath() + File.separator + DEST_PATH);
+
+                        if (!destFolderFile.exists()) {
+                            if (!destFolderFile.mkdirs()) {
+                                return;
+                            }
+                        }
+
+                        destFile = new File(destFolderFile, s);
+                        outStream = new FileOutputStream(destFile);
+                    }
+
+                    if (outStream != null) {
+
+                        InputStream inStream = mAssetManager.open(PATH.concat(File.separator).concat(s));
+
+                        try {
+                            byte[] buf = new byte[1024];
+                            int len;
+                            while ((len = inStream.read(buf)) > 0) {
+                                outStream.write(buf, 0, len);
+                            }
+                        } finally {
+                            try {
+                                inStream.close();
+                                outStream.flush();
+                                outStream.close();
+                            } catch (IOException e) {
+                                log(e.getMessage());
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    // update media library
+                    if (destFile != null) {
+                        if (null == mediaScannerIntent) {
+                            mediaScannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        }
+                        mediaScannerIntent.setData(Uri.fromFile(destFile));
+                        mContext.sendBroadcast(mediaScannerIntent);
+                    }
+
+                } catch (IOException e) {
+                    log(e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
+
+
+            ContentResolver resolver = mContext.getApplicationContext().getContentResolver();
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         }
     }
 
