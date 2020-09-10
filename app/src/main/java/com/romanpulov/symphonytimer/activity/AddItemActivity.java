@@ -286,10 +286,14 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
 
             //load and save to media storage
             mEditImageFile = MediaStorageHelper.getInstance(getApplicationContext()).createMediaFile(MediaStorageHelper.MEDIA_TYPE_IMAGE, (int)mEditId);
-            UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditImageFile);
-
-            //update image from file to ensure it was loaded correctly
-            mImageFileButton.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
+            if (UriHelper.uriSaveToFile(getApplicationContext(), uri, mEditImageFile)) {
+                //update image from file to ensure it was loaded correctly
+                mImageFileButton.setImageURI(UriHelper.fileNameToUri(getApplicationContext(), mEditImageFile.getPath()));
+            } else {
+                if (mEditImageFile.exists()) {
+                    mEditImageFile.delete();
+                }
+            }
        }
 
       super.onActivityResult(requestCode, resultCode, data);

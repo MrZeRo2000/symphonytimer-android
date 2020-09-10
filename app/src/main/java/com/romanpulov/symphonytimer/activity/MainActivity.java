@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         mAssetsHelper = new AssetsHelper(this);
         if (mAssetsHelper.isFirstRun()) {
-            mAssetsHelper.clearFirstRun();
+            // mAssetsHelper.clearFirstRun();
             mAssets = mAssetsHelper.getAssets();
             if (!mAssets.isEmpty()) {
                 //for Android 10+ permissions are not required

@@ -8,33 +8,27 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.content.Context;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 
 public final class UriHelper {
 
     public static boolean uriSaveToFile(Context context, Uri uri, File file) {
-        try {
-            InputStream inStream = context.getContentResolver().openInputStream(uri);
+        try (InputStream inStream = context.getApplicationContext().getContentResolver().openInputStream(uri);
+             OutputStream outStream = new FileOutputStream(file);
+        ) {
             if (inStream == null)
                 return false;
-            OutputStream outStream = new FileOutputStream(file);
-            try {
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = inStream.read(buf)) > 0) {
-                    outStream.write(buf, 0, len);
-                }
-            } finally {
-                try {
-                    inStream.close();
-                    outStream.flush();
-                    outStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inStream.read(buf)) > 0) {
+                outStream.write(buf, 0, len);
             }
+            outStream.flush();
         }
         catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -45,7 +39,7 @@ public final class UriHelper {
         File file = new File(fileName);
         if (file.exists()) {
             return Uri.parse(Uri.fromFile(file).toString());
-        }	else
+        } else
             return null;
     }
 }
