@@ -127,7 +127,6 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-            // actionBar.setIcon(R.drawable.tuba);
         }
 
         if (null != savedInstanceState) {

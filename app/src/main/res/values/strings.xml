@@ -37,8 +37,8 @@
     <string name="pref_cat_settings">Application Settings</string>
     <string name="pref_vibrate">Vibrate</string>
     <string name="pref_summary_vibrate">Enables vibration on task completion</string>
-    <string name="pref_mute">Mute</string>
-    <string name="pref_summary_mute">Disables sound on task completion</string>
+    <string name="pref_sound_volume">Sound volume</string>
+    <string name="pref_summary_sound_volume">Sound volume when timer fires</string>
     <string name="pref_logging">Logging</string>
     <string name="pref_logging_summary">Writes logs to application folder.\nClose and open the application for the changes to take effect</string>
 

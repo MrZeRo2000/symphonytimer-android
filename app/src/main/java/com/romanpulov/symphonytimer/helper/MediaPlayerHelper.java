@@ -14,7 +14,6 @@ public class MediaPlayerHelper {
 	}
 
 	private final Context mContext;
-    private final boolean mIsMute;
 	private MediaPlayer mMediaPlayer;
 	private int mOriginalVolume = -1;
 	private AudioManager mAudioManager;
@@ -33,7 +32,6 @@ public class MediaPlayerHelper {
 
 	public MediaPlayerHelper(Context context){
 		mContext = context;
-		mIsMute = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_mute", false);
 	}
 
 	public void start() {
@@ -65,7 +63,9 @@ public class MediaPlayerHelper {
     }
 
 	private void startSoundFile(String soundFileName) {
-        if (mIsMute)
+		int soundVolume = PreferenceManager.getDefaultSharedPreferences(mContext).getInt("pref_sound_volume", 100);
+
+        if (soundVolume == 0)
             return;
 
 		stop();
@@ -89,8 +89,13 @@ public class MediaPlayerHelper {
 		}
 		
 		mOriginalVolume = getAudioManager().getStreamVolume(AudioManager.STREAM_MUSIC);
-		log ("set max volume");
-		getAudioManager().setStreamVolume(AudioManager.STREAM_MUSIC, getAudioManager().getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+		log ("set volume");
+
+		getAudioManager().setStreamVolume(
+				AudioManager.STREAM_MUSIC,
+				Math.round(getAudioManager().getStreamMaxVolume(AudioManager.STREAM_MUSIC) * soundVolume / 100f),
+				0
+		);
 		
 		mMediaPlayer.setLooping(true);
 		mMediaPlayer.start();

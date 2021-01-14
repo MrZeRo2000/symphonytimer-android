@@ -12,11 +12,13 @@
 		    android:defaultValue="true"
 			app:iconSpaceReserved="false"
 		    />
-		<SwitchPreference
-			android:key="pref_mute"
-			android:title="@string/pref_mute"
-            android:summary="@string/pref_summary_mute"
-			android:defaultValue="false"
+		<SeekBarPreference
+			android:key="pref_sound_volume"
+			android:title="@string/pref_sound_volume"
+			android:summary="@string/pref_summary_sound_volume"
+			android:defaultValue="100"
+			android:max="100"
+			app:seekBarIncrement="10"
 			app:iconSpaceReserved="false"
 			/>
 		<SwitchPreference

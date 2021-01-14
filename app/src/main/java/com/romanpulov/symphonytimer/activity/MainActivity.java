@@ -114,10 +114,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 		//setup toolbar
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            // getSupportActionBar().setIcon(R.drawable.tuba);
-        }
 
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, new OnDMTimerInteractionListener() {
             @Override
