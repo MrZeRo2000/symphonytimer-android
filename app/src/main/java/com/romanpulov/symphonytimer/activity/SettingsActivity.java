@@ -22,7 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-            actionBar.setIcon(R.drawable.tuba);
+            // actionBar.setIcon(R.drawable.tuba);
         }
     }
 }

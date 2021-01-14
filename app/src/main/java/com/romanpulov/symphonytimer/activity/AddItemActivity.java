@@ -91,7 +91,7 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-            actionBar.setIcon(R.drawable.tuba);
+            // actionBar.setIcon(R.drawable.tuba);
         }
 
         mMediaPlayerHelper = new MediaPlayerHelper(this);

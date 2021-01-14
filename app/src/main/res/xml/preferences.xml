@@ -5,21 +5,21 @@
 	    android:title="@string/pref_cat_settings"
 		app:iconSpaceReserved="false"
 	    >    
-		<CheckBoxPreference
+		<SwitchPreference
 		    android:key="pref_vibrate"
 		    android:title="@string/pref_vibrate"
             android:summary="@string/pref_summary_vibrate"
 		    android:defaultValue="true"
 			app:iconSpaceReserved="false"
 		    />
-		<CheckBoxPreference
+		<SwitchPreference
 			android:key="pref_mute"
 			android:title="@string/pref_mute"
             android:summary="@string/pref_summary_mute"
 			android:defaultValue="false"
 			app:iconSpaceReserved="false"
 			/>
-		<CheckBoxPreference
+		<SwitchPreference
 			android:key="pref_logging"
 			android:title="@string/pref_logging"
 			android:summary="@string/pref_logging_summary"
@@ -51,14 +51,14 @@
 		android:title="@string/pref_cat_interface"
 		app:iconSpaceReserved="false"
 		>
-		<CheckBoxPreference
+		<SwitchPreference
 			android:key="pref_bitmap_background"
 			android:title="@string/pref_bitmap_background"
 			android:summary="@string/pref_bitmap_background_summary"
 			android:defaultValue="false"
 			app:iconSpaceReserved="false"
 			/>
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="pref_full_history_info"
             android:title="@string/pref_full_history_info"
             android:summary="@string/pref_full_history_info_summary"
