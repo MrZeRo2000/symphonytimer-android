@@ -2,9 +2,14 @@ package com.romanpulov.symphonytimer.helper;
 
 import android.content.Context;
 import androidx.preference.PreferenceManager;
+
+import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 
+import com.romanpulov.library.common.logger.AbstractLogger;
 import com.romanpulov.library.common.logger.FileLogger;
+import com.romanpulov.library.common.logger.MediaStoreLogger;
 
 import java.io.File;
 
@@ -29,30 +34,32 @@ public class LoggerHelper {
         mInstance = null;
     }
 
-    private static FileLogger mLogger;
-    private final File mLogFolder;
+    private static AbstractLogger mLogger;
 
+    private final Context mContext;
     private final boolean mEnableLogging;
+
+    private String mLogFolderName;
 
     public void log(String tag, String message) {
         if (mEnableLogging)
             internalLog(tag, message);
-
     }
 
     private void internalLog(String tag, String message) {
-        if (mLogFolder != null) {
+        String logFileName =  DateFormatterHelper.formatLogFileDate(System.currentTimeMillis()) + ".log";
 
-            String logFileName = mLogFolder.getPath() + "/" + DateFormatterHelper.formatLogFileDate(System.currentTimeMillis()) + ".log";
-            if (mLogger == null) {
-                mLogger = new FileLogger(logFileName);
-            } else if (!mLogger.getFileName().equals(logFileName)) {
-                mLogger.close();
-                mLogger = new FileLogger(logFileName);
-            }
+        if (mLogger == null) {
+            mLogger = prepareLogger(logFileName);
+        } else if (!mLogger.getFileName().equals(logFileName)) {
+            mLogger.close();
+            mLogger = prepareLogger(logFileName);
+        }
+
+        if (mLogger != null) {
             mLogger.log(tag, message, 0);
-        } else
-            Log.d("LoggerHelper", "Folder not prepared");
+        }
+
         Log.d(tag, message);
     }
 
@@ -71,22 +78,41 @@ public class LoggerHelper {
         }
     }
 
-
     private LoggerHelper(Context context) {
+        mContext = context;
         mEnableLogging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_logging", false);
-        mLogFolder = prepareLogFolder(context);
     }
 
-    private static File prepareLogFolder(Context context) {
-        File logFolder = context.getExternalFilesDir(LOG_FOLDER_NAME);
+    private File prepareLogFolder() {
+        File logFolder = mContext.getExternalFilesDir(LOG_FOLDER_NAME);
         if (logFolder == null) {
-            logFolder = new File(context.getFilesDir(), LOG_FOLDER_NAME);
+            logFolder = new File(mContext.getFilesDir(), LOG_FOLDER_NAME);
         }
 
-        if (!logFolder.exists())
-            if (!logFolder.mkdir())
-                return null;
+        if (!logFolder.exists() && !logFolder.mkdir()) {
+            Log.d("LoggerHelper", "Log folder does not exist and can't be created");
+            return null;
+        }
 
         return logFolder;
+    }
+
+    private AbstractLogger prepareLogger(String logFileName) {
+        // String logFileName = DateFormatterHelper.formatLogFileDate(System.currentTimeMillis()) + ".log";
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new MediaStoreLogger(
+                    mContext,
+                    Environment.DIRECTORY_DOCUMENTS + "/" + LOCAL_APP_FOLDER_NAME + "/" + LOG_FOLDER_NAME + "/",
+                    logFileName
+            );
+        } else {
+            File logFolder = prepareLogFolder();
+            if (logFolder != null) {
+                return new FileLogger(logFolder.getPath() + "/", logFileName);
+            } else {
+                return null;
+            }
+        }
     }
 }
