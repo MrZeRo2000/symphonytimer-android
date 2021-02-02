@@ -14,16 +14,13 @@ import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 public class BackupLocalLoader extends AbstractContextLoader {
 
-    private final DBStorageHelper mDBStorageHelper;
-
     public BackupLocalLoader(Context context) {
         super(context);
-        mDBStorageHelper = new DBStorageHelper(context);
     }
 
     @Override
     public void load() throws Exception {
-        String localBackupFileName = mDBStorageHelper.createLocalBackup();
+        String localBackupFileName = DBStorageHelper.createLocalBackup(mContext);
         if (localBackupFileName == null)
             throw new Exception(mContext.getString(R.string.error_backup));
         PreferenceRepository.setPreferenceKeyLastLoadedCurrentTime(mContext, PreferenceRepository.PREF_KEY_LOCAL_BACKUP);

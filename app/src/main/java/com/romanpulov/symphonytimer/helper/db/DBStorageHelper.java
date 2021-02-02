@@ -3,16 +3,21 @@ package com.romanpulov.symphonytimer.helper.db;
 import java.io.File;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.romanpulov.jutilscore.io.ZipFileUtils;
+import com.romanpulov.jutilscore.storage.BackupProcessor;
 import com.romanpulov.jutilscore.storage.BackupUtils;
+import com.romanpulov.jutilscore.storage.FileBackupProcessor;
+import com.romanpulov.library.common.backup.MediaStoreBackupProcessor;
+import com.romanpulov.library.common.media.MediaStoreUtils;
 
 public class DBStorageHelper {
 	private static final String LOCAL_BACKUP_FOLDER_NAME = "SymphonyTimerBackup";
     // database backup file name
     private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb_" + DBOpenHelper.DATABASE_VERSION;
 
-    private final BackupUtils mDatabaseBackupUtils;
+    // private final BackupUtils mDatabaseBackupUtils;
 
 	private final Context mContext;
 
@@ -26,11 +31,14 @@ public class DBStorageHelper {
 	
 	public DBStorageHelper(Context context) {
         this.mContext = context;
+        /*
 
         mDatabaseBackupUtils = new BackupUtils(
                 mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
                 getLocalBackupFolderName(),
                 LOCAL_BACKUP_DB_FILE_NAME);
+
+         */
 	}
 
     public static boolean restoreFromBackupPath(Context context, String path) {
@@ -44,13 +52,72 @@ public class DBStorageHelper {
         }
     }
 
+    public static BackupProcessor createBackupProcessor(Context context, String dataFileName) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new MediaStoreBackupProcessor(
+                    context,
+                    dataFileName,
+                    MediaStoreUtils.MEDIA_STORE_ROOT_PATH + '/' + LOCAL_BACKUP_FOLDER_NAME + '/',
+                    LOCAL_BACKUP_DB_FILE_NAME
+            );
+        } else {
+            File f = context.getExternalFilesDir(LOCAL_BACKUP_FOLDER_NAME);
+            if (f == null) {
+                // should not get here
+                f = new File(context.getFilesDir(), LOCAL_BACKUP_FOLDER_NAME);
+            }
+
+            return new FileBackupProcessor(
+                    dataFileName,
+                    f.getAbsolutePath(),
+                    LOCAL_BACKUP_DB_FILE_NAME
+                    );
+        }
+    }
+
+    public static String createLocalBackup(Context context) {
+        DBHelper dbHelper = DBHelper.getInstance(context);
+
+        BackupProcessor bp = createBackupProcessor(
+                context,
+                context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString()
+        );
+
+        dbHelper.closeDB();
+        String result = bp.createRollingBackup();
+        dbHelper.openDB();
+
+        return result;
+    }
+
+    public static String restoreLocalBackup(Context context) {
+        DBHelper dbHelper = DBHelper.getInstance(context);
+
+        BackupProcessor bp = createBackupProcessor(
+                context,
+                context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString()
+        );
+
+        dbHelper.closeDB();
+        String result = bp.restoreBackup();
+        dbHelper.openDB();
+
+        dbHelper.setDBDataChanged();
+
+        return result;
+    }
+
     /**
      * Creates local backup and returns backup file name if successful     *
      * @return backup file name
      */
 	public String createLocalBackup() {
 	    DBHelper.getInstance(mContext).closeDB();
+        String result = null;
+	    /*
         String result = mDatabaseBackupUtils.createRollingLocalBackup();
+
+	     */
         DBHelper.getInstance(mContext).openDB();
 
         return result;
@@ -63,7 +130,12 @@ public class DBStorageHelper {
     public String restoreLocalBackup() {
         DBHelper dbHelper = DBHelper.getInstance(mContext);
         dbHelper.closeDB();
+
+        String result = null;
+        /*
         String result = mDatabaseBackupUtils.restoreBackup();
+
+         */
         dbHelper.openDB();
         dbHelper.setDBDataChanged();
 
@@ -71,15 +143,23 @@ public class DBStorageHelper {
     }
 
     public static String restorePathBackup(Context context, String restorePath) {
+        /*
         BackupUtils restoreUtils = new BackupUtils(
                 context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
                 restorePath,
                 LOCAL_BACKUP_DB_FILE_NAME
         );
 
+         */
+
         DBHelper dbHelper = DBHelper.getInstance(context);
         dbHelper.closeDB();
+
+        String result = null;
+        /*
         String result = restoreUtils.restoreBackup();
+
+         */
         dbHelper.openDB();
         dbHelper.setDBDataChanged();
 
@@ -91,7 +171,11 @@ public class DBStorageHelper {
      * @return Files
      */
     public File[] getDatabaseBackupFiles()  {
+        return null;
+        /*
         return mDatabaseBackupUtils.getBackupFiles();
+
+         */
     }
 
     /**
