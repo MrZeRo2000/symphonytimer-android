@@ -1,6 +1,9 @@
 package com.romanpulov.symphonytimer.helper.db;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 import android.content.Context;
 import android.os.Build;
@@ -69,7 +72,7 @@ public class DBStorageHelper {
 
             return new FileBackupProcessor(
                     dataFileName,
-                    f.getAbsolutePath(),
+                    f.getAbsolutePath() + '/',
                     LOCAL_BACKUP_DB_FILE_NAME
                     );
         }
@@ -164,6 +167,14 @@ public class DBStorageHelper {
         dbHelper.setDBDataChanged();
 
         return result;
+    }
+
+    public static List<String> getDatabaseBackupFiles(Context context) {
+        return createBackupProcessor(context, null).getBackupFileNames();
+    }
+
+    public static InputStream createBackupInputStream(Context context, String backupFileName) throws IOException {
+        return createBackupProcessor(context, LOCAL_BACKUP_DB_FILE_NAME).createBackupInputStream(backupFileName);
     }
 
     /**

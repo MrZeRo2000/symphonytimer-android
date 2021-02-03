@@ -268,18 +268,24 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         final AbstractCloudAccountFacade cloudAccountFacade = CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType);
 
         if (cloudAccountFacade != null) {
-            final AbstractCloudAccountManager accountManager = cloudAccountFacade.getAccountManager(getActivity());
+            final AbstractCloudAccountManager<?> accountManager = cloudAccountFacade.getAccountManager(getActivity());
             if (accountManager != null) {
                 mPreferenceBackupCloudProcessor.preExecute();
 
                 accountManager.setOnAccountSetupListener(new AbstractCloudAccountManager.OnAccountSetupListener() {
                     @Override
                     public void onAccountSetupSuccess() {
+                        /*
                         DBStorageHelper storageHelper = new DBStorageHelper(getActivity());
                         String backupResult = storageHelper.createLocalBackup();
 
-                        if (backupResult == null)
+                         */
+                        String backupResult = DBStorageHelper.createLocalBackup(getContext());
+
+                        if (backupResult == null) {
                             PreferenceRepository.displayMessage(getActivity(), getString(R.string.error_backup));
+                            mPreferenceBackupCloudProcessor.postExecute(getString(R.string.error_backup));
+                        }
                         else {
                             mPreferenceBackupCloudProcessor.preExecute();
                             mLoaderServiceManager.startLoader(cloudAccountFacade.getBackupLoaderClassName());
