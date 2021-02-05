@@ -146,24 +146,18 @@ public class DBStorageHelper {
     }
 
     public static String restorePathBackup(Context context, String restorePath) {
-        /*
-        BackupUtils restoreUtils = new BackupUtils(
+
+        BackupProcessor bp =  new FileBackupProcessor(
                 context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
                 restorePath,
                 LOCAL_BACKUP_DB_FILE_NAME
         );
 
-         */
-
         DBHelper dbHelper = DBHelper.getInstance(context);
         dbHelper.closeDB();
-
-        String result = null;
-        /*
-        String result = restoreUtils.restoreBackup();
-
-         */
+        String result = bp.restoreBackup();
         dbHelper.openDB();
+
         dbHelper.setDBDataChanged();
 
         return result;

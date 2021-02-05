@@ -1,19 +1,12 @@
 package com.romanpulov.symphonytimer.loader.dropbox;
 
 import android.content.Context;
-
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.WriteMode;
 import com.romanpulov.library.common.loader.core.AbstractContextLoader;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
@@ -26,12 +19,10 @@ import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFIC
 public class BackupDropboxUploader extends AbstractContextLoader {
 
     private final DropboxHelper mDropboxHelper;
-    private final DBStorageHelper mDBStorageHelper;
 
     public BackupDropboxUploader(Context context) {
         super(context);
         mDropboxHelper = DropboxHelper.getInstance(context.getApplicationContext());
-        mDBStorageHelper = new DBStorageHelper(context);
     }
 
     @Override
@@ -40,29 +31,11 @@ public class BackupDropboxUploader extends AbstractContextLoader {
         if (accessToken == null)
             throw new Exception(mContext.getResources().getString(R.string.error_dropbox_auth));
 
-        DbxClientV2 client = mDropboxHelper.getClient();
-
-        /*
-        File[] files = mDBStorageHelper.getDatabaseBackupFiles();
-        for (File f : files) {
-            String remoteFileName = f.getName();
-            InputStream inputStream = new FileInputStream(f);
-            try {
-                client.files().uploadBuilder(DropboxLoaderRepository.REMOTE_PATH + remoteFileName).withMode(WriteMode.OVERWRITE).uploadAndFinish(inputStream);
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-
-         */
+        mDropboxHelper.initClient();
 
         for (String backupFileName: DBStorageHelper.getDatabaseBackupFiles(mContext)) {
             try (InputStream inputStream = DBStorageHelper.createBackupInputStream(mContext, backupFileName)) {
-                client.files().uploadBuilder(DropboxLoaderRepository.REMOTE_PATH + backupFileName).withMode(WriteMode.OVERWRITE).uploadAndFinish(inputStream);
+                mDropboxHelper.putStream(inputStream, DropboxLoaderRepository.REMOTE_PATH + backupFileName);
             }
         }
 

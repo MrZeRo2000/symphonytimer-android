@@ -355,7 +355,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         final AbstractCloudAccountFacade cloudAccountFacade = CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType);
 
         if (cloudAccountFacade != null) {
-            final AbstractCloudAccountManager accountManager = cloudAccountFacade.getAccountManager(getActivity());
+            final AbstractCloudAccountManager<?> accountManager = cloudAccountFacade.getAccountManager(getActivity());
             if (accountManager != null) {
                 mPreferenceRestoreCloudProcessor.preExecute();
 
