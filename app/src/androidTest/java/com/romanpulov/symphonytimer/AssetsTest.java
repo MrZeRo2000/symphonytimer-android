@@ -9,6 +9,7 @@ import androidx.test.rule.GrantPermissionRule;
 
 import com.romanpulov.symphonytimer.helper.AssetsHelper;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -19,12 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SmallTest
+@Ignore("Not valid for Android 10+")
 public class AssetsTest {
     private static final String LOG_TAG = "AssetsTest";
 
     private static void log(String message) {
         Log.d(LOG_TAG, message);
     }
+
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);

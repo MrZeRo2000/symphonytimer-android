@@ -22,7 +22,6 @@ public class DBStorageHelperBackupTest {
 
     @Test
     public void testCase2() {
-        DBStorageHelper dh = new DBStorageHelper(getApplicationContext());
-        dh.createLocalBackup();
+        DBStorageHelper.createLocalBackup(getApplicationContext());
     }
 }

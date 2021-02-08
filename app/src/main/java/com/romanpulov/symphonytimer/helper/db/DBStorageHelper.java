@@ -8,9 +8,10 @@ import java.util.List;
 import android.content.Context;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 import com.romanpulov.jutilscore.io.ZipFileUtils;
 import com.romanpulov.jutilscore.storage.BackupProcessor;
-import com.romanpulov.jutilscore.storage.BackupUtils;
 import com.romanpulov.jutilscore.storage.FileBackupProcessor;
 import com.romanpulov.library.common.backup.MediaStoreBackupProcessor;
 import com.romanpulov.library.common.media.MediaStoreUtils;
@@ -20,31 +21,16 @@ public class DBStorageHelper {
     // database backup file name
     private static final String LOCAL_BACKUP_DB_FILE_NAME = "symphonytimerdb_" + DBOpenHelper.DATABASE_VERSION;
 
-    // private final BackupUtils mDatabaseBackupUtils;
-
-	private final Context mContext;
-
-    private String getLocalBackupFolderName() {
-        File f = mContext.getExternalFilesDir(LOCAL_BACKUP_FOLDER_NAME);
-        if (f == null) {
-            f = new File(mContext.getFilesDir(), LOCAL_BACKUP_FOLDER_NAME);
-        }
-        return f.getAbsolutePath();
-    }
-	
-	public DBStorageHelper(Context context) {
-        this.mContext = context;
-        /*
-
-        mDatabaseBackupUtils = new BackupUtils(
-                mContext.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
-                getLocalBackupFolderName(),
-                LOCAL_BACKUP_DB_FILE_NAME);
-
-         */
+	private DBStorageHelper() {
 	}
 
-    public static boolean restoreFromBackupPath(Context context, String path) {
+    /**
+     * Restores backup from a temporary file
+     * @param context Context to create BackupProcessor
+     * @param path File path to restore
+     * @return success flag
+     */
+    public static boolean restoreFromBackupPath(@NonNull Context context, String path) {
         File file = new File(path);
         if (file.exists()) {
             String restoreResult = DBStorageHelper.restorePathBackup(context, file.getParent());
@@ -55,7 +41,14 @@ public class DBStorageHelper {
         }
     }
 
-    public static BackupProcessor createBackupProcessor(Context context, String dataFileName) {
+    /**
+     * Create internally BackupProcessor to support differences between Android versions
+     * @param context Context
+     * @param dataFileName Data file name
+     * @return BackupProcessor implementation
+     */
+    @NonNull
+    private static BackupProcessor createBackupProcessor(@NonNull Context context, String dataFileName) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return new MediaStoreBackupProcessor(
                     context,
@@ -78,7 +71,12 @@ public class DBStorageHelper {
         }
     }
 
-    public static String createLocalBackup(Context context) {
+    /**
+     * Creates backup locally
+     * @param context Context
+     * @return backup creation result as file name, null if failed
+     */
+    public static String createLocalBackup(@NonNull Context context) {
         DBHelper dbHelper = DBHelper.getInstance(context);
 
         BackupProcessor bp = createBackupProcessor(
@@ -93,7 +91,12 @@ public class DBStorageHelper {
         return result;
     }
 
-    public static String restoreLocalBackup(Context context) {
+    /**
+     * Restores backup from local file via BackupProcessor
+     * @param context Context
+     * @return restore result as file name, null if failed
+     */
+    public static String restoreLocalBackup(@NonNull Context context) {
         DBHelper dbHelper = DBHelper.getInstance(context);
 
         BackupProcessor bp = createBackupProcessor(
@@ -111,41 +114,11 @@ public class DBStorageHelper {
     }
 
     /**
-     * Creates local backup and returns backup file name if successful     *
-     * @return backup file name
+     * Restores backup from local file via FileBackupProcessor
+     * @param context Context
+     * @return restore result as file name, null if failed
      */
-	public String createLocalBackup() {
-	    DBHelper.getInstance(mContext).closeDB();
-        String result = null;
-	    /*
-        String result = mDatabaseBackupUtils.createRollingLocalBackup();
-
-	     */
-        DBHelper.getInstance(mContext).openDB();
-
-        return result;
-	}
-
-    /**
-     * Restores local backup
-     * @return Restored file name if successful
-     */
-    public String restoreLocalBackup() {
-        DBHelper dbHelper = DBHelper.getInstance(mContext);
-        dbHelper.closeDB();
-
-        String result = null;
-        /*
-        String result = mDatabaseBackupUtils.restoreBackup();
-
-         */
-        dbHelper.openDB();
-        dbHelper.setDBDataChanged();
-
-        return result;
-    }
-
-    public static String restorePathBackup(Context context, String restorePath) {
+    public static String restorePathBackup(@NonNull Context context, String restorePath) {
 
         BackupProcessor bp =  new FileBackupProcessor(
                 context.getDatabasePath(DBOpenHelper.DATABASE_NAME).toString(),
@@ -163,30 +136,31 @@ public class DBStorageHelper {
         return result;
     }
 
-    public static List<String> getDatabaseBackupFiles(Context context) {
+    /**
+     * Returns database backup file names
+     * @param context Context
+     * @return File name list
+     */
+    public static List<String> getDatabaseBackupFiles(@NonNull Context context) {
         return createBackupProcessor(context, null).getBackupFileNames();
     }
 
-    public static InputStream createBackupInputStream(Context context, String backupFileName) throws IOException {
-        return createBackupProcessor(context, LOCAL_BACKUP_DB_FILE_NAME).createBackupInputStream(backupFileName);
-    }
-
     /**
-     * Returns list of database backup files
-     * @return Files
+     * Creates InputStream for backup
+     * @param context Context
+     * @param backupFileName Backup file name
+     * @return InputStream
+     * @throws IOException
      */
-    public File[] getDatabaseBackupFiles()  {
-        return null;
-        /*
-        return mDatabaseBackupUtils.getBackupFiles();
-
-         */
+    public static InputStream createBackupInputStream(@NonNull Context context, String backupFileName) throws IOException {
+        return createBackupProcessor(context, LOCAL_BACKUP_DB_FILE_NAME).createBackupInputStream(backupFileName);
     }
 
     /**
      * Returns local backup Zip file name
      * @return Zip file name
      */
+    @NonNull
     public static String getBackupZipFileName() {
         return ZipFileUtils.getZipFileName(LOCAL_BACKUP_DB_FILE_NAME);
     }

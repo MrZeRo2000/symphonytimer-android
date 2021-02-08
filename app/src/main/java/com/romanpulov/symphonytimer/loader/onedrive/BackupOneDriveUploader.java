@@ -15,7 +15,9 @@ import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,24 +29,22 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
     }
 
     private final OneDriveHelper mOneDriveHelper;
-    private final DBStorageHelper mDBStorageHelper;
     private final CountDownLatch mLocker = new CountDownLatch(1);
 
     public BackupOneDriveUploader(Context context) {
         super(context);
         mOneDriveHelper = OneDriveHelper.getInstance();
-        mDBStorageHelper = new DBStorageHelper(context);
     }
 
     @Override
     public void load() throws Exception {
-        final File[] files = mDBStorageHelper.getDatabaseBackupFiles();
+        final List<String> fileNames = DBStorageHelper.getDatabaseBackupFiles(mContext);
 
-        log("Got backup files:" + Arrays.toString(files));
+        log("Got backup files:" + fileNames);
 
         final AtomicReference<Exception> mException = new AtomicReference<>();
         final AtomicReference<Integer> mFileCounter = new AtomicReference<>();
-        mFileCounter.set(files.length);
+        mFileCounter.set(fileNames.size());
 
         mOneDriveHelper.setOnOneDriveItemListener(new OneDriveHelper.OnOneDriveItemListener() {
             @Override
@@ -68,9 +68,11 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
                 });
 
                 try {
-                    for (File f : files) {
-                        log("Putting file:" + f.getName());
-                        mOneDriveHelper.putFile(f, CloudLoaderRepository.REMOTE_PATH);
+                    for (String fileName : fileNames) {
+                        log("Putting file:" + fileName);
+                        try (InputStream inputStream = DBStorageHelper.createBackupInputStream(mContext, fileName)) {
+                            mOneDriveHelper.putStream(inputStream, CloudLoaderRepository.REMOTE_PATH, fileName);
+                        }
                     }
                 } catch (IOException e) {
                     log("Putting file IO exception:" + e.getMessage());
