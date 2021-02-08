@@ -10,6 +10,7 @@ import android.util.Log;
 import com.romanpulov.library.common.logger.AbstractLogger;
 import com.romanpulov.library.common.logger.FileLogger;
 import com.romanpulov.library.common.logger.MediaStoreLogger;
+import com.romanpulov.library.common.media.MediaStoreUtils;
 
 import java.io.File;
 
@@ -19,7 +20,7 @@ import java.io.File;
 
 public class LoggerHelper {
     private static final String LOCAL_APP_FOLDER_NAME = "SymphonyTimer";
-    private static final String LOG_FOLDER_NAME = "log";
+    private static final String LOG_FOLDER_NAME = "Log";
 
     private static LoggerHelper mInstance;
 
@@ -103,7 +104,7 @@ public class LoggerHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return new MediaStoreLogger(
                     mContext,
-                    Environment.DIRECTORY_DOCUMENTS + "/" + LOCAL_APP_FOLDER_NAME + "/" + LOG_FOLDER_NAME + "/",
+                    MediaStoreUtils.MEDIA_STORE_ROOT_PATH + "/" + LOCAL_APP_FOLDER_NAME + LOG_FOLDER_NAME + "/",
                     logFileName
             );
         } else {
