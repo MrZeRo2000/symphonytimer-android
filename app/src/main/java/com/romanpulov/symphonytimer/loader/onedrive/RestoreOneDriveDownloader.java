@@ -10,7 +10,6 @@ import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_LOADER;
 
-
 public class RestoreOneDriveDownloader extends com.romanpulov.symphonytimer.loader.onedrive.OneDriveFileLoader {
 
     public RestoreOneDriveDownloader(Context context) {
@@ -21,7 +20,7 @@ public class RestoreOneDriveDownloader extends com.romanpulov.symphonytimer.load
     public void load() throws Exception {
         super.load();
 
-        boolean isRestoreSuccess = DBStorageHelper.restoreFromBackupPath(mContext, getLoadPathProvider().getDestPath());
+        boolean isRestoreSuccess = DBStorageHelper.getInstance(mContext).getDBBackupManager().restoreFromBackupPath(getLoadPathProvider().getDestPath());
 
         String restoreMessage = mContext.getString(isRestoreSuccess ? R.string.info_load_cloud_backup : R.string.error_restore);
 

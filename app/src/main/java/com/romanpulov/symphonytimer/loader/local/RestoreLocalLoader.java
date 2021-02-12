@@ -20,7 +20,7 @@ public class RestoreLocalLoader extends AbstractContextLoader {
 
     @Override
     public void load() throws Exception {
-        String loadResult = DBStorageHelper.restoreLocalBackup(mContext);
+        String loadResult = DBStorageHelper.getInstance(mContext).getDBBackupManager().restoreLocalBackup();
         if (loadResult == null)
             throw new Exception(mContext.getString(R.string.error_load_local_backup));
         PreferenceRepository.setPreferenceKeyLastLoadedCurrentTime(mContext, PreferenceRepository.PREF_KEY_LOCAL_RESTORE);

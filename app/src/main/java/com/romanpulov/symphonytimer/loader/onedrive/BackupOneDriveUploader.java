@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.onedrive.sdk.core.ClientException;
 import com.onedrive.sdk.extensions.Item;
+import com.romanpulov.library.common.db.DBBackupManager;
 import com.romanpulov.library.common.loader.core.AbstractContextLoader;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
@@ -13,10 +14,8 @@ import com.romanpulov.symphonytimer.loader.cloud.CloudLoaderRepository;
 import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,7 +37,9 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
 
     @Override
     public void load() throws Exception {
-        final List<String> fileNames = DBStorageHelper.getDatabaseBackupFiles(mContext);
+        final DBBackupManager backupManager =  DBStorageHelper.getInstance(mContext).getDBBackupManager();
+
+        final List<String> fileNames = backupManager.getDatabaseBackupFiles();
 
         log("Got backup files:" + fileNames);
 
@@ -70,7 +71,7 @@ public class BackupOneDriveUploader extends AbstractContextLoader {
                 try {
                     for (String fileName : fileNames) {
                         log("Putting file:" + fileName);
-                        try (InputStream inputStream = DBStorageHelper.createBackupInputStream(mContext, fileName)) {
+                        try (InputStream inputStream = backupManager.createBackupInputStream(fileName)) {
                             mOneDriveHelper.putStream(inputStream, CloudLoaderRepository.REMOTE_PATH, fileName);
                         }
                     }

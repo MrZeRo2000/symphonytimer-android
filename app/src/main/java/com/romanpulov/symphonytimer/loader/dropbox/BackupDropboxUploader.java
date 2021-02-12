@@ -1,6 +1,8 @@
 package com.romanpulov.symphonytimer.loader.dropbox;
 
 import android.content.Context;
+
+import com.romanpulov.library.common.db.DBBackupManager;
 import com.romanpulov.library.common.loader.core.AbstractContextLoader;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
@@ -33,8 +35,10 @@ public class BackupDropboxUploader extends AbstractContextLoader {
 
         mDropboxHelper.initClient();
 
-        for (String backupFileName: DBStorageHelper.getDatabaseBackupFiles(mContext)) {
-            try (InputStream inputStream = DBStorageHelper.createBackupInputStream(mContext, backupFileName)) {
+        final DBBackupManager backupManager = DBStorageHelper.getInstance(mContext).getDBBackupManager();
+
+        for (String backupFileName: backupManager.getDatabaseBackupFiles()) {
+            try (InputStream inputStream = backupManager.createBackupInputStream(backupFileName)) {
                 mDropboxHelper.putStream(inputStream, DropboxLoaderRepository.REMOTE_PATH + backupFileName);
             }
         }

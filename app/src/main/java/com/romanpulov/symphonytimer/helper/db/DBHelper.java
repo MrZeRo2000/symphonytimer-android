@@ -11,6 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.romanpulov.library.common.db.DBController;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
 import com.romanpulov.symphonytimer.model.DMTimerExecutionList;
@@ -18,8 +19,9 @@ import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
-public class DBHelper {
-	private static DBHelper mDBHelperInstance = null;	
+public class DBHelper implements DBController {
+	private static DBHelper mDBHelperInstance = null;
+
 	private SQLiteDatabase mDB;
 	private final DBOpenHelper mDBOpenHelper;
 	private boolean mDBDataChanged = false;
@@ -41,20 +43,32 @@ public class DBHelper {
 		mDBOpenHelper = new DBOpenHelper(context);
 		openDB();
 	}
-	
+
+	@Override
 	public void openDB() {
 		if (null == mDB) {
 			mDB = mDBOpenHelper.getWritableDatabase();
 		}
 	}
 
+	@Override
 	public void closeDB() {
 		if (null != mDB) {
 			mDB.close();
 			mDB = null;
 		}
 	}
-	
+
+	@Override
+	public void dbDataChanged() {
+		mDBDataChanged = true;
+	}
+
+	@Override
+	public String getDBName() {
+		return DBOpenHelper.DATABASE_NAME;
+	}
+
 	public static DBHelper getInstance(Context context) {
 		if (null == mDBHelperInstance) {
 			mDBHelperInstance = new DBHelper(context.getApplicationContext());
@@ -77,10 +91,6 @@ public class DBHelper {
         this.mDBDataChanged = false;
 	}
 
-	public void setDBDataChanged() {
-		mDBDataChanged = true;
-	}
-	
 	public long insertTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
 

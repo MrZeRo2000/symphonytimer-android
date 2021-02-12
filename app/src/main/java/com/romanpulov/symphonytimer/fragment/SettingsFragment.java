@@ -136,7 +136,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    int cloudAccountType = Integer.valueOf(sharedPreferences.getString("pref_cloud_account_type", "-1"));
+                    int cloudAccountType = Integer.parseInt(sharedPreferences.getString("pref_cloud_account_type", "-1"));
                     if (cloudAccountType == -1) {
                         PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
                     } else {
@@ -280,7 +280,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         String backupResult = storageHelper.createLocalBackup();
 
                          */
-                        String backupResult = DBStorageHelper.createLocalBackup(getContext());
+                        String backupResult = DBStorageHelper.getInstance(getContext()).getDBBackupManager().createLocalBackup();
 
                         if (backupResult == null) {
                             PreferenceRepository.displayMessage(getActivity(), getString(R.string.error_backup));

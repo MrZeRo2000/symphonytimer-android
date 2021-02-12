@@ -20,7 +20,7 @@ public class BackupLocalLoader extends AbstractContextLoader {
 
     @Override
     public void load() throws Exception {
-        String localBackupFileName = DBStorageHelper.createLocalBackup(mContext);
+        String localBackupFileName = DBStorageHelper.getInstance(mContext).getDBBackupManager().createLocalBackup();
         if (localBackupFileName == null)
             throw new Exception(mContext.getString(R.string.error_backup));
         PreferenceRepository.setPreferenceKeyLastLoadedCurrentTime(mContext, PreferenceRepository.PREF_KEY_LOCAL_BACKUP);
