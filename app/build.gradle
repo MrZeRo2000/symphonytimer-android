@@ -9,7 +9,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 14
-        versionName "0.8.4"
+        versionName "0.8.5"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -44,7 +44,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation "androidx.preference:preference:1.1.1"
-    implementation 'com.romanpulov.library.common:library:1.3.6'
+    implementation 'com.romanpulov.library.common:library:1.3.7'
     implementation 'com.romanpulov.library.dropbox:library:1.1.2'
     implementation 'com.romanpulov.library.onedrive:library:0.1.1'
     implementation 'com.romanpulov.library.view:library:1.1.1'
