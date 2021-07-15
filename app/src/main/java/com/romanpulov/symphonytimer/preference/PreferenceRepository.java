@@ -28,6 +28,7 @@ public final class PreferenceRepository {
 
     public static final int PREF_CLOUD_ACCOUNT_TYPE_DROPBOX = 0;
     public static final int PREF_CLOUD_ACCOUNT_TYPE_ONEDRIVE = 1;
+    public static final int PREF_CLOUD_ACCOUNT_TYPE_MSGRAPH = 2;
 
     public static final String PREF_KEY_CLOUD_BACKUP = "pref_cloud_backup";
     private static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_dropbox_cloud_last_loaded";

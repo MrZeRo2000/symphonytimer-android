@@ -2,6 +2,7 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
@@ -12,7 +13,11 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
         mavenLocal()
         google()
+        maven {
+            url 'https://pkgs.dev.azure.com/MicrosoftDeviceSDK/DuoSDK-Public/_packaging/Duo-SDK-Feed/maven/v1'
+        }
     }
 }

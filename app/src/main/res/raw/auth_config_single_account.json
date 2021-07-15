@@ -1,0 +1,13 @@
+{
+  "client_id" : "53b9437b-4686-4200-9af4-72859d3d8b8b",
+  "authorization_user_agent" : "DEFAULT",
+  "redirect_uri" : "msauth://com.romanpulov.symphonytimer/jM3pVmJp7fA39q%2F7ryRaKnhDVzY%3D",
+  "account_mode" : "SINGLE",
+  "broker_redirect_uri_registered": false,
+  "authorities" : [
+    {
+      "type": "AAD",
+      "authority_url": "https://login.microsoftonline.com/consumers"
+    }
+  ]
+}

@@ -85,11 +85,8 @@
     <string name="error_dropbox_auth">Invalid access token. Please, authenticate</string>
     <string name="error_dropbox_load_file_data">No information for file : %s</string>
     <string name="error_cloud_account_type_not_set_up">Please, set up cloud account type</string>
-    <string name="error_onedrive_login">Error logging in to OneDrive: %d</string>
-    <string name="error_onedrive_logout">Error logging out from OneDrive: %d</string>
-
-
-
+    <string name="error_onedrive_login">Error logging in to OneDrive: %s</string>
+    <string name="error_onedrive_logout">Error logging out from OneDrive: %s</string>
 
     <string name="info_load_local_backup">Local backup has been restored successfully</string>
     <string name="info_load_cloud_backup">Cloud backup has been restored successfully</string>

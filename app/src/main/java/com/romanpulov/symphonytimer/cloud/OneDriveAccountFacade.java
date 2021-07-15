@@ -118,7 +118,7 @@ public class OneDriveAccountFacade extends AbstractCloudAccountFacade {
     }
 
     @Override
-    public AbstractCloudAccountManager getAccountManager(Activity activity) {
+    public AbstractCloudAccountManager<?> getAccountManager(Activity activity) {
         return new OneDriveCloudAccountManager(activity);
     }
 

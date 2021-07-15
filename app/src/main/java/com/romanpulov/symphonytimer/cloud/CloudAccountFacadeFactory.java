@@ -9,6 +9,8 @@ public final class CloudAccountFacadeFactory {
                 return new DropboxAccountFacade();
             case PreferenceRepository.PREF_CLOUD_ACCOUNT_TYPE_ONEDRIVE:
                 return new OneDriveAccountFacade();
+            case PreferenceRepository.PREF_CLOUD_ACCOUNT_TYPE_MSGRAPH:
+                return new MSGraphAccountFacade();
             default:
                 return null;
         }
