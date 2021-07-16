@@ -7,6 +7,7 @@ import com.romanpulov.library.common.loader.core.AbstractContextLoader;
 import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
+import com.romanpulov.symphonytimer.loader.cloud.CloudLoaderRepository;
 import com.romanpulov.symphonytimer.loader.helper.LoaderNotificationHelper;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 import java.io.InputStream;
@@ -39,7 +40,7 @@ public class BackupDropboxUploader extends AbstractContextLoader {
 
         for (String backupFileName: backupManager.getDatabaseBackupFiles()) {
             try (InputStream inputStream = backupManager.createBackupInputStream(backupFileName)) {
-                mDropboxHelper.putStream(inputStream, DropboxLoaderRepository.REMOTE_PATH + backupFileName);
+                mDropboxHelper.putStream(inputStream, "/" + CloudLoaderRepository.REMOTE_PATH + "/" + backupFileName);
             }
         }
 

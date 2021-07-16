@@ -15,7 +15,7 @@ public class DropboxAccountFacade extends AbstractCloudAccountFacade {
     }
 
     @Override
-    public AbstractCloudAccountManager getAccountManager(Activity activity) {
+    public AbstractCloudAccountManager<?> getAccountManager(Activity activity) {
         return new DropboxCloudAccountManager(activity);
     }
 
