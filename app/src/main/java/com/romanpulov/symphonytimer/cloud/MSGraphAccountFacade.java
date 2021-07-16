@@ -9,6 +9,7 @@ import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.msgraph.OnMSActionListener;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.loader.msgraph.BackupMSGraphUploader;
+import com.romanpulov.symphonytimer.loader.msgraph.RestoreMSGraphDownloader;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
 public class MSGraphAccountFacade extends AbstractCloudAccountFacade {
@@ -80,6 +81,6 @@ public class MSGraphAccountFacade extends AbstractCloudAccountFacade {
 
     @Override
     public String getRestoreLoaderClassName() {
-        return null;
+        return RestoreMSGraphDownloader.class.getName();
     }
 }
