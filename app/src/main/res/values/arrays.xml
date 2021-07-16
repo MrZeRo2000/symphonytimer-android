@@ -50,12 +50,10 @@
     </string-array>
     <string-array name="cloud_account_type_entries">
         <item>Dropbox</item>
-        <item>OneDrive</item>
         <item>MSGraph</item>
     </string-array>
     <string-array name="cloud_account_type_entry_values">
         <item>0</item>
-        <item>1</item>
         <item>2</item>
     </string-array>
 </resources>

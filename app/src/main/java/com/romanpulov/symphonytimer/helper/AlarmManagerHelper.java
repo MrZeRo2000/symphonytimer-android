@@ -53,11 +53,29 @@ public class AlarmManagerHelper {
         logContext(context, "set Onetime timer  to " + DateFormatterHelper.formatLog(triggerAt));
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        /*
+        // initial version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi);
         } else {
             am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
         }
+         */
+
+        // fix version 1
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        } else {
+            am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        }
+
+        /*
+        am.setAlarmClock(new AlarmManager.AlarmClockInfo(triggerAt, pi), pi);
+
+         */
     }
 
     public void setAdvanceTimer(Context context, long triggerAt, long targetTriggerAt) {

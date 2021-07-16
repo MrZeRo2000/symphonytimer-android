@@ -123,8 +123,13 @@ public class TaskServiceManager {
             log("updateServiceTasks: tasks, not bound");
             DMTasks newTasks = tasks.createParcelableCopy();
             serviceIntent.putExtra(DMTasks.class.toString(), newTasks);
+            log("updateServiceTasks: starting service");
             mContext.startService(serviceIntent);
+            log("updateServiceTasks: service started");
+            log("updateServiceTasks: binding service");
             mContext.bindService(new Intent(mContext, TaskService.class), mConnection, Context.BIND_AUTO_CREATE);
+            log("updateServiceTasks: service bound");
+
             return;
         }
 

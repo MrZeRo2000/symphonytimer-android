@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 long clickTime = System.currentTimeMillis();
                 if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
                     VibratorHelper.shortVibrate(MainActivity.this);
+                    log("Timer action registered");
                     performTimerAction(mDMTimers.get(position));
                 }
                 mLastClickTime = clickTime;
@@ -164,10 +165,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (PermissionRequestHelper.isGrantResultSuccessful(grantResults)) {
             switch (requestCode) {
                 case PERMISSION_REQUEST_COPY_ASSETS:
-                    if ((mAssetsHelper !=null) && (mAssets != null)) {
+                    if ((mAssetsHelper != null) && (mAssets != null)) {
                         mAssetsHelper.copyAssets(mAssets);
                     }
                     break;
@@ -356,23 +358,14 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     	if (null == taskItem) {
     		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);
-    		//newTaskItem.setTaskItemCompleted(mTaskItemCompleted);
     		newTaskItem.startProcess();
     		
     		mDMTasks.add(newTaskItem);
 
-            /*
-            if (null == mAlarm)
-                mAlarm = new ExactAlarmBroadcastReceiver();
-            mAlarm.setOnetimeTimer(getApplicationContext(), newTaskItem.getId(), newTaskItem.getTriggerAtTime());
-            */
+    		// to fix long startup issue
+    		updateTimers();
 
     	} else {
-            /*
-            if (null != mAlarm)
-                mAlarm.cancelAlarm(getApplicationContext(), taskItem.getId());
-                */
-
     		updateTimers();
 
             int prevStatus = mDMTasks.getStatus();
@@ -382,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     		performDMTaskStatusChanged(prevStatus);
     	}
 
+        log("Starting update service tasks");
         mTaskServiceManager.updateServiceTasks(mDMTasks);
     }
     
@@ -479,6 +473,10 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
      * Handler of incoming messages from service.
      */
     private static class IncomingHandler extends Handler {
+        private void log(String message) {
+            LoggerHelper.logContext(mHostReference, "MainActivity.IncomingHandler", message);
+        }
+
         private final MainActivity mHostReference;
 
         IncomingHandler(MainActivity host) {
@@ -491,9 +489,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             if (hostActivity != null) {
                 switch (msg.what) {
                     case TaskService.MSG_UPDATE_DM_PROGRESS:
+                        log("Obtained update DM progress message");
                         hostActivity.performUpdateDMProgress();
                         break;
                     case TaskService.MSG_UPDATE_DM_TASKS:
+                        log("Obtained update DM tasks message");
                         DMTasks newTasks = msg.getData().getParcelable(DMTasks.class.toString());
                         hostActivity.performUpdateDMTasks(newTasks);
                         break;

@@ -389,6 +389,7 @@ public class TaskService extends Service implements Runnable {
             ProgressNotificationHelper.getInstance(this).notify(mDMTasks);
 
             int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
+            log("statusChangeEvent=" + statusChangeEvent);
             //log(DMTasksStatus.statusEventAsString(statusChangeEvent));
 
             // log to completed event

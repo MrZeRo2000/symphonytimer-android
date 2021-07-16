@@ -34,8 +34,6 @@ import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
 import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
 import com.romanpulov.symphonytimer.loader.msgraph.BackupMSGraphUploader;
 import com.romanpulov.symphonytimer.loader.msgraph.RestoreMSGraphDownloader;
-import com.romanpulov.symphonytimer.loader.onedrive.BackupOneDriveUploader;
-import com.romanpulov.symphonytimer.loader.onedrive.RestoreOneDriveDownloader;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupLocalProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
@@ -168,14 +166,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         //backup cloud
         mPreferenceBackupCloudProcessor = new PreferenceBackupCloudProcessor(this);
         mPreferenceLoadProcessors.put(BackupDropboxUploader.class.getName(), mPreferenceBackupCloudProcessor);
-        mPreferenceLoadProcessors.put(BackupOneDriveUploader.class.getName(), mPreferenceBackupCloudProcessor);
         mPreferenceLoadProcessors.put(BackupMSGraphUploader.class.getName(), mPreferenceBackupCloudProcessor);
         setupPrefCloudBackupLoadService();
 
         //restore cloud
         mPreferenceRestoreCloudProcessor = new PreferenceRestoreCloudProcessor(this);
         mPreferenceLoadProcessors.put(RestoreDropboxDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
-        mPreferenceLoadProcessors.put(RestoreOneDriveDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         mPreferenceLoadProcessors.put(RestoreMSGraphDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         setupPrefCloudRestoreLoadService();
     }
