@@ -32,6 +32,8 @@ import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
 import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
+import com.romanpulov.symphonytimer.loader.gdrive.BackupGDriveUploader;
+import com.romanpulov.symphonytimer.loader.gdrive.RestoreGDriveDownloader;
 import com.romanpulov.symphonytimer.loader.msgraph.BackupMSGraphUploader;
 import com.romanpulov.symphonytimer.loader.msgraph.RestoreMSGraphDownloader;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupCloudProcessor;
@@ -45,6 +47,7 @@ import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.romanpulov.symphonytimer.preference.PreferenceRepository.PREF_KEY_CLOUD_ACCOUNT_TYPE;
 
@@ -167,12 +170,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         mPreferenceBackupCloudProcessor = new PreferenceBackupCloudProcessor(this);
         mPreferenceLoadProcessors.put(BackupDropboxUploader.class.getName(), mPreferenceBackupCloudProcessor);
         mPreferenceLoadProcessors.put(BackupMSGraphUploader.class.getName(), mPreferenceBackupCloudProcessor);
+        mPreferenceLoadProcessors.put(BackupGDriveUploader.class.getName(), mPreferenceBackupCloudProcessor);
         setupPrefCloudBackupLoadService();
 
         //restore cloud
         mPreferenceRestoreCloudProcessor = new PreferenceRestoreCloudProcessor(this);
         mPreferenceLoadProcessors.put(RestoreDropboxDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         mPreferenceLoadProcessors.put(RestoreMSGraphDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
+        mPreferenceLoadProcessors.put(RestoreGDriveDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         setupPrefCloudRestoreLoadService();
     }
 

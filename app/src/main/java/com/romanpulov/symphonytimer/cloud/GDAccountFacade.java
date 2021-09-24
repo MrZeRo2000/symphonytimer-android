@@ -6,14 +6,13 @@ import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
 
 import com.romanpulov.library.common.account.AbstractCloudAccountManager;
-import com.romanpulov.library.msgraph.OnMSActionListener;
+import com.romanpulov.library.gdrive.OnGDActionListener;
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.loader.msgraph.BackupMSGraphUploader;
-import com.romanpulov.symphonytimer.loader.msgraph.RestoreMSGraphDownloader;
+import com.romanpulov.symphonytimer.loader.gdrive.BackupGDriveUploader;
+import com.romanpulov.symphonytimer.loader.gdrive.RestoreGDriveDownloader;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 
-public class MSGraphAccountFacade extends AbstractCloudAccountFacade {
-
+public class GDAccountFacade extends AbstractCloudAccountFacade {
     @Override
     public void setupAccount(Activity activity) {
         final AlertDialog.Builder alert = new AlertDialog.Builder(activity);
@@ -23,17 +22,16 @@ public class MSGraphAccountFacade extends AbstractCloudAccountFacade {
                 .setPositiveButton(R.string.caption_login, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        MSGraphHelper.getInstance().login(
-                                activity,
-                                new OnMSActionListener<String>() {
+                        GDHelper.getInstance().login(
+                                activity, new OnGDActionListener<Void>() {
                                     @Override
-                                    public void onActionSuccess(int action, String data) {
-                                        PreferenceRepository.displayMessage(activity, R.string.notification_onedrive_successfully_logged_in);
+                                    public void onActionSuccess(Void unused) {
+
                                     }
 
                                     @Override
-                                    public void onActionFailure(int action, String errorMessage) {
-                                        PreferenceRepository.displayMessage(activity, R.string.error_onedrive_login, errorMessage);
+                                    public void onActionFailure(Exception e) {
+
                                     }
                                 }
                         );
@@ -42,17 +40,16 @@ public class MSGraphAccountFacade extends AbstractCloudAccountFacade {
                 .setNegativeButton(R.string.caption_logout, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        MSGraphHelper.getInstance().logout(
-                                activity,
-                                new OnMSActionListener<Void>() {
+                        GDHelper.getInstance().logout(
+                                activity, new OnGDActionListener<Void>() {
                                     @Override
-                                    public void onActionSuccess(int action, Void data) {
-                                        PreferenceRepository.displayMessage(activity, R.string.notification_onedrive_successfully_logged_out);
+                                    public void onActionSuccess(Void unused) {
+                                        PreferenceRepository.displayMessage(activity, R.string.notification_gdrive_successfully_logged_out);
                                     }
 
                                     @Override
-                                    public void onActionFailure(int action, String errorMessage) {
-                                        PreferenceRepository.displayMessage(activity, R.string.error_onedrive_logout, errorMessage);
+                                    public void onActionFailure(Exception e) {
+                                        PreferenceRepository.displayMessage(activity, R.string.error_gdrive_logout, e.getMessage());
                                     }
                                 }
                         );
@@ -63,16 +60,16 @@ public class MSGraphAccountFacade extends AbstractCloudAccountFacade {
 
     @Override
     public AbstractCloudAccountManager<?> getAccountManager(Activity activity) {
-        return new MSGraphCloudAccountManager(activity);
+        return new GDCloudAccountManager(activity);
     }
 
     @Override
     public String getBackupLoaderClassName() {
-        return BackupMSGraphUploader.class.getName();
+        return BackupGDriveUploader.class.getName();
     }
 
     @Override
     public String getRestoreLoaderClassName() {
-        return RestoreMSGraphDownloader.class.getName();
+        return RestoreGDriveDownloader.class.getName();
     }
 }

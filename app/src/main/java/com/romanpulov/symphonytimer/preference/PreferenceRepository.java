@@ -13,6 +13,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by romanpulov on 21.11.2017.
@@ -29,6 +30,7 @@ public final class PreferenceRepository {
     public static final int PREF_CLOUD_ACCOUNT_TYPE_DROPBOX = 0;
     public static final int PREF_CLOUD_ACCOUNT_TYPE_ONEDRIVE = 1;
     public static final int PREF_CLOUD_ACCOUNT_TYPE_MSGRAPH = 2;
+    public static final int PREF_CLOUD_ACCOUNT_TYPE_GDRIVE = 3;
 
     public static final String PREF_KEY_CLOUD_BACKUP = "pref_cloud_backup";
     private static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_dropbox_cloud_last_loaded";
@@ -70,6 +72,25 @@ public final class PreferenceRepository {
     }
 
     /**
+     * Display message common routine
+     * @param context Context
+     * @param displayMessageId String resource id
+     */
+    public static void displayMessage(Context context, int displayMessageId) {
+        displayMessage(context, context.getString(displayMessageId));
+    }
+
+    /**
+     *
+     * @param context Context
+     * @param displayMessageId Formatted string resource id
+     * @param message Message used in formatting
+     */
+    public static void displayMessage(Context context, int displayMessageId, String message) {
+        displayMessage(context, context.getString(displayMessageId, message));
+    }
+
+    /**
      * Updates load status as summary
      * @param preferenceFragment PreferenceFragment
      * @param preferenceKey preference key
@@ -77,7 +98,7 @@ public final class PreferenceRepository {
      * @param value value to set: PREF_LOAD_LOADING - loading in progress, PREV_LOAD_NEVER - never loaded, otherwise last loaded time
      */
     private static void updateLoadPreferenceSummary(PreferenceFragmentCompat preferenceFragment, String preferenceKey, String preferenceLastLoadedKey, long value) {
-        Preference prefLoad = preferenceFragment.findPreference(preferenceKey);
+        Preference prefLoad = Objects.requireNonNull(preferenceFragment.findPreference(preferenceKey));
 
         if (value == PREF_LOAD_LOADING)
             prefLoad.setSummary(R.string.caption_loading);
