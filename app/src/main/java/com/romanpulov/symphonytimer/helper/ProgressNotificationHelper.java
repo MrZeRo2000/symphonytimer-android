@@ -89,7 +89,7 @@ public class ProgressNotificationHelper {
         mContext = new WeakReference<>(context);
         mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(context, MainActivity.class);
-        mContentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+        mContentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
     }
 
     public Notification getNotification(DMTasks dmTasks) {

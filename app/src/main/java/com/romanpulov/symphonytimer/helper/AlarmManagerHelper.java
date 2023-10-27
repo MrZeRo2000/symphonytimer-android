@@ -27,7 +27,7 @@ public class AlarmManagerHelper {
 
     private void cancelTimeAlarm(Context context, Class<?> intentClass, int requestCode) {
         Intent intent = new Intent(context, intentClass);
-        PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_NO_CREATE);
+        PendingIntent sender = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_NO_CREATE + PendingIntent.FLAG_IMMUTABLE);
         if (null != sender) {
             logContext(context, intentClass.getName() + ": cancelling alarm");
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

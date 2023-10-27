@@ -222,22 +222,21 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-    	switch(item.getItemId()) {
-            case R.id.action_add:
-                startAddItemActivity(new DMTimerRec());
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_add) {
+            startAddItemActivity(new DMTimerRec());
+            return true;
+        } else if (itemId == R.id.action_preferences) {
+            if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
+                startSettingsActivity();
                 return true;
-            case R.id.action_preferences:
-                if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
-                    startSettingsActivity();
-                    return true;
-                } else
-                    return super.onOptionsItemSelected(item);
-            case R.id.action_history:
-                startHistoryActivity();
-                return true;
-            default:
+            } else
                 return super.onOptionsItemSelected(item);
-    	}
+        } else if (itemId == R.id.action_history) {
+            startHistoryActivity();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void startAddItemActivity(DMTimerRec dmTimerRec) {
@@ -426,31 +425,31 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         int selectedItemPos = mListViewSelector.getSelectedItemPos();
         DMTimerRec actionTimer = (DMTimerRec)mTimersListView.getAdapter().getItem(selectedItemPos);
 
-        switch (menuItem.getItemId()) {
-            case R.id.action_edit:
-                startAddItemActivity(actionTimer);
-                return true;
-            case R.id.action_delete:
-                AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
-                deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
-                    @Override
-                    public void OnOkButtonClickEvent(DialogFragment dialog) {
-                        DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
-                        if (null != dmTimerRec) {
-                            executeTimerAction(dmTimerRec, new TimerDeleteAction());
-                            //performDeleteTimer(dmTimerRec);
-                            actionMode.finish();
-                        }
+        int itemId = menuItem.getItemId();
+        if (itemId == R.id.action_edit) {
+            startAddItemActivity(actionTimer);
+            return true;
+        } else if (itemId == R.id.action_delete) {
+            AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
+            deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
+                @Override
+                public void OnOkButtonClickEvent(DialogFragment dialog) {
+                    DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+                    if (null != dmTimerRec) {
+                        executeTimerAction(dmTimerRec, new TimerDeleteAction());
+                        //performDeleteTimer(dmTimerRec);
+                        actionMode.finish();
                     }
-                });
-                deleteDialog.show(getSupportFragmentManager(), null);
-                return true;
-            case R.id.action_move_up:
-                executeTimerAction(actionTimer, new TimerMoveUp());
-                return true;
-            case R.id.action_move_down:
-                executeTimerAction(actionTimer, new TimerMoveDown());
-                return true;
+                }
+            });
+            deleteDialog.show(getSupportFragmentManager(), null);
+            return true;
+        } else if (itemId == R.id.action_move_up) {
+            executeTimerAction(actionTimer, new TimerMoveUp());
+            return true;
+        } else if (itemId == R.id.action_move_down) {
+            executeTimerAction(actionTimer, new TimerMoveDown());
+            return true;
         }
         return false;
     }

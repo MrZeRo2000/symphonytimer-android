@@ -29,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.romanpulov.library.view.SlideNumberPicker;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
@@ -305,7 +306,11 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(file.getPath());
         String mediaData = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-        mediaMetadataRetriever.release();
+        try {
+            mediaMetadataRetriever.release();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (mediaData == null)
             return getString(R.string.unknown_sound);
         else
