@@ -3,7 +3,6 @@ package com.romanpulov.symphonytimer.preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.romanpulov.library.common.loader.core.Loader;
-import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
 
 /**
  * Created by romanpulov on 27.11.2017.
@@ -36,7 +35,7 @@ public class PreferenceRestoreCloudProcessor implements PreferenceLoaderProcesso
 
     @Override
     public Class<? extends Loader> getLoaderClass() {
-        return RestoreDropboxDownloader.class;
+        return null;
     }
 
 }

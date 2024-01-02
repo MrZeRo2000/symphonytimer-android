@@ -63,7 +63,6 @@
     <string name="pref_summary_local_backup">Backup current data to local Download folder</string>
     <string name="pref_local_restore">Local restore</string>
     <string name="pref_summary_local_restore">Restore current data from local Download folder</string>
-    <string name="pref_cat_dropbox_backup">DropBox backup</string>
     <string name="pref_cat_cloud_data_management">Cloud data management</string>
     <string name="pref_cloud_account_type">Account Type</string>
     <string name="pref_cloud_account_type_default">0</string>
@@ -82,8 +81,6 @@
     <string name="error_load_process_running">Load process is already running</string>
     <string name="error_backup">Error creating backup</string>
     <string name="error_restore">Error restoring backup</string>
-    <string name="error_dropbox_auth">Invalid access token. Please, authenticate</string>
-    <string name="error_dropbox_load_file_data">No information for file : %s</string>
     <string name="error_cloud_account_type_not_set_up">Please, set up cloud account type</string>
     <string name="error_onedrive_login">Error logging in to OneDrive: %s</string>
     <string name="error_onedrive_logout">Error logging out from OneDrive: %s</string>
@@ -102,7 +99,6 @@
     <string name="tab_history_top_chart">Top Chart</string>
     <string name="button_plus">+</string>
     <string name="button_minus">-</string>
-    <string name="notification_dropbox_backup_completed">Dropbox backup has been completed</string>
     <string name="notification_onedrive_backup_completed">OneDrive backup has been completed</string>
     <string name="notification_gdrive_backup_completed">Google Drive backup has been completed</string>
     <string name="notification_load_operation_error">Load operation error : %s</string>
@@ -113,8 +109,6 @@
     <string name="notification_notification_permission_granted">Notification permission granted</string>
     <!-- Hints -->
     <string name="hint_timer_title">Timer title</string>
-    <!-- Dropbox -->
-    <string name="app_key">ml2bc3bur9qdrl7</string>
     <!-- OneDrive -->
     <string name="onedrive_client_id" tools:ignore="TypographyDashes">53b9437b-4686-4200-9af4-72859d3d8b8b</string>
     <!-- Loader -->

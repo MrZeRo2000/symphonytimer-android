@@ -27,13 +27,11 @@ public final class PreferenceRepository {
 
     public static final String PREF_KEY_CLOUD_ACCOUNT_TYPE = "pref_cloud_account_type";
 
-    public static final int PREF_CLOUD_ACCOUNT_TYPE_DROPBOX = 0;
-    public static final int PREF_CLOUD_ACCOUNT_TYPE_ONEDRIVE = 1;
     public static final int PREF_CLOUD_ACCOUNT_TYPE_MSGRAPH = 2;
     public static final int PREF_CLOUD_ACCOUNT_TYPE_GDRIVE = 3;
 
     public static final String PREF_KEY_CLOUD_BACKUP = "pref_cloud_backup";
-    private static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_dropbox_cloud_last_loaded";
+    private static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_cloud_backup_last_loaded";
 
     public static final String PREF_KEY_CLOUD_RESTORE =  "pref_cloud_restore";
     private static final String PREF_KEY_CLOUD_RESTORE_LAST_LOADED =  "pref_cloud_restore_last_loaded";

@@ -1,5 +1,7 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import static com.romanpulov.symphonytimer.preference.PreferenceRepository.PREF_KEY_CLOUD_ACCOUNT_TYPE;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -13,25 +15,21 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
 import androidx.preference.Preference.OnPreferenceClickListener;
-import androidx.fragment.app.DialogFragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import androidx.appcompat.app.AlertDialog;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.common.network.NetworkUtils;
-import com.romanpulov.library.dropbox.DropboxHelper;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.cloud.AbstractCloudAccountFacade;
 import com.romanpulov.symphonytimer.cloud.CloudAccountFacadeFactory;
-import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.loader.dropbox.BackupDropboxUploader;
-import com.romanpulov.symphonytimer.loader.dropbox.RestoreDropboxDownloader;
+import com.romanpulov.symphonytimer.helper.db.DBStorageHelper;
 import com.romanpulov.symphonytimer.loader.gdrive.BackupGDriveUploader;
 import com.romanpulov.symphonytimer.loader.gdrive.RestoreGDriveDownloader;
 import com.romanpulov.symphonytimer.loader.msgraph.BackupMSGraphUploader;
@@ -47,9 +45,6 @@ import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-
-import static com.romanpulov.symphonytimer.preference.PreferenceRepository.PREF_KEY_CLOUD_ACCOUNT_TYPE;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -168,14 +163,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         //backup cloud
         mPreferenceBackupCloudProcessor = new PreferenceBackupCloudProcessor(this);
-        mPreferenceLoadProcessors.put(BackupDropboxUploader.class.getName(), mPreferenceBackupCloudProcessor);
         mPreferenceLoadProcessors.put(BackupMSGraphUploader.class.getName(), mPreferenceBackupCloudProcessor);
         mPreferenceLoadProcessors.put(BackupGDriveUploader.class.getName(), mPreferenceBackupCloudProcessor);
         setupPrefCloudBackupLoadService();
 
         //restore cloud
         mPreferenceRestoreCloudProcessor = new PreferenceRestoreCloudProcessor(this);
-        mPreferenceLoadProcessors.put(RestoreDropboxDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         mPreferenceLoadProcessors.put(RestoreMSGraphDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         mPreferenceLoadProcessors.put(RestoreGDriveDownloader.class.getName(), mPreferenceRestoreCloudProcessor);
         setupPrefCloudRestoreLoadService();
@@ -472,14 +465,5 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
         doUnbindService();
         super.onDetach();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Context context = getContext();
-        if (context != null) {
-            DropboxHelper.getInstance(getContext().getApplicationContext()).refreshAccessToken();
-        }
     }
 }
