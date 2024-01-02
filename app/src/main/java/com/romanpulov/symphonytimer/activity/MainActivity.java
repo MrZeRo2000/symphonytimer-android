@@ -1,7 +1,5 @@
 package com.romanpulov.symphonytimer.activity;
 
-import java.util.List;
-
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -9,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.fragment.app.DialogFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +16,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 
+import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.actions.TimerAction;
 import com.romanpulov.symphonytimer.activity.actions.TimerDeleteAction;
 import com.romanpulov.symphonytimer.activity.actions.TimerInsertAction;
@@ -31,21 +29,22 @@ import com.romanpulov.symphonytimer.activity.actions.TimerMoveDown;
 import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
 import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
+import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
+import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
+import com.romanpulov.symphonytimer.helper.AssetsHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.VibratorHelper;
-import com.romanpulov.symphonytimer.service.TaskService;
-import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
-import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
-import com.romanpulov.symphonytimer.helper.AssetsHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
+import com.romanpulov.symphonytimer.service.TaskService;
 import com.romanpulov.symphonytimer.service.TaskServiceManager;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements ActionMode.Callback {
@@ -63,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 	public static final int CONTEXT_MENU_MOVE_DOWN = Menu.FIRST + 5;
 
     public final static int PERMISSION_REQUEST_COPY_ASSETS = 101;
+    public final static int PERMISSION_REQUEST_NOTIFICATIONS = 102;
 
     private static final long LIST_CLICK_DELAY = 1000;
 	private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
@@ -70,9 +70,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     //assets
     private AssetsHelper mAssetsHelper;
     private List<String> mAssets;
-    private PermissionRequestHelper mWriteStorageRequestHelper;
 
-	//data
+    //data
 	private final DMTimers mDMTimers = new DMTimers();
 	private final DMTasks mDMTasks = new DMTasks();
     {
@@ -152,13 +151,26 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     mAssetsHelper.copyAssetsContent(mAssets);
                 } else {
-                    mWriteStorageRequestHelper = new PermissionRequestHelper(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    if (mWriteStorageRequestHelper.isPermissionGranted()) {
+                    PermissionRequestHelper writeStorageRequestHelper =
+                            new PermissionRequestHelper(
+                                    this,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    if (writeStorageRequestHelper.isPermissionGranted()) {
                         mAssetsHelper.copyAssetsContent(mAssets);
                     } else {
-                        mWriteStorageRequestHelper.requestPermission(PERMISSION_REQUEST_COPY_ASSETS);
+                        writeStorageRequestHelper.requestPermission(PERMISSION_REQUEST_COPY_ASSETS);
                     }
                 }
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            PermissionRequestHelper notificationRequestHelper =
+                    new PermissionRequestHelper(
+                            this,
+                            Manifest.permission.POST_NOTIFICATIONS);
+            if (!notificationRequestHelper.isPermissionGranted()) {
+                notificationRequestHelper.requestPermission(PERMISSION_REQUEST_NOTIFICATIONS);
             }
         }
     }
@@ -173,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                         mAssetsHelper.copyAssets(mAssets);
                     }
                     break;
+                case PERMISSION_REQUEST_NOTIFICATIONS:
+                    Toast.makeText(this, R.string.notification_notification_permission_granted, Toast.LENGTH_SHORT).show();
             }
         }
     }

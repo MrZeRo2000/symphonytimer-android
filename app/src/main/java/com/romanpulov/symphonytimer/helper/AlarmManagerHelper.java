@@ -52,7 +52,11 @@ public class AlarmManagerHelper {
     private void setOnetimeTimer(Context context, long triggerAt, Intent intent, int requestCode){
         logContext(context, "set Onetime timer  to " + DateFormatterHelper.formatLog(triggerAt));
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pi = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_MUTABLE + PendingIntent.FLAG_UPDATE_CURRENT);
 
         /*
         // initial version
@@ -64,12 +68,14 @@ public class AlarmManagerHelper {
          */
 
         // fix version 1
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (am.canScheduleExactAlarms()) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi);
         } else {
-            am.set(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+            am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi);
         }
 
         /*

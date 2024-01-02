@@ -33,6 +33,10 @@
 -dontwarn com.google.appengine.**
 -dontwarn com.google.crypto.**
 -dontwarn org.bouncycastle.**
+-dontwarn com.google.auto.value.AutoValue
+-dontwarn edu.umd.cs.findbugs.annotations.NonNull
+-dontwarn edu.umd.cs.findbugs.annotations.Nullable
+-dontwarn edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 
 -keepclassmembers class com.romanpulov.symphonytimer.loader.** { *; }
 -keepclassmembers class com.onedrive.sdk.extensions.** { *; }
