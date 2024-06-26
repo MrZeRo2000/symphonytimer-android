@@ -107,6 +107,7 @@
     <string name="notification_gdrive_successfully_logged_in">Successfully logged in to Google Drive</string>
     <string name="notification_gdrive_successfully_logged_out">Successfully logged out from Google Drive</string>
     <string name="notification_notification_permission_granted">Notification permission granted</string>
+    <string name="notification_overlay_permission_granted">Overlay permission granted</string>
     <!-- Hints -->
     <string name="hint_timer_title">Timer title</string>
     <!-- OneDrive -->

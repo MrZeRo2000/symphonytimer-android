@@ -7,19 +7,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
 
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.actions.TimerAction;
@@ -55,14 +55,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 	public static final int ADD_ITEM_RESULT_CODE = 1;
 	public static final int EDIT_ITEM_RESULT_CODE = 2;
 	
-	public static final int CONTEXT_MENU_ADD = Menu.FIRST + 1;
-	public static final int CONTEXT_MENU_EDIT = Menu.FIRST + 2;
-	public static final int CONTEXT_MENU_DELETE = Menu.FIRST + 3;
-	public static final int CONTEXT_MENU_MOVE_UP = Menu.FIRST + 4;
-	public static final int CONTEXT_MENU_MOVE_DOWN = Menu.FIRST + 5;
-
     public final static int PERMISSION_REQUEST_COPY_ASSETS = 101;
     public final static int PERMISSION_REQUEST_NOTIFICATIONS = 102;
+
+    //interactions
+    ActivityResultLauncher<Intent> mStartForOverlaysResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Settings.canDrawOverlays(this)) {
+                        Toast.makeText(this, R.string.notification_overlay_permission_granted, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
     private static final long LIST_CLICK_DELAY = 1000;
 	private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
@@ -75,12 +79,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 	private final DMTimers mDMTimers = new DMTimers();
 	private final DMTasks mDMTasks = new DMTasks();
     {
-        mDMTasks.setTasksCompleted(new DMTaskItem.OnTaskItemCompleted() {
-            @Override
-            public void OnTaskItemCompletedEvent(DMTaskItem dmTaskItem) {
-                performTaskCompleted(dmTaskItem);
-            }
-        });
+        mDMTasks.setTasksCompleted(this::performTaskCompleted);
     }
 
     //UI
@@ -114,29 +113,21 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, new OnDMTimerInteractionListener() {
-            @Override
-            public void onDMTimerInteraction(DMTimerRec item, int position) {
-                long clickTime = System.currentTimeMillis();
-                if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
-                    VibratorHelper.shortVibrate(MainActivity.this);
-                    log("Timer action registered");
-                    performTimerAction(mDMTimers.get(position));
-                }
-                mLastClickTime = clickTime;
+		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, (item, position) -> {
+            long clickTime = System.currentTimeMillis();
+            if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
+                VibratorHelper.shortVibrate(MainActivity.this);
+                log("Timer action registered");
+                performTimerAction(mDMTimers.get(position));
             }
+            mLastClickTime = clickTime;
         });
         mListViewSelector = adapter.getListViewSelector();
 
         mTimersListView = findViewById(R.id.main_list_view);
         mTimersListView.setAdapter(adapter);
 
-        mTimersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                log("onClick");
-            }
-        });
+        mTimersListView.setOnItemClickListener((parent, view, position, id) -> log("onClick"));
 
         // Update List
         loadTimers();
@@ -164,13 +155,20 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            PermissionRequestHelper notificationRequestHelper =
-                    new PermissionRequestHelper(
-                            this,
-                            Manifest.permission.POST_NOTIFICATIONS);
-            if (!notificationRequestHelper.isPermissionGranted()) {
-                notificationRequestHelper.requestPermission(PERMISSION_REQUEST_NOTIFICATIONS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                mStartForOverlaysResult.launch(intent);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                PermissionRequestHelper notificationRequestHelper =
+                        new PermissionRequestHelper(
+                                this,
+                                Manifest.permission.POST_NOTIFICATIONS);
+                if (!notificationRequestHelper.isPermissionGranted()) {
+                    notificationRequestHelper.requestPermission(PERMISSION_REQUEST_NOTIFICATIONS);
+                }
             }
         }
     }
@@ -187,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     break;
                 case PERMISSION_REQUEST_NOTIFICATIONS:
                     Toast.makeText(this, R.string.notification_notification_permission_granted, Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     }
@@ -445,15 +444,12 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             return true;
         } else if (itemId == R.id.action_delete) {
             AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
-            deleteDialog.setOkButtonClick(new AlertOkCancelDialogFragment.OnOkButtonClick() {
-                @Override
-                public void OnOkButtonClickEvent(DialogFragment dialog) {
-                    DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
-                    if (null != dmTimerRec) {
-                        executeTimerAction(dmTimerRec, new TimerDeleteAction());
-                        //performDeleteTimer(dmTimerRec);
-                        actionMode.finish();
-                    }
+            deleteDialog.setOkButtonClick(dialog -> {
+                DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+                if (null != dmTimerRec) {
+                    executeTimerAction(dmTimerRec, new TimerDeleteAction());
+                    //performDeleteTimer(dmTimerRec);
+                    actionMode.finish();
                 }
             });
             deleteDialog.show(getSupportFragmentManager(), null);
