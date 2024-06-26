@@ -11,6 +11,8 @@
         <!-- Common window styles -->
         <item name="android:windowBackground">@color/colorWindowBackground</item>
         <item name="android:textColor">@color/brightTextColor</item>
+        <!-- Prevent icon with white background from appearing on startup -->
+        <item name="android:windowDisablePreview">true</item>
     </style>
 
     <style name="Theme.CompatTransparent" parent="AppTheme" >
