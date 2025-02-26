@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,8 +15,6 @@ public class DMTasks implements Parcelable {
     public static final int STATUS_IDLE = 0;
     public static final int STATUS_PROCESSING = 1;
     public static final int STATUS_COMPLETED = 2;
-
-	private static final long serialVersionUID = -7435677773769357006L;
 
     private final List<DMTaskItem> mDataItems = new ArrayList<>();
 
@@ -97,7 +96,7 @@ public class DMTasks implements Parcelable {
             sb.append("(");
             sb.append(taskItem.getExecutionPercent());
             sb.append("%)");
-			delimiter = ",";
+            delimiter = ",";
 		}
 		return sb.toString();
 	}
@@ -212,7 +211,7 @@ public class DMTasks implements Parcelable {
     };
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         int i = 0;
         StringBuilder sb = new StringBuilder();
 
@@ -251,7 +250,7 @@ public class DMTasks implements Parcelable {
     public static DMTasks fromJSONString(String data) {
         DMTasks result = new DMTasks();
 
-        if ((data == null) || (data.equals("")))
+        if ((data == null) || (data.isEmpty()))
             return result;
         else
             try {
