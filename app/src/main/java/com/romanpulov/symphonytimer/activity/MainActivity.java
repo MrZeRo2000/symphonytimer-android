@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 	
     //assets
     private AssetsHelper mAssetsHelper;
-    private List<String> mAssets;
 
     //data
 	private final DMTimers mDMTimers = new DMTimers();
@@ -136,18 +135,19 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         mAssetsHelper = new AssetsHelper(this);
         if (mAssetsHelper.isFirstRun()) {
             mAssetsHelper.clearFirstRun();
-            mAssets = mAssetsHelper.getAssets();
-            if (!mAssets.isEmpty()) {
+            mAssetsHelper.fillAssets();
+            List<String> assets;
+            if (!(assets = mAssetsHelper.getAssets()).isEmpty()) {
                 //for Android 10+ permissions are not required
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    mAssetsHelper.copyAssetsContent(mAssets);
+                    mAssetsHelper.copyAssetsContent(assets);
                 } else {
                     PermissionRequestHelper writeStorageRequestHelper =
                             new PermissionRequestHelper(
                                     this,
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE);
                     if (writeStorageRequestHelper.isPermissionGranted()) {
-                        mAssetsHelper.copyAssetsContent(mAssets);
+                        mAssetsHelper.copyAssetsContent(assets);
                     } else {
                         writeStorageRequestHelper.requestPermission(PERMISSION_REQUEST_COPY_ASSETS);
                     }
@@ -179,8 +179,9 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         if (PermissionRequestHelper.isGrantResultSuccessful(grantResults)) {
             switch (requestCode) {
                 case PERMISSION_REQUEST_COPY_ASSETS:
-                    if ((mAssetsHelper != null) && (mAssets != null)) {
-                        mAssetsHelper.copyAssets(mAssets);
+                    List<String> assets;
+                    if ((mAssetsHelper != null) && ((assets = mAssetsHelper.getAssets()) != null)) {
+                        mAssetsHelper.copyAssets(assets);
                     }
                     break;
                 case PERMISSION_REQUEST_NOTIFICATIONS:
@@ -199,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         LoggerHelper.clearInstance();
 
-    	super.onDestroy();
+        super.onDestroy();
     }
     
     @Override
@@ -230,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_options, menu);
-    	return super.onCreateOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu);
     }
     
     @Override
@@ -445,11 +446,14 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         } else if (itemId == R.id.action_delete) {
             AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
             deleteDialog.setOkButtonClick(dialog -> {
-                DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
-                if (null != dmTimerRec) {
-                    executeTimerAction(dmTimerRec, new TimerDeleteAction());
-                    //performDeleteTimer(dmTimerRec);
-                    actionMode.finish();
+                Bundle dialogBundle = dialog.getArguments();
+                if (dialogBundle != null) {
+                    DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
+                    if (null != dmTimerRec) {
+                        executeTimerAction(dmTimerRec, new TimerDeleteAction());
+                        //performDeleteTimer(dmTimerRec);
+                        actionMode.finish();
+                    }
                 }
             });
             deleteDialog.show(getSupportFragmentManager(), null);

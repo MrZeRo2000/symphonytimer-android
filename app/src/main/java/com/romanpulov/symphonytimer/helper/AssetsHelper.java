@@ -11,18 +11,20 @@ import java.util.List;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.AssetManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
+import android.util.Log;
 import androidx.annotation.NonNull;
 
 public class AssetsHelper {
+    private static final String TAG = "AssetsHelper";
     private void log(String message) {
-        LoggerHelper.logContext(mContext, "AssetsHelper", message);
+        LoggerHelper.logContext(mContext, AssetsHelper.TAG, message);
     }
 
     private static final String PATH = "pre_inst_images";
@@ -34,13 +36,23 @@ public class AssetsHelper {
     private final AssetManager mAssetManager;
     private final File mDestFolderPathFile;
 
+    private List<String> mAssets;
+
+    public List<String> getAssets() {
+        return mAssets;
+    }
+
     public AssetsHelper(@NonNull Context context) {
         this.mContext = context.getApplicationContext();
         this.mAssetManager = mContext.getResources().getAssets();
         this.mDestFolderPathFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
     }
 
-	public List<String> getAssets() {
+    public void fillAssets() {
+        mAssets = getAssetsFromAssetManager();
+    }
+
+	private List<String> getAssetsFromAssetManager() {
         List<String> result = new ArrayList<>();
 
         if (mAssetManager != null) {
@@ -51,7 +63,7 @@ public class AssetsHelper {
                 destFolderFile = new File(mDestFolderPathFile.getAbsolutePath() + File.separator + DEST_PATH);
             } catch (IOException e) {
                 log(e.getMessage());
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             }
 
             if (list != null) {
@@ -71,9 +83,27 @@ public class AssetsHelper {
         return result;
     }
 
+    private void copyStream(InputStream inStream, OutputStream outStream) throws IOException {
+        try {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inStream.read(buf)) > 0) {
+                outStream.write(buf, 0, len);
+            }
+        } finally {
+            try {
+                inStream.close();
+                outStream.flush();
+                outStream.close();
+            } catch (IOException e) {
+                log(e.getMessage());
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+    }
+
     public void copyAssets(List<String> assets) {
         if (mAssetManager != null) {
-            Intent mediaScannerIntent = null;
             for (String s : assets) {
                 try {
                     InputStream inStream = mAssetManager.open(PATH.concat(File.separator).concat(s));
@@ -88,42 +118,21 @@ public class AssetsHelper {
 
                     File destFile = new File(destFolderFile, s);
                     FileOutputStream outStream = new FileOutputStream(destFile);
-                    try {
-                        byte[] buf = new byte[1024];
-                        int len;
-                        while ((len = inStream.read(buf)) > 0) {
-                            outStream.write(buf, 0, len);
-                        }
-                    } finally {
-                        try {
-                            inStream.close();
-                            outStream.flush();
-                            outStream.close();
-                        } catch (IOException e) {
-                            log(e.getMessage());
-                            e.printStackTrace();
-                        }
-                    }
+
+                    copyStream(inStream, outStream);
 
                     // update media library
-                    if (null == mediaScannerIntent) {
-                        mediaScannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    }
-                    mediaScannerIntent.setData(Uri.fromFile(destFile));
-                    mContext.sendBroadcast(mediaScannerIntent);
-
+                    MediaScannerConnection.scanFile(mContext, new String[]{destFile.toString()}, null, null);
                 } catch (IOException e) {
-                        log(e.getMessage());
-                        e.printStackTrace();
-                    }
+                    log(e.getMessage());
+                    Log.e(TAG, e.getMessage(), e);
+                }
             }
         }
     }
 
     public void copyAssetsContent(List<String> assets) {
         if (mAssetManager != null) {
-            Intent mediaScannerIntent = null;
-
             for (String s : assets) {
                 try {
 
@@ -156,53 +165,33 @@ public class AssetsHelper {
                     if (outStream != null) {
 
                         InputStream inStream = mAssetManager.open(PATH.concat(File.separator).concat(s));
-
-                        try {
-                            byte[] buf = new byte[1024];
-                            int len;
-                            while ((len = inStream.read(buf)) > 0) {
-                                outStream.write(buf, 0, len);
-                            }
-                        } finally {
-                            try {
-                                inStream.close();
-                                outStream.flush();
-                                outStream.close();
-                            } catch (IOException e) {
-                                log(e.getMessage());
-                                e.printStackTrace();
-                            }
-                        }
+                        copyStream(inStream, outStream);
                     }
 
                     // update media library
                     if (destFile != null) {
-                        if (null == mediaScannerIntent) {
-                            mediaScannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                        }
-                        mediaScannerIntent.setData(Uri.fromFile(destFile));
-                        mContext.sendBroadcast(mediaScannerIntent);
+                        MediaScannerConnection.scanFile(mContext, new String[]{destFile.toString()}, null, null);
                     }
 
                 } catch (IOException e) {
                     log(e.getMessage());
-                    e.printStackTrace();
+                    Log.e(TAG, e.getMessage(), e);
                 }
             }
-
-
-
-            ContentResolver resolver = mContext.getApplicationContext().getContentResolver();
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         }
     }
 
     public boolean isFirstRun() {
-        return mContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getBoolean(PREF_FIRST_RUN_PARAM_NAME, true);
+        return mContext
+                .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .getBoolean(PREF_FIRST_RUN_PARAM_NAME, true);
     }
 
     public void clearFirstRun() {
-        mContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().putBoolean(PREF_FIRST_RUN_PARAM_NAME, false).apply();
+        mContext
+                .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(PREF_FIRST_RUN_PARAM_NAME, false)
+                .apply();
     }
-
 }
