@@ -21,6 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 
+import androidx.navigation.Navigation;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.actions.TimerAction;
 import com.romanpulov.symphonytimer.activity.actions.TimerDeleteAction;
@@ -30,6 +35,8 @@ import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
 import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
+import com.romanpulov.symphonytimer.databinding.ActivityAppHostBinding;
+import com.romanpulov.symphonytimer.databinding.ActivityMainBinding;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
 import com.romanpulov.symphonytimer.helper.AssetsHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
@@ -46,10 +53,11 @@ import com.romanpulov.symphonytimer.service.TaskServiceManager;
 
 import java.util.List;
 
-
 public class MainActivity extends AppCompatActivity implements ActionMode.Callback {
+    private final static String TAG = "MainActivity";
+
     private void log(String message) {
-        LoggerHelper.logContext(this, "MainActivity", message);
+        LoggerHelper.logContext(this, TAG, message);
     }
 
 	public static final int ADD_ITEM_RESULT_CODE = 1;
@@ -57,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 	
     public final static int PERMISSION_REQUEST_COPY_ASSETS = 101;
     public final static int PERMISSION_REQUEST_NOTIFICATIONS = 102;
+
+    private AppBarConfiguration mAppBarConfiguration;
+    private ActivityAppHostBinding binding;
 
     //interactions
     ActivityResultLauncher<Intent> mStartForOverlaysResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -91,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        binding = ActivityAppHostBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         
         this.getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
@@ -112,6 +124,13 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
+        NavHostFragment navHostFragment = binding.mainNavContent.getFragment();
+        NavController navController = navHostFragment.getNavController();
+
+        mAppBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+
+        /*
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, (item, position) -> {
             long clickTime = System.currentTimeMillis();
             if ((!mDMTasks.isLocked()) && (clickTime - mLastClickTime > LIST_CLICK_DELAY)) {
@@ -128,9 +147,12 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         mTimersListView.setOnItemClickListener((parent, view, position, id) -> log("onClick"));
 
+
         // Update List
         loadTimers();
         updateTimers();
+
+         */
 
         mAssetsHelper = new AssetsHelper(this);
         if (mAssetsHelper.isFirstRun()) {
@@ -170,6 +192,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     notificationRequestHelper.requestPermission(PERMISSION_REQUEST_NOTIFICATIONS);
                 }
             }
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        if (getOnBackPressedDispatcher().hasEnabledCallbacks()) {
+            getOnBackPressedDispatcher().onBackPressed();
+            return true;
+        } else {
+            NavController navController = Navigation.findNavController(this, binding.mainNavContent.getId());
+            return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                    || super.onSupportNavigateUp();
         }
     }
 
@@ -214,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     	super.onResume();
     	mActivityVisible = true;
 
+        /*
+
     	if (DBHelper.getInstance(this).getDBDataChanged()) {
     		loadTimers();
     		DBHelper.getInstance(this).resetDBDataChanged();
@@ -226,7 +262,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             mDMTasks.lock();
             mTaskServiceManager.updateServiceTasks(mDMTasks);
         }
+
+         */
     }
+
+    /*
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -252,6 +292,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         }
         return super.onOptionsItemSelected(item);
     }
+
+     */
 
     private void startAddItemActivity(DMTimerRec dmTimerRec) {
     	Intent startItemIntent = new Intent(this, AddItemActivity.class);
@@ -394,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     
     protected void onActivityResult (int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-    	if (RESULT_OK == resultCode) {    		
+        if (RESULT_OK == resultCode) {
     		if ((null != data) && (null != data.getExtras())) {
     		    //retrieve data
     			DMTimerRec newTimer = data.getExtras().getParcelable(AddItemActivity.EDIT_REC_NAME);
