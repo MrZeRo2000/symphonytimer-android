@@ -7,10 +7,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.lifecycle.ViewModelProvider;
 import com.romanpulov.symphonytimer.databinding.FragmentMainBinding;
+import com.romanpulov.symphonytimer.model.TimerViewModel;
 import org.jetbrains.annotations.NotNull;
 
 public class MainFragment extends Fragment {
+
+    private TimerViewModel model;
 
     public MainFragment() {
         // Required empty public constructor
@@ -31,5 +35,10 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        model = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
+        model.getDMTimers().observe(this, dmTimers -> {
+
+        });
     }
 }

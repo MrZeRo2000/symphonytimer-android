@@ -244,12 +244,42 @@ public class DBHelper implements DBController {
 		return dmTimerRec;
 	}
 	*/
-	
+
+	public List<DMTimerRec> getTimers() {
+		List<DMTimerRec> dmTimers = new ArrayList<>();
+
+		Cursor c = null;
+
+		try {
+			c = mDB.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, null, null, null, null, "order_id");
+
+			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
+				DMTimerRec dmTimerRec = new DMTimerRec();
+				dmTimerRec.mId = c.getLong(0);
+				dmTimerRec.mTitle = c.getString(1);
+				dmTimerRec.mTimeSec = c.getLong(2);
+				dmTimerRec.mSoundFile = c.getString(3);
+				dmTimerRec.mImageName = c.getString(4);
+				dmTimerRec.mOrderId = c.getLong(5);
+				dmTimerRec.mAutoTimerDisableInterval = c.getInt(6);
+
+				dmTimers.add(dmTimerRec);
+			}
+		} finally {
+			if (null != c && !c.isClosed()) {
+				c.close();
+			}
+		}
+
+		return dmTimers;
+	}
+
 	public void fillTimers(DMTimers dmTimers) {
 		// no need ...
 		openDB();
 		
 		dmTimers.clear();
+
 		Cursor c = null;
 		
 		try {
