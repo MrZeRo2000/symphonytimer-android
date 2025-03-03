@@ -1,14 +1,12 @@
 package com.romanpulov.symphonytimer.adapter;
 
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
 import com.romanpulov.library.view.ProgressCircle;
 import com.romanpulov.symphonytimer.helper.UriHelper;
 import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
-import com.romanpulov.symphonytimer.model.DMTimers;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -22,12 +20,16 @@ import android.widget.ImageView;
 
 import androidx.appcompat.view.ActionMode;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
-	private final DMTimers mValues;
+	private final List<DMTimerRec> mValues;
+    private Map<Long, DMTaskItem> mTaskItemMap;
 	private DMTasks mTasks;
-    private final MainActivity.OnDMTimerInteractionListener mListener;
+    private final BiConsumer<DMTaskItem, Integer> mTimerInteractionListener;
     private final ListViewSelector mListViewSelector;
 
     public ListViewSelector getListViewSelector() {
@@ -52,7 +54,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 		ViewHolder(View view, DMTimerRec item, int position) {
             mView = view;
             mPosition = position;
-			mTitleTextView = view.findViewById(R.id.title_text_view);
+            mTitleTextView = view.findViewById(R.id.title_text_view);
 			mImageView = view.findViewById(R.id.image_image_view);
 			mProgressTextView = view.findViewById(R.id.progress_text_view);
 			mProgressCircle = view.findViewById(R.id.progress_circle);
@@ -79,8 +81,8 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         @Override
         public void onClick(View v) {
             if (mListViewSelector.getSelectedItemPos() == -1) {
-                if (mListener != null) {
-                    mListener.onDMTimerInteraction(null, mPosition);
+                if (mTimerInteractionListener != null) {
+                    mTimerInteractionListener.accept(null, mPosition);
                 }
             } else
                 mListViewSelector.setSelectedView(mPosition);
@@ -88,19 +90,28 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
         }
     }
 	
-	public SymphonyArrayAdapter(Context context, ActionMode.Callback actionModeCallback, DMTimers values, DMTasks tasks, MainActivity.OnDMTimerInteractionListener listener) {
+	public SymphonyArrayAdapter(
+            Context context,
+            ActionMode.Callback actionModeCallback,
+            List<DMTimerRec> values,
+            DMTasks tasks,
+            BiConsumer<DMTaskItem, Integer> timerInteractionListener) {
 		super(context, R.layout.symphony_row_view);
 		mValues = values;
 		mTasks = tasks;
-        mListener = listener;
+        mTimerInteractionListener = timerInteractionListener;
         mListViewSelector = new ListViewSelector(this, actionModeCallback);
 	}
 	
 	public void setTasks(DMTasks tasks) {
 		this.mTasks = tasks;
 	}
-	
-	@Override
+
+    public void setTaskItemMap(Map<Long, DMTaskItem> mTaskItemMap) {
+        this.mTaskItemMap = mTaskItemMap;
+    }
+
+    @Override
     public int getCount() {
         return mValues.size();
     }
@@ -115,7 +126,9 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 		final DMTimerRec item = mValues.get(position);
 		
 		//calculate progress
-        DMTaskItem taskItem = mTasks.getTaskItemById(item.mId);
+        DMTaskItem taskItem = mTasks != null ? mTasks.getTaskItemById(item.mId) :
+                mTaskItemMap != null ? mTaskItemMap.get(item.mId) : null;
+
 		int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
 		final long displayProgress = item.mTimeSec - timerProgress;
 

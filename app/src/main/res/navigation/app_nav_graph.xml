@@ -10,5 +10,27 @@
             android:name="com.romanpulov.symphonytimer.fragment.MainFragment"
             android:label="@string/app_name"
             tools:layout="@layout/fragment_main">
+
+        <action
+                android:id="@+id/action_main_to_timer_edit"
+                app:destination="@id/nav_timer_edit"
+                app:enterAnim="@android:anim/slide_in_left"
+                app:exitAnim="@android:anim/slide_out_right"
+                app:popEnterAnim="@android:anim/slide_in_left"
+                app:popExitAnim="@android:anim/slide_out_right"/>
     </fragment>
+
+    <fragment
+            android:id="@+id/nav_timer_edit"
+            android:name="com.romanpulov.symphonytimer.fragment.TimerEditFragment"
+            android:label="@string/title_activity_add_item"
+            tools:layout="@layout/fragment_timer_edit">
+
+        <argument
+                android:name="editItem"
+                app:argType="com.romanpulov.symphonytimer.model.DMTimerRec"
+                app:nullable="true"
+                android:defaultValue="@null" />
+    </fragment>
+
 </navigation>

@@ -5,15 +5,15 @@
     <item android:id="@+id/action_add"
           android:icon="@drawable/ic_action_add"
           android:title="@string/action_add"
-          symphonytimer:showAsAction="ifRoom" />
+          symphonytimer:showAsAction="always" />
 	<item
 		android:id="@+id/action_history"
 		android:icon="@drawable/ic_action_document"
 		android:title="@string/action_history"
-		symphonytimer:showAsAction="never" />
+		symphonytimer:showAsAction="ifRoom" />
 	<item
         android:id="@+id/action_preferences"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_preferences"
-        symphonytimer:showAsAction="never" />
+        symphonytimer:showAsAction="ifRoom" />
 </menu>
