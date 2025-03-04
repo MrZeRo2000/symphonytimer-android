@@ -104,21 +104,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         binding = ActivityAppHostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        
-        this.getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                        //WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                        WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 
         mActivityVisible = true;
-
-        //setup actionbar icon
-		/*
-        ActionBar actionBar= this.getSupportActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME, ActionBar.DISPLAY_SHOW_HOME);
-        actionBar.setIcon(R.drawable.tuba);
-        */
 
 		//setup toolbar
         setSupportActionBar(binding.toolbar);

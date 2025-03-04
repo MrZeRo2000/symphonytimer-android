@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
@@ -118,6 +119,17 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            requireActivity().setTurnScreenOn(true);
+            requireActivity().setShowWhenLocked(true);
+        } else {
+            requireActivity().getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        }
+        requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
 
         model = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
         model.getDMTimers().observe(this, dmTimers -> {
