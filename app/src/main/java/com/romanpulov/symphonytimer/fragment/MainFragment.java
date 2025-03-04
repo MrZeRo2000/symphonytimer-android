@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,6 +10,7 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
@@ -18,6 +20,7 @@ import com.romanpulov.symphonytimer.model.TimerViewModel;
 import androidx.appcompat.view.ActionMode;
 
 public class MainFragment extends Fragment {
+    public static final String TAG = MainFragment.class.getSimpleName();
 
     private FragmentMainBinding binding;
     private TimerViewModel model;
@@ -133,12 +136,20 @@ public class MainFragment extends Fragment {
 
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                Log.d(TAG, "Menu created");
                 menuInflater.inflate(R.menu.main_options, menu);
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                return true;
+                int itemId = menuItem.getItemId();
+                if (itemId == R.id.action_add) {
+                    NavHostFragment.findNavController(MainFragment.this).navigate(
+                            MainFragmentDirections.actionMainToTimerEdit());
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 

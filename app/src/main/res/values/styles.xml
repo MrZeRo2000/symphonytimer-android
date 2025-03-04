@@ -1,7 +1,6 @@
 <resources>
 
-    <style name="RootTheme" parent="Theme.AppCompat">
-    </style>
+    <style name="RootTheme" parent="Theme.AppCompat" />
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="RootTheme">

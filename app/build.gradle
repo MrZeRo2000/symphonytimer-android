@@ -70,7 +70,9 @@ android {
 dependencies {
     def nav_version = "2.8.7"
 
+    implementation 'androidx.annotation:annotation:1.9.1'
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation "androidx.preference:preference:1.2.1"
 
@@ -83,7 +85,7 @@ dependencies {
     implementation 'com.romanpulov.library.view:library:1.1.8'
 
     // Unit testing dependencies
-    androidTestImplementation 'androidx.annotation:annotation:1.9.0'
+    androidTestImplementation 'androidx.annotation:annotation:1.9.1'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test:rules:1.6.1'
     testImplementation 'junit:junit:4.13.2'

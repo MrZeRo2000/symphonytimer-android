@@ -121,8 +121,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         */
 
 		//setup toolbar
-		Toolbar toolbar = findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
 
         NavHostFragment navHostFragment = binding.mainNavContent.getFragment();
         NavController navController = navHostFragment.getNavController();
