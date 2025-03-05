@@ -1,21 +1,21 @@
 package com.romanpulov.symphonytimer.helper;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.content.Context;
-import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.util.Log;
 
 public final class UriHelper {
+    private static final String TAG = UriHelper.class.getSimpleName();
 
     public static boolean uriSaveToFile(Context context, Uri uri, File file) {
         try (InputStream inStream = context.getApplicationContext().getContentResolver().openInputStream(uri);
-             OutputStream outStream = new FileOutputStream(file);
+             OutputStream outStream = new FileOutputStream(file)
         ) {
             if (inStream == null)
                 return false;
@@ -28,7 +28,7 @@ public final class UriHelper {
             outStream.flush();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "uriSaveToFile error:" + e.getMessage());
             return false;
         }
 

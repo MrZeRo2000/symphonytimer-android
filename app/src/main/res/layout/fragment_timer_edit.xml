@@ -289,7 +289,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:background="?android:attr/selectableItemBackground"
             android:text="@android:string/ok"
-            android:onClick="onCommandClick"
     />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

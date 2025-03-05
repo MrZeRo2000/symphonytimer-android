@@ -47,3 +47,6 @@ captures/
 
 # Test data logs
 data/*.log
+
+# Test data files
+data/*.db

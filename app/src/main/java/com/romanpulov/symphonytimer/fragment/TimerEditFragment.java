@@ -1,30 +1,45 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.navigation.Navigation;
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.activity.AddItemActivity;
 import com.romanpulov.symphonytimer.adapter.AutoTimerDisableAdapter;
 import com.romanpulov.symphonytimer.databinding.FragmentTimerEditBinding;
 import com.romanpulov.symphonytimer.helper.MediaPlayerHelper;
+import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.UriHelper;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TimerEditFragment extends Fragment {
     private static final String TAG = TimerEditFragment.class.getSimpleName();
+
+    public static final String MEDIA_ID_KEY = TimerEditFragment.class.getName() + "_MEDIA_ID";
+    public static final String RESULT_KEY = TimerEditFragment.class.getName() + "_RESULT_KEY";
+    public static final String RESULT_VALUE_KEY = TimerEditFragment.class.getName() + "_RESULT_VALUE_KEY";
 
     private FragmentTimerEditBinding binding;
 
@@ -33,6 +48,61 @@ public class TimerEditFragment extends Fragment {
 
     private File mEditImageFile;
     private File mEditSoundFile;
+
+    private ExecutorService mExecutor;
+
+    private final ActivityResultLauncher<Intent> mMediaPickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Intent data;
+                if ((data = result.getData()) != null) {
+                    Uri uri = data.getData();
+                    String mimeType = requireContext().getContentResolver().getType(uri);
+
+                    Log.d(TAG, "onActivityResult: " + result.getResultCode() +
+                            ", MIME type:" + mimeType);
+
+                    int mediaType = MediaStorageHelper.mediaTypeFromMIMEType(mimeType);
+                    if (mediaType > -1) {
+                        int mediaId = data.getIntExtra(MEDIA_ID_KEY, 0);
+                        File mediaFile =  MediaStorageHelper.getInstance(requireContext()).createMediaFile(mediaType, mediaId);
+
+                        if (mExecutor != null) {
+                            mExecutor.shutdown();
+                            try {
+                                if (!mExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                                    return;
+                                }
+                            } catch (InterruptedException e) {
+                                Log.e(TAG, "Interrupted exception: " + e.getMessage(), e);
+                            }
+                        } else {
+                            mExecutor = Executors.newSingleThreadExecutor();
+                        }
+                        mExecutor.submit(() -> {
+                            Log.d(TAG, "saving URI " + uri + " to file " + mediaFile.getAbsolutePath());
+                            boolean saveResult = UriHelper.uriSaveToFile(requireContext(), uri, mediaFile);
+                            if (!saveResult && mediaFile.exists()) {
+                                mediaFile.delete();
+                            } else {
+                                Activity activity = getActivity();
+                                if (activity != null) {
+                                    activity.runOnUiThread(() -> {
+                                       if (mediaType == MediaStorageHelper.MEDIA_TYPE_IMAGE) {
+                                           mEditImageFile = mediaFile;
+                                           binding.imageFileImageButton.setImageURI(UriHelper.fileNameToUri(activity, mEditImageFile.getPath()));
+                                       } else if (mediaType == MediaStorageHelper.MEDIA_TYPE_SOUND) {
+                                           mEditSoundFile = mediaFile;
+                                           binding.soundFileText.setText(getMediaFileTitle(mEditSoundFile));
+                                       }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+    );
 
     private static class AddItemInputException extends Exception {
         private final TextView mItem;
@@ -89,6 +159,42 @@ public class TimerEditFragment extends Fragment {
             // update sound and image controls
             updateSoundImageFromFile(editItem.mSoundFile, editItem.mImageName);
         }
+
+        binding.imageFileImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            if (editItem != null) {
+                intent.putExtra(MEDIA_ID_KEY, editItem.mId);
+            }
+            mMediaPickerLauncher.launch(intent);
+        });
+
+        binding.okButton.setOnClickListener(v -> {
+            DMTimerRec resultRec;
+            try {
+                resultRec = getEditRec();
+            } catch (AddItemInputException e) {
+                if (!(e.getItem() instanceof EditText))
+                    Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                else
+                    e.getItem().setError(e.getMessage());
+                return;
+            }
+
+            mMediaPlayerHelper.stop();
+
+            Bundle result = new Bundle();
+
+            if (editItem != null) {
+                resultRec.mId = editItem.mId;
+            }
+            result.putParcelable(RESULT_VALUE_KEY, resultRec);
+            getParentFragmentManager().setFragmentResult(RESULT_KEY, result);
+
+            Navigation.findNavController(requireView()).navigateUp();
+        });
+
     }
 
     private void updateSoundImageFromFile(String soundFile, String imageFile) {
