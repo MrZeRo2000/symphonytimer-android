@@ -25,4 +25,9 @@ public class TimerViewModel extends AndroidViewModel {
     public LiveData<List<DMTimerRec>> getDMTimers() {
         return mDMTimers;
     }
+
+    public void addTimer(DMTimerRec item) {
+        mDBHelper.insertTimer(item);
+        loadTimers();
+    }
 }

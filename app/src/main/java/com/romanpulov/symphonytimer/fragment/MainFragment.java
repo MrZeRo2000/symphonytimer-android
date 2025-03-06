@@ -17,6 +17,7 @@ import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.FragmentMainBinding;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
+import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import androidx.appcompat.view.ActionMode;
 
@@ -165,6 +166,16 @@ public class MainFragment extends Fragment {
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
+        model.loadTimers();
+
+        getParentFragmentManager().setFragmentResultListener(
+                TimerEditFragment.RESULT_KEY, this, (requestKey, bundle) -> {
+                    DMTimerRec item = bundle.getParcelable(TimerEditFragment.RESULT_VALUE_KEY);
+                    if (item != null) {
+                        Log.d(TAG, "Timer edit result: " + item);
+                        model.addTimer(item);
+                    }
+                });
     }
 
     private void onTimerInteraction(DMTaskItem item, int position) {

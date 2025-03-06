@@ -2,6 +2,7 @@ package com.romanpulov.symphonytimer.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import org.jetbrains.annotations.NotNull;
 
 public class DMTimerRec implements Parcelable{
 	public long mId;
@@ -53,4 +54,17 @@ public class DMTimerRec implements Parcelable{
 			return new DMTimerRec[size];
 		}
 	};
+
+	@Override
+	public @NotNull String toString() {
+		return "DMTimerRec{" +
+				"mId=" + mId +
+				", mTitle='" + mTitle + '\'' +
+				", mTimeSec=" + mTimeSec +
+				", mSoundFile='" + mSoundFile + '\'' +
+				", mImageName='" + mImageName + '\'' +
+				", mOrderId=" + mOrderId +
+				", mAutoTimerDisableInterval=" + mAutoTimerDisableInterval +
+				'}';
+	}
 }
