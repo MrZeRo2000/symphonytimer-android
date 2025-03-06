@@ -90,7 +90,8 @@ public class TimerEditFragment extends Fragment {
                                     activity.runOnUiThread(() -> {
                                        if (mediaType == MediaStorageHelper.MEDIA_TYPE_IMAGE) {
                                            mEditImageFile = mediaFile;
-                                           binding.imageFileImageButton.setImageURI(UriHelper.fileNameToUri(activity, mEditImageFile.getPath()));
+                                           binding.imageFileImageButton.setImageURI(
+                                                   UriHelper.fileNameToUri(activity, mEditImageFile.getPath()));
                                        } else if (mediaType == MediaStorageHelper.MEDIA_TYPE_SOUND) {
                                            mEditSoundFile = mediaFile;
                                            binding.soundFileText.setText(getMediaFileTitle(mEditSoundFile));
@@ -168,6 +169,30 @@ public class TimerEditFragment extends Fragment {
                 intent.putExtra(MEDIA_ID_KEY, editItem.mId);
             }
             mMediaPickerLauncher.launch(intent);
+        });
+
+        binding.clearImageFileButton.setOnClickListener(v -> {
+            mEditImageFile = null;
+            binding.imageFileImageButton.setImageResource(R.drawable.btn_check_off);
+        });
+
+        binding.soundFileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("audio/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            if (editItem != null) {
+                intent.putExtra(MEDIA_ID_KEY, editItem.mId);
+            }
+            mMediaPickerLauncher.launch(intent);
+        });
+
+        binding.previewSoundFileButton.setOnClickListener(v ->
+                mMediaPlayerHelper.toggleSound(mEditSoundFile == null ? null : mEditSoundFile.getPath()));
+
+        binding.clearSoundFileButton.setOnClickListener(v -> {
+            mMediaPlayerHelper.stop();
+            mEditSoundFile = null;
+            binding.soundFileText.setText(R.string.default_sound);
         });
 
         binding.okButton.setOnClickListener(v -> {
