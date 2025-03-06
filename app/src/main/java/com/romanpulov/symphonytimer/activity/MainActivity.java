@@ -213,8 +213,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     @Override
     protected void onDestroy() {
-    	DBHelper.clearInstance();
-
         mTaskServiceManager.unbindService();
         mTaskServiceManager = null;
 

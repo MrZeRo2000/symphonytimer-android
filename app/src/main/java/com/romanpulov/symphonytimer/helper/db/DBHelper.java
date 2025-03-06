@@ -11,6 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import android.util.Log;
 import com.romanpulov.library.common.db.DBController;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
@@ -20,6 +21,7 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
 public class DBHelper implements DBController {
+	private static final String TAG = DBHelper.class.getSimpleName();
 	private static DBHelper mDBHelperInstance = null;
 
 	private SQLiteDatabase mDB;
@@ -47,6 +49,7 @@ public class DBHelper implements DBController {
 	@Override
 	public void openDB() {
 		if (null == mDB) {
+			Log.d(TAG, "Opening DB");
 			mDB = mDBOpenHelper.getWritableDatabase();
 		}
 	}
@@ -54,6 +57,7 @@ public class DBHelper implements DBController {
 	@Override
 	public void closeDB() {
 		if (null != mDB) {
+			Log.d(TAG, "Closing DB");
 			mDB.close();
 			mDB = null;
 		}
@@ -476,9 +480,9 @@ public class DBHelper implements DBController {
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3]));
-            cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4]));
+			cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4], recItem.fields.get(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4]));
 
-			mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);						
+			mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);
 		}
 	}
 	
