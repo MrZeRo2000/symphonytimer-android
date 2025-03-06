@@ -81,10 +81,10 @@ public class HistoryArrayAdapter extends ArrayAdapter<DMTimerHistRec> {
 		DMTimerHistRec rec = mDMTimerHistList.get(position);
 		DMTimerRec dmTimerRec = mDMTimers.getItemById(rec.mTimerId);
 		
-		viewHolder.mTitle.setText(dmTimerRec.mTitle);		
+		viewHolder.mTitle.setText(dmTimerRec.getTitle());
 		viewHolder.mTime.setText(DateFormatterHelper.format(rec.mStartTime));
 		viewHolder.mImage.setImageURI(
-				null != dmTimerRec.mImageName ? Uri.parse(dmTimerRec.mImageName) : null);
+				null != dmTimerRec.getImageName() ? Uri.parse(dmTimerRec.getImageName()) : null);
 
         boolean hideTimeDetails = !PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_full_history_info", false);
 

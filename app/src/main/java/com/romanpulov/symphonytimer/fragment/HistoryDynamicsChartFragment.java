@@ -64,7 +64,7 @@ public class HistoryDynamicsChartFragment extends HistoryChartFragment {
                 Long histItemValue = histItem.get(argumentItem.getKey());
                 DMTimerRec timer = mDMTimers.getItemById(argumentItem.getKey());
                 if (timer != null)
-                    series.addXY(position++, timer.mTitle, histItemValue == null ? 0 : histItemValue);
+                    series.addXY(position++, timer.getTitle(), histItemValue == null ? 0 : histItemValue);
             }
             isHist = false;
         }

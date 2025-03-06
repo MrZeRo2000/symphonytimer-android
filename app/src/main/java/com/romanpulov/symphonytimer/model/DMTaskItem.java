@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -184,7 +185,7 @@ public class DMTaskItem implements Parcelable {
     }
 
 	@Override
-	public String toString() {
+	public @NotNull String toString() {
 		return "(id = " + mId + "," +
 				"title = " + mTitle + "," +
                 "maxTimeSec=" + mMaxTimeSec + "," +

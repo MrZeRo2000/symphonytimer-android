@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     	Intent startItemIntent = new Intent(this, AddItemActivity.class);
     	startItemIntent.putExtra(AddItemActivity.EDIT_REC_NAME, dmTimerRec);    	
     	startActivityForResult(startItemIntent,
-                null == dmTimerRec.mTitle ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
+                null == dmTimerRec.getTitle() ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
     }
     
     private void startHistoryActivity() {
@@ -340,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 updateTimers();
 
                 if (timerAction.getChangeType() == TimerAction.CHANGE_TYPE_POSITION) {
-                    int pos = mDMTimers.getPosById(dmTimerRec.mId);
+                    int pos = mDMTimers.getPosById(dmTimerRec.getId());
                     if (pos != -1) {
                         mListViewSelector.setSelectedView(pos);
                         mTimersListView.smoothScrollToPositionFromTop(pos, 0);
@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private void performTimerAction(DMTimerRec dmTimerRec) {
-    	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.mId);
+    	DMTaskItem taskItem = mDMTasks.getTaskItemById(dmTimerRec.getId());
 
     	if (null == taskItem) {
     		DMTaskItem newTaskItem = mDMTasks.addTaskItem(dmTimerRec);
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             actionMode.getMenuInflater().inflate(R.menu.main_actions, menu);
             int pos;
             if ((mListViewSelector != null) && ((pos = mListViewSelector.getSelectedItemPos()) != -1)) {
-                actionMode.setTitle(mDMTimers.get(pos).mTitle);
+                actionMode.setTitle(mDMTimers.get(pos).getTitle());
             }
             return true;
         }

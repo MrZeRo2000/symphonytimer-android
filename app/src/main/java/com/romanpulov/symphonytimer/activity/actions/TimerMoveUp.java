@@ -12,7 +12,7 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 public class TimerMoveUp implements TimerAction {
     @Override
     public long execute(Context context, DMTimerRec data) {
-        return DBHelper.getInstance(context).moveTimerUp(data.mOrderId) ? 1 : 0;
+        return DBHelper.getInstance(context).moveTimerUp(data.getOrderId()) ? 1 : 0;
     }
 
     @Override

@@ -145,20 +145,20 @@ public class TimerEditFragment extends Fragment {
         if (editItem == null) {
             updateSoundImageFromFile(null, null);
         } else {
-            binding.titleEditText.setText(editItem.mTitle);
+            binding.titleEditText.setText(editItem.getTitle());
 
-            long hours =  editItem.mTimeSec / 3600;
-            long minutes = editItem.mTimeSec % 3600 / 60;
-            long seconds = editItem.mTimeSec % 60;
+            long hours =  editItem.getTimeSec() / 3600;
+            long minutes = editItem.getTimeSec() % 3600 / 60;
+            long seconds = editItem.getTimeSec() % 60;
             binding.hoursNumberPicker.setValue((int) hours);
             binding.minutesNumberPicker.setValue((int) minutes);
             binding.secondsNumberPicker.setValue((int) seconds);
 
             binding.autoTimerDisableSpinner.setSelection(
-                    mAutoTimerDisableAdapter.getPositionByValue(editItem.mAutoTimerDisableInterval));
+                    mAutoTimerDisableAdapter.getPositionByValue(editItem.getAutoTimerDisableInterval()));
 
             // update sound and image controls
-            updateSoundImageFromFile(editItem.mSoundFile, editItem.mImageName);
+            updateSoundImageFromFile(editItem.getSoundFile(), editItem.getImageName());
         }
 
         binding.imageFileImageButton.setOnClickListener(v -> {
@@ -166,7 +166,7 @@ public class TimerEditFragment extends Fragment {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             if (editItem != null) {
-                intent.putExtra(MEDIA_ID_KEY, editItem.mId);
+                intent.putExtra(MEDIA_ID_KEY, editItem.getId());
             }
             mMediaPickerLauncher.launch(intent);
         });
@@ -181,7 +181,7 @@ public class TimerEditFragment extends Fragment {
             intent.setType("audio/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             if (editItem != null) {
-                intent.putExtra(MEDIA_ID_KEY, editItem.mId);
+                intent.putExtra(MEDIA_ID_KEY, editItem.getId());
             }
             mMediaPickerLauncher.launch(intent);
         });
@@ -198,7 +198,7 @@ public class TimerEditFragment extends Fragment {
         binding.okButton.setOnClickListener(v -> {
             DMTimerRec resultRec;
             try {
-                resultRec = getEditRec();
+                resultRec = getEditRec(editItem);
             } catch (AddItemInputException e) {
                 if (!(e.getItem() instanceof EditText))
                     Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -211,9 +211,6 @@ public class TimerEditFragment extends Fragment {
 
             Bundle result = new Bundle();
 
-            if (editItem != null) {
-                resultRec.mId = editItem.mId;
-            }
             result.putParcelable(RESULT_VALUE_KEY, resultRec);
             getParentFragmentManager().setFragmentResult(RESULT_KEY, result);
 
@@ -259,29 +256,36 @@ public class TimerEditFragment extends Fragment {
         }
     }
 
-    private DMTimerRec getEditRec() throws AddItemInputException {
-        DMTimerRec rec = new DMTimerRec();
-        //rec.mId = mEditId;
-        rec.mTitle = binding.titleEditText.getText().toString().trim();
+    private DMTimerRec getEditRec(DMTimerRec editItem) throws AddItemInputException {
+        long id = editItem == null ? 0 : editItem.getId();
 
-        if (rec.mTitle.isEmpty()) {
+        String title = binding.titleEditText.getText().toString().trim();
+
+        if (title.isEmpty()) {
             throw new AddItemInputException(binding.titleEditText, getResources().getString(R.string.error_title_not_assigned));
         }
 
         int hours = binding.hoursNumberPicker.getValue();
         int minutes = binding.minutesNumberPicker.getValue();
         int seconds = binding.secondsNumberPicker.getValue();
-        rec.mTimeSec = (long)hours * 3600 + (long)minutes * 60 + seconds;
-        rec.mAutoTimerDisableInterval = mAutoTimerDisableAdapter.getValueBySelection(
+        long timeSec = (long)hours * 3600 + (long)minutes * 60 + seconds;
+        int autoTimerDisableInterval = mAutoTimerDisableAdapter.getValueBySelection(
                 binding.autoTimerDisableSpinner.getSelectedItem().toString());
 
-        if (0 == rec.mTimeSec) {
+        if (0 == timeSec) {
             throw new AddItemInputException(binding.timeTextView, getResources().getString(R.string.error_time_zero));
         }
 
-        rec.mSoundFile = null != mEditSoundFile ? mEditSoundFile.getPath() : null;
-        rec.mImageName = null != mEditImageFile ? mEditImageFile.getPath() : null;
+        String soundFile = null != mEditSoundFile ? mEditSoundFile.getPath() : null;
+        String imageName = null != mEditImageFile ? mEditImageFile.getPath() : null;
 
-        return rec;
+        return new DMTimerRec(
+                id,
+                title,
+                timeSec,
+                soundFile,
+                imageName,
+                0L,
+                autoTimerDisableInterval);
     }
 }

@@ -34,7 +34,7 @@ public class DMTimers implements Parcelable {
 	
 	public DMTimerRec getItemById(long id) {
 		for (DMTimerRec timerRec : dataItems) {
-			if (timerRec.mId == id) {
+			if (timerRec.getId() == id) {
 				return timerRec;
 			}
 		}
@@ -43,7 +43,7 @@ public class DMTimers implements Parcelable {
 
     public int getPosById(long id) {
         for (DMTimerRec timerRec : dataItems) {
-            if (timerRec.mId == id) {
+            if (timerRec.getId() == id) {
                 return dataItems.indexOf(timerRec);
             }
         }

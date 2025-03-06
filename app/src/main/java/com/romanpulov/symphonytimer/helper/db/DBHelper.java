@@ -98,12 +98,12 @@ public class DBHelper implements DBController {
 	public long insertTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
 
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.mTitle);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.getTitle());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.getTimeSec());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.getSoundFile());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.getImageName());
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], getMaxOrderId() + 1);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.mAutoTimerDisableInterval);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.getAutoTimerDisableInterval());
 
 		return mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);
 	}
@@ -111,13 +111,13 @@ public class DBHelper implements DBController {
 	public long updateTimer(DMTimerRec dmTimerRec) {
 		ContentValues cv = new ContentValues();
 
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.mTitle);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.mTimeSec);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.mSoundFile);
-		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.mImageName);
-        cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.mAutoTimerDisableInterval);
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], dmTimerRec.getTitle());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.getTimeSec());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.getSoundFile());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.getImageName());
+        cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.getAutoTimerDisableInterval());
 
-		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.mId, null);
+		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.getId(), null);
 	}
 	
 	public long insertTimerHistory(DMTaskItem dmTaskItem) {
@@ -258,14 +258,14 @@ public class DBHelper implements DBController {
 			c = mDB.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, null, null, null, null, "order_id");
 
 			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
-				DMTimerRec dmTimerRec = new DMTimerRec();
-				dmTimerRec.mId = c.getLong(0);
-				dmTimerRec.mTitle = c.getString(1);
-				dmTimerRec.mTimeSec = c.getLong(2);
-				dmTimerRec.mSoundFile = c.getString(3);
-				dmTimerRec.mImageName = c.getString(4);
-				dmTimerRec.mOrderId = c.getLong(5);
-				dmTimerRec.mAutoTimerDisableInterval = c.getInt(6);
+				DMTimerRec dmTimerRec = new DMTimerRec(
+						c.getLong(0),
+						c.getString(1),
+						c.getLong(2),
+						c.getString(3),
+						c.getString(4),
+						c.getLong(5),
+						c.getInt(6));
 
 				dmTimers.add(dmTimerRec);
 			}
@@ -289,16 +289,16 @@ public class DBHelper implements DBController {
 		try {
 			c = mDB.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, null, null, null, null, "order_id");
 			
-			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
-                DMTimerRec dmTimerRec = new DMTimerRec();
-				dmTimerRec.mId = c.getLong(0);
-				dmTimerRec.mTitle = c.getString(1);
-				dmTimerRec.mTimeSec = c.getLong(2);
-				dmTimerRec.mSoundFile = c.getString(3);
-				dmTimerRec.mImageName = c.getString(4);
-				dmTimerRec.mOrderId = c.getLong(5);
-				dmTimerRec.mAutoTimerDisableInterval = c.getInt(6);
-				
+			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
+                DMTimerRec dmTimerRec = new DMTimerRec(
+						c.getLong(0),
+						c.getString(1),
+						c.getLong(2),
+						c.getString(3),
+						c.getString(4),
+						c.getLong(5),
+						c.getInt(6));
+
 				dmTimers.add(dmTimerRec);
 			}
 		} finally {

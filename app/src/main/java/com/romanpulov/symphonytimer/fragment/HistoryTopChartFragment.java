@@ -16,7 +16,7 @@ public class HistoryTopChartFragment extends HistoryChartFragment {
         BarChart.Series series = getBarChart().addSeries();
         for (int position = 0; position < timerExecutionList.size(); position++) {
             DMTimerExecutionRec rec =  timerExecutionList.get(position);
-            series.addXY(position + 1, mDMTimers.getItemById(rec.mTimerId).mTitle, rec.mExecCnt);
+            series.addXY(position + 1, mDMTimers.getItemById(rec.mTimerId).getTitle(), rec.mExecCnt);
         }
     }
 }

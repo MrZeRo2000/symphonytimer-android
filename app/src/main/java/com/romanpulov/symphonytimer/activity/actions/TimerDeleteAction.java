@@ -12,7 +12,7 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 public class TimerDeleteAction implements TimerAction {
     @Override
     public long execute(Context context, DMTimerRec data) {
-        return DBHelper.getInstance(context).deleteTimer(data.mId);
+        return DBHelper.getInstance(context).deleteTimer(data.getId());
     }
 
     @Override

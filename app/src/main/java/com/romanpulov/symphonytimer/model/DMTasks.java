@@ -82,7 +82,12 @@ public class DMTasks implements Parcelable {
 	}
 		
 	public DMTaskItem addTaskItem(DMTimerRec dmTimerRec) {
-        DMTaskItem newItem = new DMTaskItem(dmTimerRec.mId, dmTimerRec.mTitle, dmTimerRec.mTimeSec, dmTimerRec.mSoundFile, dmTimerRec.mAutoTimerDisableInterval);
+        DMTaskItem newItem = new DMTaskItem(
+                dmTimerRec.getId(),
+                dmTimerRec.getTitle(),
+                dmTimerRec.getTimeSec(),
+                dmTimerRec.getSoundFile(),
+                dmTimerRec.getAutoTimerDisableInterval());
         newItem.setTaskItemCompleted(mTaskItemCompletedListener);
 		return newItem;
 	}

@@ -115,23 +115,23 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
         updateEditRec();
 
         //don't auto show keyboard if Title is not empty
-        if (editRec.mTitle != null)
+        if (editRec.getTitle() != null)
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     private void updateEditRec(){
-        mEditId = editRec.mId;
-        mTitleEditText.setText(editRec.mTitle);
-        long hours =  editRec.mTimeSec / 3600;
-        long minutes = editRec.mTimeSec % 3600 / 60;
-        long seconds = editRec.mTimeSec % 60;
+        mEditId = editRec.getId();
+        mTitleEditText.setText(editRec.getTitle());
+        long hours =  editRec.getTimeSec() / 3600;
+        long minutes = editRec.getTimeSec() % 3600 / 60;
+        long seconds = editRec.getTimeSec() % 60;
         mHoursNumberPicker.setValue((int) hours);
         mMinutesNumberPicker.setValue((int) minutes);
         mSecondsNumberPicker.setValue((int) seconds);
-        mAutoTimerDisableSpinner.setSelection(mAutoTimerDisableAdapter.getPositionByValue(editRec.mAutoTimerDisableInterval));
+        mAutoTimerDisableSpinner.setSelection(mAutoTimerDisableAdapter.getPositionByValue(editRec.getAutoTimerDisableInterval()));
 
         // update sound and image controls
-        updateSoundImageFromFile(editRec.mSoundFile, editRec.mImageName);
+        updateSoundImageFromFile(editRec.getSoundFile(), editRec.getImageName());
     }
 
     private void updateSoundImageFromFile(String soundFile, String imageFile) {
@@ -157,6 +157,7 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
     }
 
     private DMTimerRec getEditRec() throws AddItemInputException {
+        /*
         DMTimerRec rec = new DMTimerRec();
         rec.mId = mEditId;
         rec.mTitle = mTitleEditText.getText().toString().trim();
@@ -182,6 +183,9 @@ public class AddItemActivity extends AppCompatActivity implements OnSoundFileInf
         rec.mImageName = null != mEditImageFile ? mEditImageFile.getPath() : null;
 
         return rec;
+
+         */
+        return null;
     }
 
     @Override

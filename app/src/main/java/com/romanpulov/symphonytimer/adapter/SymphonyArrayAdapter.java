@@ -68,7 +68,7 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
             DMTimerRec selectedItem;
 
             if ((mListViewSelector != null) && ((actionMode = mListViewSelector.getActionMode()) != null) && ((selectedItem = getItem(mListViewSelector.getSelectedItemPos())) != null))
-                actionMode.setTitle(selectedItem.mTitle);
+                actionMode.setTitle(selectedItem.getTitle());
         }
 
 
@@ -126,11 +126,11 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
 		final DMTimerRec item = mValues.get(position);
 		
 		//calculate progress
-        DMTaskItem taskItem = mTasks != null ? mTasks.getTaskItemById(item.mId) :
-                mTaskItemMap != null ? mTaskItemMap.get(item.mId) : null;
+        DMTaskItem taskItem = mTasks != null ? mTasks.getTaskItemById(item.getId()) :
+                mTaskItemMap != null ? mTaskItemMap.get(item.getId()) : null;
 
 		int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
-		final long displayProgress = item.mTimeSec - timerProgress;
+		final long displayProgress = item.getTimeSec() - timerProgress;
 
 		//background drawer
 		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("pref_bitmap_background", false);
@@ -191,17 +191,17 @@ public class SymphonyArrayAdapter extends ArrayAdapter<DMTimerRec> {
             //update position
             viewHolder.mPosition = position;
 
-		viewHolder.mTitleTextView.setText(item.mTitle);
+		viewHolder.mTitleTextView.setText(item.getTitle());
 
 		//display image
 		viewHolder.mImageView.setImageURI(
-                null != item.mImageName ? UriHelper.fileNameToUri(getContext(), item.mImageName) : null);
+                null != item.getImageName() ? UriHelper.fileNameToUri(getContext(), item.getImageName()) : null);
 
 		//display text
 		viewHolder.mProgressTextView.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
 		
 		//display circle bar
-		viewHolder.mProgressCircle.setMax((int) item.mTimeSec);
+		viewHolder.mProgressCircle.setMax((int) item.getTimeSec());
 		viewHolder.mProgressCircle.setProgress(timerProgress);
         //ensure minimum progress for active item
         viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
