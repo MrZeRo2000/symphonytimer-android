@@ -21,6 +21,8 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import androidx.appcompat.view.ActionMode;
 
+import java.util.List;
+
 public class MainFragment extends Fragment {
     public static final String TAG = MainFragment.class.getSimpleName();
 
@@ -39,20 +41,20 @@ public class MainFragment extends Fragment {
     public class ActionBarCallBack implements ActionMode.Callback {
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            /*
-            if (mDMTasks.getStatus() != DMTasks.STATUS_IDLE)
+            if (model.getTasksStatus() != TimerViewModel.TASKS_STATUS_IDLE) {
                 return false;
-            else {
+            } else {
                 actionMode.getMenuInflater().inflate(R.menu.main_actions, menu);
+
                 int pos;
-                if ((mListViewSelector != null) && ((pos = mListViewSelector.getSelectedItemPos()) != -1)) {
-                    actionMode.setTitle(mDMTimers.get(pos).mTitle);
+                List<DMTimerRec> dmTimers;
+                if ((mListViewSelector != null) &&
+                        ((pos = mListViewSelector.getSelectedItemPos()) != -1) &&
+                        ((dmTimers = model.getDMTimers().getValue()) != null)) {
+                    actionMode.setTitle(dmTimers.get(pos).getTitle());
                 }
                 return true;
             }
-
-             */
-            return false;
         }
 
         @Override
