@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer.adapter;
 
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +31,8 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdapter.ViewHolder> {
+    private static final String TAG = SymphonyArrayAdapter.class.getSimpleName();
+
     private final Context mContext;
 	private List<DMTimerRec> mValues;
     private Map<Long, DMTaskItem> mTaskItemMap;
@@ -41,6 +44,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         return mListViewSelector;
     }
 
+    private boolean mIsBitmapBackground;
 	private RoundedBitmapBackgroundBuilder mBackgroundBuilder;
     private int mItemHeight = 0;
     private int mItemWidth = 0;
@@ -48,12 +52,23 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     private final View.OnLayoutChangeListener mOnLayoutChangeListener = (
             v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
         if ((mItemHeight == 0) || (mItemWidth == 0)) {
+            Log.d(TAG, "onLayoutChange: measuring height");
             int measuredWidth = right - left;
             int measuredHeight = bottom - top;
             if ((measuredWidth > 0) && (measuredHeight > 0)) {
                 mItemHeight = measuredHeight;
                 mItemWidth = measuredWidth;
+
+                if (mIsBitmapBackground && createBackgroundBuilder()) {
+                    ViewHolder viewHolder = (ViewHolder) v.getTag();
+                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+                    v.setBackground(viewHolder.mNormalDrawable);
+                }
             }
+        } else {
+            Log.d(TAG, "onLayoutChange: removing listener");
+            v.removeOnLayoutChangeListener(SymphonyArrayAdapter.this.mOnLayoutChangeListener);
         }
     };
 
@@ -67,8 +82,15 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
 
     @Override
     public void onBindViewHolder(@NonNull SymphonyArrayAdapter.ViewHolder viewHolder, int position) {
-        if (position == 0) {
+        //background drawer
+        mIsBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
+
+        if ((mItemHeight == 0) || (mItemWidth == 0)) {
+            Log.d(TAG, "Adding LayoutChangeListener for position " + position);
             viewHolder.itemView.addOnLayoutChangeListener(mOnLayoutChangeListener);
+            viewHolder.itemView.setTag(viewHolder);
+        } else {
+            Log.d(TAG, "Position " + position + ": height and width known");
         }
 
         DMTimerRec item = mValues.get(position);
@@ -80,11 +102,8 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
         final long displayProgress = item.getTimeSec() - timerProgress;
 
-        //background drawer
-        final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
-
         //create and store backgrounds for better performance
-        if (isBitmapBackground && (null != mBackgroundBuilder)) {
+        if (mIsBitmapBackground && (null != mBackgroundBuilder)) {
             viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
             viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
         }
@@ -107,7 +126,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         //background change depending on selection
         int selectedItemPos = mListViewSelector.getSelectedItemPos();
 
-        if (isBitmapBackground ) {
+        if (mIsBitmapBackground ) {
             if ((viewHolder.mNormalDrawable == null) || (viewHolder.mFinalDrawable == null)) {
                 if (createBackgroundBuilder()) {
                     viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);

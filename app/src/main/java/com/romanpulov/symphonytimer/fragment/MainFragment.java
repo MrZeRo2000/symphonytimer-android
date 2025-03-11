@@ -141,14 +141,18 @@ public class MainFragment extends Fragment {
 
         model = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
         model.getDMTimers().observe(this, dmTimers -> {
-            mAdapter = new SymphonyArrayAdapter(
-                    requireContext(),
-                    new ActionBarCallBack(),
-                    dmTimers,
-                    null,
-                    this::onTimerInteraction);
-            mListViewSelector = mAdapter.getListViewSelector();
-            binding.mainListView.setAdapter(mAdapter);
+            if (mAdapter == null) {
+                mAdapter = new SymphonyArrayAdapter(
+                        requireContext(),
+                        new ActionBarCallBack(),
+                        dmTimers,
+                        null,
+                        this::onTimerInteraction);
+                mListViewSelector = mAdapter.getListViewSelector();
+                binding.mainListView.setAdapter(mAdapter);
+            } else {
+                mAdapter.updateValues(dmTimers);
+            }
         });
 
         MenuHost menuHost = requireActivity();
