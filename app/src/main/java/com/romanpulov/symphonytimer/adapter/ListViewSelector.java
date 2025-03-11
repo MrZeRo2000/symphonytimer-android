@@ -1,17 +1,17 @@
 package com.romanpulov.symphonytimer.adapter;
 
 import android.view.View;
-import android.widget.BaseAdapter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by romanpulov on 11.11.2016.
  */
 
 public class ListViewSelector {
-    private final BaseAdapter mAdapter;
+    private final RecyclerView.Adapter<?> mAdapter;
     private final ActionMode.Callback mActionModeCallback;
     private ActionMode mActionMode;
 
@@ -25,7 +25,7 @@ public class ListViewSelector {
         return mSelectedItemPos;
     }
 
-    public ListViewSelector(BaseAdapter adapter, ActionMode.Callback actionModeCallback) {
+    public ListViewSelector(RecyclerView.Adapter<?> adapter, ActionMode.Callback actionModeCallback) {
         mAdapter = adapter;
         mActionModeCallback = actionModeCallback;
     }

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
@@ -20,6 +21,7 @@ import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import androidx.appcompat.view.ActionMode;
+import com.romanpulov.symphonytimer.utils.SpaceItemDecoration;
 
 import java.util.List;
 
@@ -133,6 +135,9 @@ public class MainFragment extends Fragment {
                             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         }
         requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+
+        binding.mainListView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.mainListView.addItemDecoration(new SpaceItemDecoration((int)requireContext().getResources().getDimension(R.dimen.list_divider_height)));
 
         model = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
         model.getDMTimers().observe(this, dmTimers -> {
