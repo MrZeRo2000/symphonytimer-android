@@ -10,7 +10,6 @@ import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
 import com.romanpulov.library.view.ProgressCircle;
 import com.romanpulov.symphonytimer.helper.UriHelper;
-import com.romanpulov.symphonytimer.model.DMTasks;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 
 import android.content.Context;
@@ -36,7 +35,6 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     private final Context mContext;
 	private List<DMTimerRec> mValues;
     private Map<Long, DMTaskItem> mTaskItemMap;
-	private DMTasks mTasks;
     private final BiConsumer<DMTaskItem, Integer> mTimerInteractionListener;
     private final ListViewSelector mListViewSelector;
 
@@ -96,8 +94,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         DMTimerRec item = mValues.get(position);
 
         //calculate progress
-        DMTaskItem taskItem = mTasks != null ? mTasks.getTaskItemById(item.getId()) :
-                mTaskItemMap != null ? mTaskItemMap.get(item.getId()) : null;
+        DMTaskItem taskItem = mTaskItemMap != null ? mTaskItemMap.get(item.getId()) : null;
 
         int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
         final long displayProgress = item.getTimeSec() - timerProgress;
@@ -214,17 +211,13 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             Context context,
             ActionMode.Callback actionModeCallback,
             List<DMTimerRec> values,
-            DMTasks tasks,
+            Map<Long, DMTaskItem> taskItemMap,
             BiConsumer<DMTaskItem, Integer> timerInteractionListener) {
         mContext = context;
         mValues = values;
-        mTasks = tasks;
+        mTaskItemMap = taskItemMap;
         mTimerInteractionListener = timerInteractionListener;
         mListViewSelector = new ListViewSelector(this, actionModeCallback);
-	}
-	
-	public void setTasks(DMTasks tasks) {
-		this.mTasks = tasks;
 	}
 
     public void setTaskItemMap(Map<Long, DMTaskItem> mTaskItemMap) {
@@ -365,27 +358,26 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         return (mBackgroundBuilder != null);
     }
 
-    public void updateValues(List<DMTimerRec> values) {
+    public void updateValues(List<DMTimerRec> values, RecyclerView recyclerView) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getDiffCallback(values));
 
         int selectedPos = -1;
         if (mValues.size() != values.size()) {
             mListViewSelector.destroyActionMode();
 
-            if (mValues.size() > values.size()) {
+            if (mValues.size() < values.size()) {
                 selectedPos = mValues.size() - 1;
             } else if (!mValues.isEmpty()) {
                 selectedPos = 0;
             }
         }
 
-        DMTimerRec selectedItem = null;
-        if (mListViewSelector.getSelectedItemPos() > -1) {
-            selectedItem = mValues.get(mListViewSelector.getSelectedItemPos());
-        }
-
         this.mValues = values;
         diffResult.dispatchUpdatesTo(this);
+
+        if (selectedPos != -1) {
+            recyclerView.scrollToPosition(selectedPos);
+        }
     }
 
     private DiffUtil.Callback getDiffCallback(List<DMTimerRec> newValues) {

@@ -151,7 +151,7 @@ public class MainFragment extends Fragment {
                         null,
                         this::onTimerInteraction);
             } else {
-                mAdapter.updateValues(dmTimers);
+                mAdapter.updateValues(dmTimers, binding.mainListView);
             }
             mListViewSelector = mAdapter.getListViewSelector();
             binding.mainListView.setAdapter(mAdapter);
