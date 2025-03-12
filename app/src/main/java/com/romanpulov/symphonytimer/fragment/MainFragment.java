@@ -24,6 +24,7 @@ import androidx.appcompat.view.ActionMode;
 import com.romanpulov.symphonytimer.utils.SpaceItemDecoration;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MainFragment extends Fragment {
     public static final String TAG = MainFragment.class.getSimpleName();
@@ -66,13 +67,15 @@ public class MainFragment extends Fragment {
 
         @Override
         public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
-            /*
             int selectedItemPos = mListViewSelector.getSelectedItemPos();
-            DMTimerRec actionTimer = (DMTimerRec)mTimersListView.getAdapter().getItem(selectedItemPos);
+            DMTimerRec actionTimer = Objects.requireNonNull(model.getDMTimers().getValue()).get(selectedItemPos);
 
             int itemId = menuItem.getItemId();
+
             if (itemId == R.id.action_edit) {
-                startAddItemActivity(actionTimer);
+                NavHostFragment.findNavController(MainFragment.this).navigate(
+                        MainFragmentDirections.actionMainToTimerEdit().setEditItem(actionTimer));
+                actionMode.finish();
                 return true;
             } else if (itemId == R.id.action_delete) {
                 AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(actionTimer, R.string.question_are_you_sure);
@@ -81,15 +84,14 @@ public class MainFragment extends Fragment {
                     if (dialogBundle != null) {
                         DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
                         if (null != dmTimerRec) {
-                            executeTimerAction(dmTimerRec, new TimerDeleteAction());
-                            //performDeleteTimer(dmTimerRec);
+                            model.deleteTimer(dmTimerRec);
                             actionMode.finish();
                         }
                     }
                 });
-                deleteDialog.show(getSupportFragmentManager(), null);
+                deleteDialog.show(MainFragment.this.getParentFragmentManager(), null);
                 return true;
-            } else if (itemId == R.id.action_move_up) {
+            } /* else if (itemId == R.id.action_move_up) {
                 executeTimerAction(actionTimer, new TimerMoveUp());
                 return true;
             } else if (itemId == R.id.action_move_down) {
@@ -148,11 +150,11 @@ public class MainFragment extends Fragment {
                         dmTimers,
                         null,
                         this::onTimerInteraction);
-                mListViewSelector = mAdapter.getListViewSelector();
-                binding.mainListView.setAdapter(mAdapter);
             } else {
                 mAdapter.updateValues(dmTimers);
             }
+            mListViewSelector = mAdapter.getListViewSelector();
+            binding.mainListView.setAdapter(mAdapter);
         });
 
         MenuHost menuHost = requireActivity();
@@ -184,7 +186,11 @@ public class MainFragment extends Fragment {
                     DMTimerRec item = bundle.getParcelable(TimerEditFragment.RESULT_VALUE_KEY);
                     if (item != null) {
                         Log.d(TAG, "Timer edit result: " + item);
-                        model.addTimer(item);
+                        if (item.getId() == 0) {
+                            model.addTimer(item);
+                        } else {
+                            model.editTimer(item);
+                        }
                     }
                 });
     }

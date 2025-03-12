@@ -58,6 +58,16 @@ public class TimerViewModel extends AndroidViewModel {
         loadTimers();
     }
 
+    public void editTimer(DMTimerRec item) {
+        getDBHelper().updateTimer(item);
+        loadTimers();
+    }
+
+    public void deleteTimer(DMTimerRec item) {
+        getDBHelper().deleteTimer(item.getId());
+        loadTimers();
+    }
+
     public void updateTasks() {
         Map<Long,DMTaskItem> value = mDMTaskMap.getValue();
         if ((value != null) && !value.isEmpty()) {

@@ -218,7 +218,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             BiConsumer<DMTaskItem, Integer> timerInteractionListener) {
         mContext = context;
         mValues = values;
-		mTasks = tasks;
+        mTasks = tasks;
         mTimerInteractionListener = timerInteractionListener;
         mListViewSelector = new ListViewSelector(this, actionModeCallback);
 	}
