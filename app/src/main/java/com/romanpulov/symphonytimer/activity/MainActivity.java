@@ -27,9 +27,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.actions.TimerAction;
-import com.romanpulov.symphonytimer.activity.actions.TimerDeleteAction;
-import com.romanpulov.symphonytimer.activity.actions.TimerMoveDown;
-import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.ActivityAppHostBinding;
@@ -448,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 if (dialogBundle != null) {
                     DMTimerRec dmTimerRec = dialog.getArguments().getParcelable(DMTimerRec.class.toString());
                     if (null != dmTimerRec) {
-                        executeTimerAction(dmTimerRec, new TimerDeleteAction());
+                        //executeTimerAction(dmTimerRec, new TimerDeleteAction());
                         //performDeleteTimer(dmTimerRec);
                         actionMode.finish();
                     }
@@ -457,10 +454,10 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             deleteDialog.show(getSupportFragmentManager(), null);
             return true;
         } else if (itemId == R.id.action_move_up) {
-            executeTimerAction(actionTimer, new TimerMoveUp());
+            // executeTimerAction(actionTimer, new TimerMoveUp());
             return true;
         } else if (itemId == R.id.action_move_down) {
-            executeTimerAction(actionTimer, new TimerMoveDown());
+            // executeTimerAction(actionTimer, new TimerMoveDown());
             return true;
         }
         return false;
