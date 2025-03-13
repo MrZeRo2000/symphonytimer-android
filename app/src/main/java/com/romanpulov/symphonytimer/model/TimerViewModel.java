@@ -68,6 +68,16 @@ public class TimerViewModel extends AndroidViewModel {
         loadTimers();
     }
 
+    public void moveTimerUp(DMTimerRec item) {
+        getDBHelper().moveTimerUp(item.getOrderId());
+        loadTimers();
+    }
+
+    public void moveTimerDown(DMTimerRec item) {
+        getDBHelper().moveTimerDown(item.getOrderId());
+        loadTimers();
+    }
+
     public void updateTasks() {
         Map<Long,DMTaskItem> value = mDMTaskMap.getValue();
         if ((value != null) && !value.isEmpty()) {

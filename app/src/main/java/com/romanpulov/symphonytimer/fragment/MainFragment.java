@@ -91,17 +91,15 @@ public class MainFragment extends Fragment {
                 });
                 deleteDialog.show(MainFragment.this.getParentFragmentManager(), null);
                 return true;
-            } /* else if (itemId == R.id.action_move_up) {
-                executeTimerAction(actionTimer, new TimerMoveUp());
+            } else if (itemId == R.id.action_move_up) {
+                model.moveTimerUp(actionTimer);
                 return true;
             } else if (itemId == R.id.action_move_down) {
-                executeTimerAction(actionTimer, new TimerMoveDown());
+                model.moveTimerDown(actionTimer);
                 return true;
+            } else {
+                return false;
             }
-            return false;
-
-             */
-            return false;
         }
 
         @Override

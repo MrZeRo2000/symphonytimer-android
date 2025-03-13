@@ -223,130 +223,6 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     public void setTaskItemMap(Map<Long, DMTaskItem> mTaskItemMap) {
         this.mTaskItemMap = mTaskItemMap;
     }
-    /*
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		final DMTimerRec item = mValues.get(position);
-		
-		//calculate progress
-        DMTaskItem taskItem = mTasks != null ? mTasks.getTaskItemById(item.getId()) :
-                mTaskItemMap != null ? mTaskItemMap.get(item.getId()) : null;
-
-		int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
-		final long displayProgress = item.getTimeSec() - timerProgress;
-
-		//background drawer
-		final boolean isBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
-		
-		View rowView;
-		ViewHolder viewHolder;
-		
-		if (convertView == null) {
-			//inflate from layout
-
-			LayoutInflater inflater = LayoutInflater.from(getContext());
-			rowView = inflater.inflate(R.layout.symphony_row_view, parent, false);
-			
-			//setup holder
-			viewHolder = new ViewHolder(rowView, item, position);
-            //store holder
-            rowView.setTag(viewHolder);
-            //create and store backgrounds for better performance
-            if (isBitmapBackground && (null != mBackgroundBuilder)) {
-                viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-                viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
-            }
-
-            //setup listener to query layout only once
-            if ((mItemHeight == 0) || (mItemWidth == 0)) {
-                rowView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        if ((mItemHeight == 0) || (mItemWidth == 0)) {
-                            int measuredWidth = right - left;
-                            int measuredHeight = bottom - top;
-                            if ((measuredWidth > 0) && (measuredHeight > 0)) {
-                                mItemHeight = measuredHeight;
-                                mItemWidth = measuredWidth;
-                                if (isBitmapBackground && createBackgroundBuilder()) {
-                                    ViewHolder viewHolder = (ViewHolder) v.getTag();
-                                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-                                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
-                                    v.setBackground(viewHolder.mNormalDrawable);
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-        }
-		else { 
-			rowView = convertView;
-			viewHolder = (ViewHolder)rowView.getTag();
-		}
-		
-		// create viewHolder(just in case) and ensure update position (important!!!)
-		if (null == viewHolder) {
-			viewHolder = new ViewHolder(rowView, item, position);
-			rowView.setTag(viewHolder);
-		} else
-            //update position
-            viewHolder.mPosition = position;
-
-		viewHolder.mTitleTextView.setText(item.getTitle());
-
-		//display image
-		viewHolder.mImageView.setImageURI(
-                null != item.getImageName() ? UriHelper.fileNameToUri(getContext(), item.getImageName()) : null);
-
-		//display text
-		viewHolder.mProgressTextView.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
-		
-		//display circle bar
-		viewHolder.mProgressCircle.setMax((int) item.getTimeSec());
-		viewHolder.mProgressCircle.setProgress(timerProgress);
-        //ensure minimum progress for active item
-        viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
-
-        //background change depending on selection
-        int selectedItemPos = mListViewSelector.getSelectedItemPos();
-
-        if (isBitmapBackground ) {
-            if ((viewHolder.mNormalDrawable == null) || (viewHolder.mFinalDrawable == null)) {
-                if (createBackgroundBuilder()) {
-                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
-                }
-            }
-            //update bitmap background
-            Drawable bgDrawable;
-            if (selectedItemPos == -1)
-                bgDrawable = 0 == displayProgress  ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
-            else if (viewHolder.mPosition == selectedItemPos) {
-                bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
-            } else
-                bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
-
-            rowView.setBackground(bgDrawable);
-        } else {
-            //update solid background
-            int bgResId;
-            if (selectedItemPos == -1)
-                bgResId =  0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector;
-            else if (viewHolder.mPosition == selectedItemPos) {
-                bgResId = R.drawable.main_list_shape_selected;
-            } else
-                bgResId = R.drawable.main_list_shape;
-
-            rowView.setBackgroundResource(bgResId);
-        }
-
-		return rowView;
-	}
-
-     */
 
     private boolean createBackgroundBuilder() {
         if ((mItemWidth > 0) && (mItemHeight > 0) && (mBackgroundBuilder == null))
@@ -363,12 +239,25 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
 
         int selectedPos = -1;
         if (mValues.size() != values.size()) {
+            // add or delete actions
             mListViewSelector.destroyActionMode();
 
             if (mValues.size() < values.size()) {
-                selectedPos = mValues.size() - 1;
+                selectedPos = values.size() - 1;
             } else if (!mValues.isEmpty()) {
                 selectedPos = 0;
+            }
+        } else if (mListViewSelector.getSelectedItemPos() != -1) {
+            // move actions
+            long selectedId = mValues.get(mListViewSelector.getSelectedItemPos()).getId();
+            selectedPos = values
+                    .stream()
+                    .filter(v -> v.getId() == selectedId)
+                    .map(values::indexOf)
+                    .findFirst()
+                    .orElse(-1);
+            if (selectedPos != -1) {
+                mListViewSelector.setSelectedView(selectedPos);
             }
         }
 
