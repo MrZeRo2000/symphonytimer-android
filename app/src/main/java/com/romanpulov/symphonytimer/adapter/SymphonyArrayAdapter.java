@@ -31,12 +31,14 @@ import java.util.function.BiConsumer;
 
 public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdapter.ViewHolder> {
     private static final String TAG = SymphonyArrayAdapter.class.getSimpleName();
+    private static final long LIST_CLICK_DELAY = 1000;
 
     private final Context mContext;
 	private List<DMTimerRec> mValues;
     private Map<Long, DMTaskItem> mTaskItemMap;
     private final BiConsumer<DMTaskItem, Integer> mTimerInteractionListener;
     private final ListViewSelector mListViewSelector;
+    private long mLastClickTime;
 
     public ListViewSelector getListViewSelector() {
         return mListViewSelector;
@@ -171,7 +173,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         public ViewHolder(View view, SymphonyRowViewBinding binding) {
             super(view);
             mTitleTextView = binding.titleTextView;
-			mImageView = binding.imageImageView;
+            mImageView = binding.imageImageView;
 			mProgressTextView = binding.progressTextView;
 			mProgressCircle = binding.progressCircle;
 
@@ -191,19 +193,25 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
 
         @Override
         public boolean onLongClick(View v) {
-            mListViewSelector.startActionMode(v, getBindingAdapterPosition());
-            return true;
+            if (validateClickDelay()) {
+                mListViewSelector.startActionMode(v, getBindingAdapterPosition());
+                return true;
+            } else {
+                return false;
+            }
         }
 
         @Override
         public void onClick(View v) {
-            if (mListViewSelector.getSelectedItemPos() == -1) {
-                if (mTimerInteractionListener != null) {
-                    mTimerInteractionListener.accept(null, getBindingAdapterPosition());
-                }
-            } else
-                mListViewSelector.setSelectedView(getBindingAdapterPosition());
-            updateSelectedTitle();
+            if (validateClickDelay()) {
+                if (mListViewSelector.getSelectedItemPos() == -1) {
+                    if (mTimerInteractionListener != null) {
+                        mTimerInteractionListener.accept(null, getBindingAdapterPosition());
+                    }
+                } else
+                    mListViewSelector.setSelectedView(getBindingAdapterPosition());
+                updateSelectedTitle();
+            }
         }
     }
 	
@@ -222,6 +230,16 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
 
     public void setTaskItemMap(Map<Long, DMTaskItem> mTaskItemMap) {
         this.mTaskItemMap = mTaskItemMap;
+    }
+
+    private boolean validateClickDelay() {
+        long clickTime = System.currentTimeMillis();
+        if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
+            mLastClickTime = clickTime;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean createBackgroundBuilder() {
