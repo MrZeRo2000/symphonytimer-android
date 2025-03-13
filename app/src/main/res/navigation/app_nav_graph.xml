@@ -18,6 +18,13 @@
                 app:exitAnim="@android:anim/slide_out_right"
                 app:popEnterAnim="@android:anim/slide_in_left"
                 app:popExitAnim="@android:anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_main_to_settings"
+                app:destination="@id/nav_settings"
+                app:enterAnim="@android:anim/slide_in_left"
+                app:exitAnim="@android:anim/slide_out_right"
+                app:popEnterAnim="@android:anim/slide_in_left"
+                app:popExitAnim="@android:anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -31,6 +38,12 @@
                 app:argType="com.romanpulov.symphonytimer.model.DMTimerRec"
                 app:nullable="true"
                 android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+            android:id="@+id/nav_settings"
+            android:name="com.romanpulov.symphonytimer.fragment.SettingsFragment"
+            android:label="@string/title_activity_settings">
     </fragment>
 
 </navigation>

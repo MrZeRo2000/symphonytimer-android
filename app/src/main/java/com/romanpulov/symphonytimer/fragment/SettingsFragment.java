@@ -14,9 +14,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import android.view.View;
+import android.view.WindowManager;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
@@ -42,6 +44,7 @@ import com.romanpulov.symphonytimer.preference.PreferenceRestoreCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRestoreLocalProcessor;
 import com.romanpulov.symphonytimer.service.LoaderService;
 import com.romanpulov.symphonytimer.service.LoaderServiceManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,6 +97,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     };
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        requireActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+    }
+
+    @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         final SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
         //sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -108,7 +118,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
                 @Override
-                public boolean onPreferenceClick(Preference arg0) {
+                public boolean onPreferenceClick(@NotNull Preference arg0) {
                     FragmentActivity activity = getActivity();
                     if (activity != null) {
                         AlertOkCancelDialogFragment deleteDialog = AlertOkCancelDialogFragment.newAlertOkCancelDialog(null, R.string.question_are_you_sure);
@@ -119,35 +129,28 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     return false;
                 }
 
-                private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick = new AlertOkCancelDialogFragment.OnOkButtonClick() {
-                    @Override
-                    public void OnOkButtonClickEvent(DialogFragment dialog) {
-                        DBHelper.getInstance(getActivity()).clearData();
-                    }
-                };
+                private final AlertOkCancelDialogFragment.OnOkButtonClick onDeleteOkButtonClick =
+                        dialog -> DBHelper.getInstance(getActivity()).clearData();
             });
         }
 
         //cloud account
         preference = findPreference("pref_cloud_account");
         if (null != preference) {
-            preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    int cloudAccountType = Integer.parseInt(sharedPreferences.getString("pref_cloud_account_type", "-1"));
-                    if (cloudAccountType == -1) {
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
-                    } else {
-                        if (checkInternetConnection()) {
-                            AbstractCloudAccountFacade cloudAccountFacade = CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType);
-                            if (cloudAccountFacade != null) {
-                                cloudAccountFacade.setupAccount(getActivity());
-                            }
+            preference.setOnPreferenceClickListener(preference1 -> {
+                int cloudAccountType = Integer.parseInt(sharedPreferences.getString("pref_cloud_account_type", "-1"));
+                if (cloudAccountType == -1) {
+                    PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
+                } else {
+                    if (checkInternetConnection()) {
+                        AbstractCloudAccountFacade cloudAccountFacade = CloudAccountFacadeFactory.fromCloudAccountType(cloudAccountType);
+                        if (cloudAccountFacade != null) {
+                            cloudAccountFacade.setupAccount(getActivity());
                         }
                     }
-
-                    return false;
                 }
+
+                return false;
             });
         }
 
@@ -197,21 +200,17 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_BACKUP);
         if (pref != null) {
-            pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-
-                    if (mLoaderServiceManager == null)
-                        return true;
+            pref.setOnPreferenceClickListener(preference -> {
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
                     else {
-                        if (mLoaderServiceManager.isLoaderServiceRunning())
-                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                        else {
-                            executeLocalBackup();
-                        }
-
-                        return true;
+                        executeLocalBackup();
                     }
+
+                    return true;
                 }
             });
         }
@@ -230,34 +229,27 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_RESTORE);
         if (pref != null) {
-            pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    if (mLoaderServiceManager == null)
-                        return true;
+            pref.setOnPreferenceClickListener(preference -> {
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
                     else {
-                        if (mLoaderServiceManager.isLoaderServiceRunning())
-                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                        else {
-                            Context context = getActivity();
-                            if (context != null) {
-                                final AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                                alert
-                                        .setTitle(R.string.question_are_you_sure)
-                                        .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                executeLocalRestore();
-                                            }
-                                        })
-                                        .setNegativeButton(R.string.caption_cancel, null)
-                                        .show();
-                            }
+                        Context context = getActivity();
+                        if (context != null) {
+                            final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                            alert
+                                    .setTitle(R.string.question_are_you_sure)
+                                    .setPositiveButton(R.string.caption_ok,
+                                            (dialog, which) -> executeLocalRestore())
+                                    .setNegativeButton(R.string.caption_cancel, null)
+                                    .show();
                         }
                     }
-
-                    return true;
                 }
+
+                return true;
             });
         }
     }
@@ -319,31 +311,28 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         final Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_BACKUP);
         if (pref != null) {
-            pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    //check if cloud account type is set up
-                    final int cloudAccountType = getCloudAccountType();
-                    if (cloudAccountType == -1) {
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
-                        return true;
+            pref.setOnPreferenceClickListener(preference -> {
+                //check if cloud account type is set up
+                final int cloudAccountType = getCloudAccountType();
+                if (cloudAccountType == -1) {
+                    PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
+                    return true;
+                }
+
+                //check if internet is available
+                if (!checkInternetConnection())
+                    return true;
+
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+                    if (mLoaderServiceManager.isLoaderServiceRunning()) {
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                    } else {
+                        executeCloudBackup(cloudAccountType);
                     }
 
-                    //check if internet is available
-                    if (!checkInternetConnection())
-                        return true;
-
-                    if (mLoaderServiceManager == null)
-                        return true;
-                    else {
-                        if (mLoaderServiceManager.isLoaderServiceRunning()) {
-                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                        } else {
-                            executeCloudBackup(cloudAccountType);
-                        }
-
-                        return true;
-                    }
+                    return true;
                 }
             });
         }
@@ -385,46 +374,39 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_RESTORE);
         if (pref != null) {
-            pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    //check if cloud account type is set up
-                    final int cloudAccountType = getCloudAccountType();
-                    if (cloudAccountType == -1) {
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
-                        return true;
-                    }
-
-                    //check if internet is available
-                    if (!checkInternetConnection())
-                        return true;
-
-                    if (mLoaderServiceManager == null)
-                        return true;
-                    else {
-
-                        if (mLoaderServiceManager.isLoaderServiceRunning())
-                            PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                        else {
-                            Context context = getContext();
-                            if (context != null) {
-                                final AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                                alert
-                                        .setTitle(R.string.question_are_you_sure)
-                                        .setPositiveButton(R.string.caption_ok, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                executeCloudRestore(cloudAccountType);
-                                            }
-                                        })
-                                        .setNegativeButton(R.string.caption_cancel, null)
-                                        .show();
-                            }
-                        }
-                    }
-
+            pref.setOnPreferenceClickListener(preference -> {
+                //check if cloud account type is set up
+                final int cloudAccountType = getCloudAccountType();
+                if (cloudAccountType == -1) {
+                    PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
                     return true;
                 }
+
+                //check if internet is available
+                if (!checkInternetConnection())
+                    return true;
+
+                if (mLoaderServiceManager == null)
+                    return true;
+                else {
+
+                    if (mLoaderServiceManager.isLoaderServiceRunning())
+                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                    else {
+                        Context context = getContext();
+                        if (context != null) {
+                            final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                            alert
+                                    .setTitle(R.string.question_are_you_sure)
+                                    .setPositiveButton(R.string.caption_ok,
+                                            (dialog, which) -> executeCloudRestore(cloudAccountType))
+                                    .setNegativeButton(R.string.caption_cancel, null)
+                                    .show();
+                        }
+                    }
+                }
+
+                return true;
             });
         }
     }

@@ -19,7 +19,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.navigation.Navigation;
 import androidx.navigation.NavController;
@@ -36,13 +35,11 @@ import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.ActivityAppHostBinding;
-import com.romanpulov.symphonytimer.databinding.ActivityMainBinding;
 import com.romanpulov.symphonytimer.fragment.AlertOkCancelDialogFragment;
 import com.romanpulov.symphonytimer.helper.AssetsHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
-import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTasks;
@@ -292,11 +289,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         startActivity(startHistoryIntent);
     }
 
-    private void startSettingsActivity() {
-        Intent preferencesIntent = new Intent(this, SettingsActivity.class);
-        startActivity(preferencesIntent);
-    }
-
     //Timers interaction
 
     private void loadTimers() {
@@ -357,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     private void performTaskCompleted(DMTaskItem dmTaskItem) {
         log("taskCompleted");
     	//bring activity to front
-    	if (!mActivityVisible) {
+        if (!mActivityVisible) {
     		Intent intent = new Intent(getApplicationContext(), this.getClass());
     		intent.setComponent(new ComponentName(this.getPackageName(), this.getClass().getName()));
     		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);    		

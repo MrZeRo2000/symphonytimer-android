@@ -171,6 +171,10 @@ public class MainFragment extends Fragment {
                     NavHostFragment.findNavController(MainFragment.this).navigate(
                             MainFragmentDirections.actionMainToTimerEdit());
                     return true;
+                } else if (itemId == R.id.action_preferences) {
+                    NavHostFragment.findNavController(MainFragment.this).navigate(
+                            MainFragmentDirections.actionMainToSettings());
+                    return true;
                 } else {
                     return false;
                 }

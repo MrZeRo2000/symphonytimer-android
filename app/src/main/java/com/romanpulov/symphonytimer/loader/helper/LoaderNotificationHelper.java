@@ -10,7 +10,7 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.activity.SettingsActivity;
+import com.romanpulov.symphonytimer.activity.MainActivity;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -58,7 +58,7 @@ public final class LoaderNotificationHelper {
     public static void notify(Context context, String message, int notificationId) {
         checkNotificationChannel(context);
 
-        Intent intent = new Intent(context, SettingsActivity.class);
+        Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
