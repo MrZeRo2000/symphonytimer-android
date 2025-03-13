@@ -28,10 +28,8 @@ import androidx.navigation.ui.NavigationUI;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.actions.TimerAction;
 import com.romanpulov.symphonytimer.activity.actions.TimerDeleteAction;
-import com.romanpulov.symphonytimer.activity.actions.TimerInsertAction;
 import com.romanpulov.symphonytimer.activity.actions.TimerMoveDown;
 import com.romanpulov.symphonytimer.activity.actions.TimerMoveUp;
-import com.romanpulov.symphonytimer.activity.actions.TimerUpdateAction;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.ActivityAppHostBinding;
@@ -277,10 +275,13 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
      */
 
     private void startAddItemActivity(DMTimerRec dmTimerRec) {
+        /*
     	Intent startItemIntent = new Intent(this, AddItemActivity.class);
     	startItemIntent.putExtra(AddItemActivity.EDIT_REC_NAME, dmTimerRec);    	
     	startActivityForResult(startItemIntent,
                 null == dmTimerRec.getTitle() ? ADD_ITEM_RESULT_CODE : EDIT_ITEM_RESULT_CODE);
+
+         */
     }
     
     private void startHistoryActivity() {
@@ -408,27 +409,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         log("Starting update service tasks");
         mTaskServiceManager.updateServiceTasks(mDMTasks);
-    }
-    
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (RESULT_OK == resultCode) {
-    		if ((null != data) && (null != data.getExtras())) {
-    		    //retrieve data
-    			DMTimerRec newTimer = data.getExtras().getParcelable(AddItemActivity.EDIT_REC_NAME);
-    			//action
-    			switch (requestCode) {
-    				case (ADD_ITEM_RESULT_CODE):
-    					//performInsertTimer(newTimer);
-                        executeTimerAction(newTimer, new TimerInsertAction());
-    					break;
-    				case (EDIT_ITEM_RESULT_CODE):
-    					//performUpdateTimer(newTimer);
-                        executeTimerAction(newTimer, new TimerUpdateAction());
-    					break;    					
-    			}
-    		}
-    	}
     }
 
     // Action mode support
