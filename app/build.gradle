@@ -64,7 +64,6 @@ android {
         abortOnError false
         disable 'InvalidPackage'
     }
-
 }
 
 dependencies {

@@ -44,7 +44,7 @@ public class MainFragment extends Fragment {
     public class ActionBarCallBack implements ActionMode.Callback {
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            if (model.getTasksStatus() != TimerViewModel.TASKS_STATUS_IDLE) {
+            if (model.getCurrentTasksStatus() != TimerViewModel.TASKS_STATUS_IDLE) {
                 return false;
             } else {
                 actionMode.getMenuInflater().inflate(R.menu.main_actions, menu);
@@ -197,7 +197,12 @@ public class MainFragment extends Fragment {
                 });
     }
 
-    private void onTimerInteraction(DMTaskItem item, int position) {
-
+    private void onTimerInteraction(DMTimerRec item, int position) {
+        DMTaskItem task = Objects.requireNonNull(model.getDMTaskMap().getValue()).get(item.getId());
+        if (task == null) {
+            model.addTask(item);
+        } else {
+            model.removeTask(item);
+        }
     }
 }

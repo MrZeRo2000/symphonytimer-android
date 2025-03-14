@@ -36,7 +36,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     private final Context mContext;
 	private List<DMTimerRec> mValues;
     private Map<Long, DMTaskItem> mTaskItemMap;
-    private final BiConsumer<DMTaskItem, Integer> mTimerInteractionListener;
+    private final BiConsumer<DMTimerRec, Integer> mTimerInteractionListener;
     private final ListViewSelector mListViewSelector;
     private long mLastClickTime;
 
@@ -206,7 +206,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             if (validateClickDelay()) {
                 if (mListViewSelector.getSelectedItemPos() == -1) {
                     if (mTimerInteractionListener != null) {
-                        mTimerInteractionListener.accept(null, getBindingAdapterPosition());
+                        mTimerInteractionListener.accept(mValues.get(getBindingAdapterPosition()), getBindingAdapterPosition());
                     }
                 } else
                     mListViewSelector.setSelectedView(getBindingAdapterPosition());
@@ -220,7 +220,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             ActionMode.Callback actionModeCallback,
             List<DMTimerRec> values,
             Map<Long, DMTaskItem> taskItemMap,
-            BiConsumer<DMTaskItem, Integer> timerInteractionListener) {
+            BiConsumer<DMTimerRec, Integer> timerInteractionListener) {
         mContext = context;
         mValues = values;
         mTaskItemMap = taskItemMap;

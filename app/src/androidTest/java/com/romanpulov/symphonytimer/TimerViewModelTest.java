@@ -3,22 +3,19 @@ package com.romanpulov.symphonytimer;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.MediumTest;
+import androidx.test.filters.SmallTest;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
-@RunWith(AndroidJUnit4.class)
-@MediumTest
+@SmallTest
 public class TimerViewModelTest {
     private TimerViewModel viewModel;
 
@@ -38,7 +35,7 @@ public class TimerViewModelTest {
         viewModel.updateTasks();
 
         // test
-        Assert.assertNull(viewModel.getFirstTaskItemCompleted());
+        Assert.assertNull(viewModel.getFirstTaskItemCompleted(tasks));
     }
 
     @Test
@@ -53,7 +50,7 @@ public class TimerViewModelTest {
         viewModel.updateTasks();
 
         // test
-        Assert.assertNull(viewModel.getFirstTaskItemCompleted());
+        Assert.assertNull(viewModel.getFirstTaskItemCompleted(tasks));
     }
 
     @Test
@@ -64,15 +61,13 @@ public class TimerViewModelTest {
         tasks.put(4L, new DMTaskItem(4L, "Task 4", 20L, System.currentTimeMillis(), null, 0));
 
         // set
-        new Handler(Looper.getMainLooper()).post(() -> {
-            viewModel.setDMTaskMap(tasks);
-            viewModel.updateTasks();
+        viewModel.setDMTaskMap(tasks);
+        viewModel.updateTasks();
 
-            // test
-            DMTaskItem completed = viewModel.getFirstTaskItemCompleted();
-            Assert.assertNotNull(completed);
-            Assert.assertEquals(3L, completed.getId());
-        });
+        // test
+        DMTaskItem completed = viewModel.getFirstTaskItemCompleted(tasks);
+        Assert.assertNotNull(completed);
+        Assert.assertEquals(3L, completed.getId());
     }
 
     @Test
@@ -85,14 +80,12 @@ public class TimerViewModelTest {
         tasks.put(6L, new DMTaskItem(6L, "Task 6", 5L, System.currentTimeMillis() - 15 * 1000, null, 0));
 
         // set
-        new Handler(Looper.getMainLooper()).post(() -> {
-            viewModel.setDMTaskMap(tasks);
-            viewModel.updateTasks();
+        viewModel.setDMTaskMap(tasks);
+        viewModel.updateTasks();
 
-            // test
-            DMTaskItem completed = viewModel.getFirstTaskItemCompleted();
-            Assert.assertNotNull(completed);
-            Assert.assertEquals(6L, completed.getId());
-        });
+        // test
+        DMTaskItem completed = viewModel.getFirstTaskItemCompleted(tasks);
+        Assert.assertNotNull(completed);
+        Assert.assertEquals(6L, completed.getId());
     }
 }
