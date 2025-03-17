@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer.model;
 import android.app.Application;
 import android.util.Log;
 import android.util.Pair;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -84,18 +85,18 @@ public class TimerViewModel extends AndroidViewModel {
         loadTimers();
     }
 
-    public void setTasks(Map<Long, DMTaskItem> value) {
-        if ((value != null) && !value.isEmpty()) {
-            // update progress
+    public void setTasks(@Nullable Map<Long, DMTaskItem> value) {
+        // update progress
+        if (value != null) {
             value.values().forEach(DMTaskItem::updateProcess);
-            // check for changes
-            int tasksStatus = calcTasksStatus(mDMTaskMap.getValue(), value);
-            // post value
-            mDMTaskMap.postValue(value);
-            // post changes
-            if (tasksStatus != getCurrentTasksStatus()) {
-                mTaskStatusChange.postValue(Pair.create(getCurrentTasksStatus(), tasksStatus));
-            }
+        }
+        // check for changes
+        int tasksStatus = calcTasksStatus(mDMTaskMap.getValue(), value);
+        // post value
+        mDMTaskMap.postValue(value);
+        // post changes
+        if (tasksStatus != getCurrentTasksStatus()) {
+            mTaskStatusChange.postValue(Pair.create(getCurrentTasksStatus(), tasksStatus));
         }
     }
 
@@ -105,15 +106,20 @@ public class TimerViewModel extends AndroidViewModel {
 
     public synchronized void addTask(DMTimerRec item) {
         Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
-        if (tasks != null) {
-            Log.d(TAG, "Adding task: " + item.getId());
-            DMTaskItem newTask = tasks.computeIfAbsent(item.getId(), id -> new DMTaskItem(
+        if (tasks == null) {
+            tasks = new HashMap<>();
+        }
+
+        if (!tasks.containsKey(item.getId())) {
+            DMTaskItem newTask = new DMTaskItem(
                     item.getId(),
                     item.getTitle(),
                     item.getTimeSec(),
                     item.getSoundFile(),
-                    item.getAutoTimerDisableInterval()));
+                    item.getAutoTimerDisableInterval());
             newTask.startProcess();
+
+            tasks.put(item.getId(), newTask);
             setTasks(tasks);
         }
     }
@@ -123,14 +129,14 @@ public class TimerViewModel extends AndroidViewModel {
         if (tasks != null) {
             Log.d(TAG, "Removing task: " + item.getId());
             tasks.remove(item.getId());
-            setTasks(tasks);
+            setTasks(tasks.isEmpty() ? null : tasks);
         }
     }
 
     private int calcTasksStatus(Map<Long, DMTaskItem> oldValue, Map<Long, DMTaskItem> newValue) {
         DMTaskItem oldCompleted = getFirstTaskItemCompleted(oldValue);
         DMTaskItem newCompleted = getFirstTaskItemCompleted(newValue);
-        if (newValue.isEmpty()) {
+        if (newValue == null) {
             return TASKS_STATUS_IDLE;
         } else if ((oldCompleted == null) && (newCompleted == null)) {
             return TASKS_STATUS_PROCESSING;

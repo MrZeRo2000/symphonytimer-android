@@ -137,7 +137,7 @@ public class DMTaskItem implements Parcelable {
 		return (mCurrentTime - mStartTime) / 1000;
 	}
 	
-	boolean getCompleted() {
+	public boolean getCompleted() {
 		updateProcess();
 		return mCompletedFlag;
 	}

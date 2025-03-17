@@ -155,6 +155,12 @@ public class MainFragment extends Fragment {
             mListViewSelector = mAdapter.getListViewSelector();
             binding.mainListView.setAdapter(mAdapter);
         });
+        model.getDMTaskMap().observe(this, dmTasks -> {
+           if (mAdapter != null) {
+               //
+               mAdapter.updateTasks(dmTasks);
+           }
+        });
 
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {

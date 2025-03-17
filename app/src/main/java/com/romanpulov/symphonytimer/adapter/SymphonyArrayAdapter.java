@@ -23,10 +23,7 @@ import android.widget.ImageView;
 
 import androidx.appcompat.view.ActionMode;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdapter.ViewHolder> {
@@ -35,7 +32,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
 
     private final Context mContext;
 	private List<DMTimerRec> mValues;
-    private Map<Long, DMTaskItem> mTaskItemMap;
+    private Map<Long, DMTaskItem> mTaskMap;
     private final BiConsumer<DMTimerRec, Integer> mTimerInteractionListener;
     private final ListViewSelector mListViewSelector;
     private long mLastClickTime;
@@ -96,7 +93,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         DMTimerRec item = mValues.get(position);
 
         //calculate progress
-        DMTaskItem taskItem = mTaskItemMap != null ? mTaskItemMap.get(item.getId()) : null;
+        DMTaskItem taskItem = mTaskMap != null ? mTaskMap.get(item.getId()) : null;
 
         int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
         final long displayProgress = item.getTimeSec() - timerProgress;
@@ -223,13 +220,13 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             BiConsumer<DMTimerRec, Integer> timerInteractionListener) {
         mContext = context;
         mValues = values;
-        mTaskItemMap = taskItemMap;
+        mTaskMap = taskItemMap;
         mTimerInteractionListener = timerInteractionListener;
         mListViewSelector = new ListViewSelector(this, actionModeCallback);
 	}
 
-    public void setTaskItemMap(Map<Long, DMTaskItem> mTaskItemMap) {
-        this.mTaskItemMap = mTaskItemMap;
+    public void setTaskMap(Map<Long, DMTaskItem> mTaskMap) {
+        this.mTaskMap = mTaskMap;
     }
 
     private boolean validateClickDelay() {
@@ -253,7 +250,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     }
 
     public void updateValues(List<DMTimerRec> values, RecyclerView recyclerView) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getDiffCallback(values));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getValuesDiffCallback(values));
 
         int selectedPos = -1;
         if (mValues.size() != values.size()) {
@@ -287,7 +284,13 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         }
     }
 
-    private DiffUtil.Callback getDiffCallback(List<DMTimerRec> newValues) {
+    public void updateTasks(Map<Long, DMTaskItem> taskMap) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getTasksDiffCallback(taskMap));
+        mTaskMap = taskMap == null ? null : new HashMap<>(taskMap);
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    private DiffUtil.Callback getValuesDiffCallback(List<DMTimerRec> newValues) {
         return new DiffUtil.Callback() {
             @Override
             public int getOldListSize() {
@@ -310,6 +313,36 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
                         mValues.get(oldItemPosition).getTimeSec() == newValues.get(newItemPosition).getTimeSec() &&
                         Objects.equals(mValues.get(oldItemPosition).getTitle(), newValues.get(newItemPosition).getTitle()) &&
                         Objects.equals(mValues.get(oldItemPosition).getImageName(), newValues.get(newItemPosition).getImageName());
+            }
+        };
+    }
+
+    private DiffUtil.Callback getTasksDiffCallback(Map<Long, DMTaskItem> newTasks) {
+        return new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return mValues.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return mValues.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return true;
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                DMTaskItem oldTaskItem = mTaskMap == null ? null : mTaskMap.get(mValues.get(oldItemPosition).getId());
+                DMTaskItem newTaskItem = newTasks == null ? null : newTasks.get(mValues.get(newItemPosition).getId());
+
+                return ((oldTaskItem == null) && (newTaskItem == null)) ||
+                        ((oldTaskItem != null) && (newTaskItem != null) &&
+                                (oldTaskItem.getProgressInSec() == newTaskItem.getProgressInSec()) &&
+                                (oldTaskItem.getCompleted() == newTaskItem.getCompleted()));
             }
         };
     }
