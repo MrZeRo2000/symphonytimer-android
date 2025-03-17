@@ -24,6 +24,7 @@ import androidx.appcompat.view.ActionMode;
 import com.romanpulov.symphonytimer.utils.SpaceItemDecoration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class MainFragment extends Fragment {
@@ -198,7 +199,8 @@ public class MainFragment extends Fragment {
     }
 
     private void onTimerInteraction(DMTimerRec item, int position) {
-        DMTaskItem task = Objects.requireNonNull(model.getDMTaskMap().getValue()).get(item.getId());
+        Map<Long, DMTaskItem> taskValue = model.getDMTaskMap().getValue();
+        DMTaskItem task = taskValue == null ? null : taskValue.get(item.getId());
         if (task == null) {
             model.addTask(item);
         } else {
