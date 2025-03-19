@@ -11,7 +11,6 @@ import androidx.core.app.NotificationCompat;
 
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
-import com.romanpulov.symphonytimer.model.DMTasks;
 
 import java.lang.ref.WeakReference;
 
@@ -92,7 +91,7 @@ public class ProgressNotificationHelper {
         mContentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
     }
 
-    public Notification getNotification(DMTasks dmTasks) {
+    public Notification getNotification(String titles, int executionPercent) {
         if (mContext.get() != null) {
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(mContext.get(), CHANNEL_PROGRESS_ID)
@@ -100,8 +99,8 @@ public class ProgressNotificationHelper {
                             .setAutoCancel(false)
                             .setOngoing(true)
                             .setContentTitle(mContext.get().getString(R.string.app_name))
-                            .setContentText(dmTasks.getTaskTitles())
-                            .setProgress(100, dmTasks.getExecutionPercent(), false)
+                            .setContentText(titles)
+                            .setProgress(100, executionPercent, false)
                             .setContentIntent(mContentIntent)
                             .setOnlyAlertOnce(true)
                     ;
@@ -112,15 +111,15 @@ public class ProgressNotificationHelper {
         }
     }
 
-    public void notify(DMTasks dmTasks) {
+    public void notify(String titles, int executionPercent) {
         // get modification info
         if (mNotificationInfo == null)
-            mNotificationInfo = new NotificationInfo(dmTasks.getTaskTitles(), dmTasks.getExecutionPercent());
+            mNotificationInfo = new NotificationInfo(titles, executionPercent);
         else
-            mNotificationInfo.updateNotificationInfo(dmTasks.getTaskTitles(), dmTasks.getExecutionPercent());
+            mNotificationInfo.updateNotificationInfo(titles, executionPercent);
 
         if (mNotificationInfo.isModified()) {
-            Notification notification = getNotification(dmTasks);
+            Notification notification = getNotification(titles, executionPercent);
             if (notification != null)
                 mNotificationManager.notify(NOTIFICATION_ID_ONGOING, notification);
         } else {

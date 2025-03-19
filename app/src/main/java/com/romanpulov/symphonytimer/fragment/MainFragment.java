@@ -1,5 +1,6 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +11,6 @@ import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.romanpulov.symphonytimer.R;
@@ -21,6 +21,7 @@ import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import androidx.appcompat.view.ActionMode;
+import com.romanpulov.symphonytimer.service.TaskUpdateService;
 import com.romanpulov.symphonytimer.utils.SpaceItemDecoration;
 
 import java.util.List;
@@ -140,7 +141,7 @@ public class MainFragment extends Fragment {
         binding.mainListView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.mainListView.addItemDecoration(new SpaceItemDecoration((int)requireContext().getResources().getDimension(R.dimen.list_divider_height)));
 
-        model = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
+        model = TimerViewModel.getInstance(requireActivity().getApplication());
         model.getDMTimers().observe(this, dmTimers -> {
             if (mAdapter == null) {
                 mAdapter = new SymphonyArrayAdapter(
@@ -159,6 +160,16 @@ public class MainFragment extends Fragment {
            if (mAdapter != null) {
                //
                mAdapter.updateTasks(dmTasks);
+           }
+        });
+        model.getTaskStatusChange().observe(this, taskStatus -> {
+           if ((taskStatus.first == TimerViewModel.TASKS_STATUS_IDLE) &&
+                   (taskStatus.second != TimerViewModel.TASKS_STATUS_IDLE)) {
+               Log.d(TAG, "Task status changed from idle, need to start the service");
+               requireContext().startService(new Intent(requireContext(), TaskUpdateService.class));
+            } else if ((taskStatus.first != TimerViewModel.TASKS_STATUS_IDLE) &&
+                   (taskStatus.second == TimerViewModel.TASKS_STATUS_IDLE)) {
+               Log.d(TAG, "Task status changed to idle, need to stop the service");
            }
         });
 

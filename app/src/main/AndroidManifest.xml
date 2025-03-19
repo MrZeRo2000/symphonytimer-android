@@ -4,83 +4,86 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission
+            android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            android:maxSdkVersion="28"/>
 
     <application
-        android:icon="@drawable/tuba"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup">
+            android:fullBackupContent="@xml/backup"
+            android:icon="@drawable/tuba"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
         <service
-            android:name=".service.LoaderService"
-            android:exported="false"
-            />
-        <activity android:name="com.microsoft.identity.client.BrowserTabActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                android:name=".service.LoaderService"
+                android:exported="false"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+        <activity
+                android:name="com.microsoft.identity.client.BrowserTabActivity"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <!--
                     Add in your scheme/host from registered redirect URI
                     note that the leading "/" is required for android:path
                 -->
                 <data
-                    android:host="com.romanpulov.symphonytimer"
-                    android:path="/jM3pVmJp7fA39q/7ryRaKnhDVzY="
-                    android:scheme="msauth" />
+                        android:host="com.romanpulov.symphonytimer"
+                        android:path="/jM3pVmJp7fA39q/7ryRaKnhDVzY="
+                        android:scheme="msauth"/>
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:theme="@style/ToolBarTheme.CompatTransparent"
-            android:exported="true">
+                android:name=".activity.MainActivity"
+                android:exported="true"
+                android:label="@string/app_name"
+                android:launchMode="singleTask"
+                android:theme="@style/ToolBarTheme.CompatTransparent">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-
-        <!-- Broadcast receiver -->
-        <receiver android:name=".receiver.ExactAlarmBroadcastReceiver" />
-        <receiver android:name=".receiver.AdvanceAlarmBroadcastReceiver" />
+        </activity> <!-- Broadcast receiver -->
+        <receiver android:name=".receiver.ExactAlarmBroadcastReceiver"/>
+        <receiver android:name=".receiver.AdvanceAlarmBroadcastReceiver"/>
 
         <activity
-            android:name=".activity.HistoryActivity"
-            android:label="@string/title_activity_history"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/ToolBarTheme.CompatTransparent">
+                android:name=".activity.HistoryActivity"
+                android:label="@string/title_activity_history"
+                android:parentActivityName=".activity.MainActivity"
+                android:theme="@style/ToolBarTheme.CompatTransparent">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity" />
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".activity.MainActivity"/>
         </activity>
 
         <service
-            android:name=".service.TaskService"
-            android:foregroundServiceType="specialUse"
-            android:enabled="true"
-            android:exported="false" />
-
+                android:name=".service.TaskService"
+                android:enabled="true"
+                android:exported="false"
+                android:foregroundServiceType="specialUse"/>
+        <service
+                android:name=".service.TaskUpdateService"
+                android:enabled="true"
+                android:exported="false"
+                android:foregroundServiceType="specialUse"/>
         <!-- for OneDrive, check if it is still needed -->
         <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
+                android:name="org.apache.http.legacy"
+                android:required="false"/>
     </application>
 
 </manifest>

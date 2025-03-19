@@ -297,6 +297,7 @@ public class TaskService extends Service implements Runnable {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         log("onStartCommand: dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus);
+        /*
 
         if ((intent != null) && (intent.getAction() != null) && (intent.getAction().equals(ACTION_STOP_SERVICE))) {
             stopService();
@@ -327,6 +328,8 @@ public class TaskService extends Service implements Runnable {
             String prefAutoTimerDisable = PreferenceManager.getDefaultSharedPreferences(this).getString("pref_auto_timer_disable", getString(R.string.pref_wake_before_default));
             mAutoTimerDisableInterval = Integer.valueOf(prefAutoTimerDisable);
         }
+
+         */
 
         return START_STICKY;
     }
@@ -385,8 +388,11 @@ public class TaskService extends Service implements Runnable {
         try {
             log("run " + DateFormatterHelper.formatLog(System.currentTimeMillis()) + ", dmTasks = " + mDMTasks + ", status = " + mDMTasksStatus + ",alarm=" + mAlarm);
 
+            /*
             log("ProgressNotificationHelper notify");
             ProgressNotificationHelper.getInstance(this).notify(mDMTasks);
+
+             */
 
             int statusChangeEvent = mDMTasksStatus.getStatusChangeEvent(mDMTasks);
             log("statusChangeEvent=" + statusChangeEvent);

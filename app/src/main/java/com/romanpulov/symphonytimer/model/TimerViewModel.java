@@ -11,6 +11,7 @@ import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TimerViewModel extends AndroidViewModel {
     private static final String TAG = TimerViewModel.class.getSimpleName();
@@ -19,6 +20,15 @@ public class TimerViewModel extends AndroidViewModel {
     public static final int TASKS_STATUS_PROCESSING = 1;
     public static final int TASKS_STATUS_COMPLETED = 2;
     public static final int TASKS_STATUS_UPDATE_COMPLETED = 3;
+
+    private static TimerViewModel instance;
+
+    public static synchronized TimerViewModel getInstance(Application application) {
+        if (instance == null) {
+            instance = new TimerViewModel(application);
+        }
+        return instance;
+    }
 
     private final MutableLiveData<List<DMTimerRec>> mDMTimers = new MutableLiveData<>();
     private final MutableLiveData<Map<Long, DMTaskItem>> mDMTaskMap = new MutableLiveData<>();
@@ -164,5 +174,44 @@ public class TimerViewModel extends AndroidViewModel {
         return Optional.ofNullable(mTaskStatusChange.getValue())
                 .orElse(Pair.create(TASKS_STATUS_IDLE, TASKS_STATUS_IDLE))
                 .second;
+    }
+
+    public int getExecutionPercent() {
+        Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
+        if (tasks == null) {
+            return 0;
+        } else {
+            long currentTime = System.currentTimeMillis();
+            long minStartTime = currentTime;
+            long maxEndTime = minStartTime;
+
+            for (DMTaskItem taskItem : tasks.values()) {
+                long startTime = taskItem.getStartTime();
+                if (startTime < minStartTime)
+                    minStartTime = startTime;
+                long endTime = taskItem.getTriggerAtTime();
+                if (endTime > maxEndTime)
+                    maxEndTime = endTime;
+            }
+            long timeRange = maxEndTime - minStartTime;
+            if (timeRange == 0)
+                return 0;
+            else
+                return (int) ((currentTime - minStartTime) * 100 / timeRange);
+        }
+    }
+
+    public String getTaskTitles() {
+        Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
+        if (tasks == null) {
+            return "";
+        } else {
+            return tasks
+                    .values()
+                    .stream()
+                    .sorted(Comparator.comparingLong(DMTaskItem::getId))
+                    .map(v -> String.format(Locale.getDefault(), "%s(%d%%)", v.getTitle(), v.getExecutionPercent()))
+                    .collect(Collectors.joining(","));
+        }
     }
 }
