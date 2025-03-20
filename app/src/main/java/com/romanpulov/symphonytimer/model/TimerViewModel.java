@@ -170,6 +170,21 @@ public class TimerViewModel extends AndroidViewModel {
         }
     }
 
+    public long getFirstTriggerAtTime() {
+        Map<Long, DMTaskItem> value = mDMTaskMap.getValue();
+        if (value == null) {
+            return Long.MAX_VALUE;
+        } else {
+            return value
+                    .values()
+                    .stream()
+                    .filter(v -> !v.getCompleted())
+                    .map(DMTaskItem::getTriggerAtTime)
+                    .min(Long::compareTo)
+                    .orElse(Long.MAX_VALUE);
+        }
+    }
+
     public int getCurrentTasksStatus() {
         return Optional.ofNullable(mTaskStatusChange.getValue())
                 .orElse(Pair.create(TASKS_STATUS_IDLE, TASKS_STATUS_IDLE))
