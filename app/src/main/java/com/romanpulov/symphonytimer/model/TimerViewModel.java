@@ -66,10 +66,6 @@ public class TimerViewModel extends AndroidViewModel {
         return mTaskStatusChange;
     }
 
-    public void setDMTaskMap(Map<Long, DMTaskItem> map) {
-        mDMTaskMap.postValue(map);
-    }
-
     public void addTimer(DMTimerRec item) {
         getDBHelper().insertTimer(item);
         loadTimers();
@@ -95,7 +91,7 @@ public class TimerViewModel extends AndroidViewModel {
         loadTimers();
     }
 
-    public void setTasks(@Nullable Map<Long, DMTaskItem> value) {
+    private void setTasks(@Nullable Map<Long, DMTaskItem> value) {
         // update progress
         Map<Long, DMTaskItem> updatedValue = null;
         if (value != null) {
