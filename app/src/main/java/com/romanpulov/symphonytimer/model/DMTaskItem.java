@@ -133,12 +133,10 @@ public class DMTaskItem implements Parcelable {
 	}
 	
 	public long getProgressInSec() {
-		updateProcess();
 		return (mCurrentTime - mStartTime) / 1000;
 	}
 	
 	public boolean getCompleted() {
-		updateProcess();
 		return mCompletedFlag;
 	}
 	
@@ -177,7 +175,23 @@ public class DMTaskItem implements Parcelable {
 		}
 	}
 
-	int getExecutionPercent() {
+	public DMTaskItem createUpdated() {
+		if (mCompletedFlag) {
+			return this;
+		} else {
+			DMTaskItem newItem = new DMTaskItem(this.mId, this.mTitle, this.mMaxTimeSec, this.mSoundFileName, this.mAutoTimerDisableInterval);
+			newItem.mStartTime = this.mStartTime;
+			newItem.mCurrentTime = System.currentTimeMillis();
+			long triggerAtTime = newItem.getTriggerAtTime();
+			if (newItem.mCurrentTime > triggerAtTime) {
+				newItem.mCurrentTime = triggerAtTime;
+				newItem.mCompletedFlag = true;
+			}
+			return newItem;
+		}
+	}
+
+	public int getExecutionPercent() {
         if (mCompletedFlag)
             return 100;
         else

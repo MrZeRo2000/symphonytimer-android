@@ -78,6 +78,16 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     }
 
     @Override
+    public void onBindViewHolder(@NonNull SymphonyArrayAdapter.ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) {
+            Log.d(TAG, "onBindViewHolder: payloads is empty");
+        } else {
+            Log.d(TAG, "onBindViewHolder: payloads " + payloads);
+        }
+        super.onBindViewHolder(holder, position, payloads);
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull SymphonyArrayAdapter.ViewHolder viewHolder, int position) {
         //background drawer
         mIsBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
@@ -225,10 +235,6 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         mListViewSelector = new ListViewSelector(this, actionModeCallback);
 	}
 
-    public void setTaskMap(Map<Long, DMTaskItem> mTaskMap) {
-        this.mTaskMap = mTaskMap;
-    }
-
     private boolean validateClickDelay() {
         long clickTime = System.currentTimeMillis();
         if (clickTime - mLastClickTime > LIST_CLICK_DELAY) {
@@ -338,6 +344,10 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
                 DMTaskItem oldTaskItem = mTaskMap == null ? null : mTaskMap.get(mValues.get(oldItemPosition).getId());
                 DMTaskItem newTaskItem = newTasks == null ? null : newTasks.get(mValues.get(newItemPosition).getId());
+
+                if (oldTaskItem != null && newTaskItem != null) {
+                    Log.d(TAG, "oldTaskItem progress: " + oldTaskItem.getProgressInSec() + ", newTaskItem: " + newTaskItem);
+                }
 
                 return ((oldTaskItem == null) && (newTaskItem == null)) ||
                         ((oldTaskItem != null) && (newTaskItem != null) &&

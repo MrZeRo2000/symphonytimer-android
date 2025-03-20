@@ -97,13 +97,17 @@ public class TimerViewModel extends AndroidViewModel {
 
     public void setTasks(@Nullable Map<Long, DMTaskItem> value) {
         // update progress
+        Map<Long, DMTaskItem> updatedValue = null;
         if (value != null) {
-            value.values().forEach(DMTaskItem::updateProcess);
+            updatedValue = value.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().createUpdated()));
         }
+
         // check for changes
-        int tasksStatus = calcTasksStatus(mDMTaskMap.getValue(), value);
+        int tasksStatus = calcTasksStatus(mDMTaskMap.getValue(), updatedValue);
         // post value
-        mDMTaskMap.postValue(value);
+        mDMTaskMap.postValue(updatedValue);
         // post changes
         if (tasksStatus != getCurrentTasksStatus()) {
             mTaskStatusChange.postValue(Pair.create(getCurrentTasksStatus(), tasksStatus));

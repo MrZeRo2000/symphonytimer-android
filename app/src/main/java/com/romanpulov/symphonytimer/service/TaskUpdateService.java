@@ -25,6 +25,7 @@ public class TaskUpdateService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d(TAG, "onCreate");
         super.onCreate();
 
         model = TimerViewModel.getInstance(getApplication());
@@ -41,17 +42,19 @@ public class TaskUpdateService extends Service {
     }
 
     private final Runnable updateTask = () -> {
-
+        Log.d(TAG, "updateTask");
+        model.updateTasks();
     };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
         if (model.getDMTaskMap().getValue() != null) {
+            Log.d(TAG, "Tasks are available, starting");
             startForeground(NOTIFICATION_ID_ONGOING,
                     ProgressNotificationHelper.getInstance(this).getNotification(
                             model.getTaskTitles(),
                             model.getExecutionPercent()));
-
             mScheduleExecutor.scheduleWithFixedDelay(updateTask, 0, 1, TimeUnit.SECONDS);
         }
 
