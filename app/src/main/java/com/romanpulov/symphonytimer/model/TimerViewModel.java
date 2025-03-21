@@ -18,6 +18,10 @@ import org.json.JSONObject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Created by Roman Pulov on 28.02.2025
+ * ViewModel for main timer
+ */
 public class TimerViewModel extends AndroidViewModel {
     private static final String TAG = TimerViewModel.class.getSimpleName();
 
