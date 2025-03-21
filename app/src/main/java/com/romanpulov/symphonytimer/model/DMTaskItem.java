@@ -200,13 +200,15 @@ public class DMTaskItem implements Parcelable {
 
 	@Override
 	public @NotNull String toString() {
-		return "(id = " + mId + "," +
-				"title = " + mTitle + "," +
-                "maxTimeSec=" + mMaxTimeSec + "," +
-                "startTime=" + mStartTime + "," +
-                "currentTime=" + mCurrentTime + "," +
-                "autoTimerDisableInterval=" + mAutoTimerDisableInterval + "," +
-				"mTaskItemCompletedListener=" + mTaskItemCompletedListener + ")"
-				;
+		return "DMTaskItem{" +
+				"mId=" + mId +
+				", mTitle='" + mTitle + '\'' +
+				", mMaxTimeSec=" + mMaxTimeSec +
+				", mStartTime=" + mStartTime +
+				", mCurrentTime=" + mCurrentTime +
+				", mAutoTimerDisableInterval=" + mAutoTimerDisableInterval +
+				", mSoundFileName='" + mSoundFileName + '\'' +
+				", mCompletedFlag=" + mCompletedFlag +
+				'}';
 	}
 }

@@ -50,3 +50,4 @@ data/*.log
 
 # Test data files
 data/*.db
+data/device/

@@ -1,6 +1,8 @@
 package com.romanpulov.symphonytimer.model;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.util.Pair;
 import androidx.annotation.Nullable;
@@ -9,12 +11,20 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class TimerViewModel extends AndroidViewModel {
     private static final String TAG = TimerViewModel.class.getSimpleName();
+
+    private static final String TASKS_PREFS_NAME = "TaskServicePrefs";
+    private static final String TASKS_VALUE_NAME = "Tasks";
+    private static final String TASKS_KEY = "key";
+    private static final String TASKS_VALUE = "value";
 
     public static final int TASKS_STATUS_IDLE = 0;
     public static final int TASKS_STATUS_PROCESSING = 1;
@@ -107,6 +117,55 @@ public class TimerViewModel extends AndroidViewModel {
         // post changes
         if (tasksStatus != getCurrentTasksStatus()) {
             mTaskStatusChange.postValue(Pair.create(getCurrentTasksStatus(), tasksStatus));
+        }
+        // perform actions on tasks update
+        afterTasksUpdated();
+    }
+
+    public void afterTasksUpdated() {
+        SharedPreferences prefs = getApplication().getApplicationContext()
+                .getSharedPreferences(TASKS_PREFS_NAME,  Context.MODE_PRIVATE);
+        Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
+        if (tasks == null) {
+            prefs.edit().remove(TASKS_VALUE_NAME).apply();
+        } else {
+            try {
+                prefs.edit().putString(TASKS_VALUE_NAME, tasksToJSONString(tasks)).apply();
+            } catch (JSONException e) {
+                Log.e(TAG, "JSONException", e);
+                prefs.edit().remove(TASKS_VALUE_NAME).apply();
+            }
+        }
+    }
+
+    public static String tasksToJSONString(@NotNull Map<Long, DMTaskItem> tasks) throws JSONException {
+        JSONArray ja = new JSONArray();
+        for (Map.Entry<Long, DMTaskItem> v: tasks.entrySet()) {
+            JSONObject jvo = new JSONObject();
+            jvo.put(TASKS_KEY, v.getKey());
+            jvo.put(TASKS_VALUE, v.getValue().toJSONObject());
+            ja.put(jvo);
+        }
+        JSONObject jo = new JSONObject();
+        jo.put(TASKS_VALUE_NAME, ja);
+
+        return jo.toString();
+    }
+
+    public static Map<Long, DMTaskItem> tasksFromJSONString(String json) throws JSONException {
+        if ((json == null) || (json.isEmpty())) {
+            return null;
+        } else {
+            Map<Long, DMTaskItem> result = new HashMap<>();
+
+            JSONObject jo = new JSONObject(json);
+            JSONArray ja = (JSONArray) jo.get(TASKS_VALUE_NAME);
+            for (int i = 0; i < ja.length(); i++) {
+                JSONObject jvo = (JSONObject)ja.get(i);
+                result.put((long) jvo.getInt(TASKS_KEY), DMTaskItem.fromJSONObject(jvo.get(TASKS_VALUE)));
+            }
+
+            return result;
         }
     }
 
