@@ -1,7 +1,9 @@
 package com.romanpulov.symphonytimer.activity;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -169,6 +171,14 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 if (!notificationRequestHelper.isPermissionGranted()) {
                     notificationRequestHelper.requestPermission(PERMISSION_REQUEST_NOTIFICATIONS);
                 }
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if ((alarmManager != null) && (!alarmManager.canScheduleExactAlarms())) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent);
             }
         }
     }
