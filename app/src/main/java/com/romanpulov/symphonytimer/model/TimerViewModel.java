@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 public class TimerViewModel extends AndroidViewModel {
     private static final String TAG = TimerViewModel.class.getSimpleName();
 
-    private static final String TASKS_PREFS_NAME = "TaskServicePrefs";
-    private static final String TASKS_VALUE_NAME = "Tasks";
+    private static final String TASKS_PREFS_NAME = "task_service_prefs";
+    private static final String TASKS_VALUE_NAME = "tasks";
     private static final String TASKS_KEY = "key";
     private static final String TASKS_VALUE = "value";
 
@@ -48,6 +48,19 @@ public class TimerViewModel extends AndroidViewModel {
     public TimerViewModel(@NotNull Application application) {
         super(application);
         Log.d(TAG, "TimerViewModel created");
+
+        SharedPreferences prefs = getApplication().getApplicationContext()
+                .getSharedPreferences(TASKS_PREFS_NAME,  Context.MODE_PRIVATE);
+        String storedTasksString = prefs.getString(TASKS_VALUE_NAME, "");
+        if (!storedTasksString.isEmpty()) {
+            try {
+                Map<Long, DMTaskItem> storedTasks = tasksFromJSONString(storedTasksString);
+                setTasks(storedTasks);
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing tasks json", e);
+                prefs.edit().remove(TASKS_VALUE_NAME).apply();
+            }
+        }
     }
 
     @Override
@@ -119,13 +132,12 @@ public class TimerViewModel extends AndroidViewModel {
             mTaskStatusChange.postValue(Pair.create(getCurrentTasksStatus(), tasksStatus));
         }
         // perform actions on tasks update
-        afterTasksUpdated();
+        afterTasksUpdated(updatedValue);
     }
 
-    public void afterTasksUpdated() {
+    public void afterTasksUpdated(Map<Long, DMTaskItem> tasks) {
         SharedPreferences prefs = getApplication().getApplicationContext()
                 .getSharedPreferences(TASKS_PREFS_NAME,  Context.MODE_PRIVATE);
-        Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
         if (tasks == null) {
             prefs.edit().remove(TASKS_VALUE_NAME).apply();
         } else {
