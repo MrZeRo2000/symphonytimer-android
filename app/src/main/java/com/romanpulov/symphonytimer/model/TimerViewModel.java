@@ -32,8 +32,9 @@ public class TimerViewModel extends AndroidViewModel {
 
     public static final int TASKS_STATUS_IDLE = 0;
     public static final int TASKS_STATUS_PROCESSING = 1;
-    public static final int TASKS_STATUS_COMPLETED = 2;
-    public static final int TASKS_STATUS_UPDATE_COMPLETED = 3;
+    public static final int TASKS_STATUS_UPDATE_PROCESSING = 2;
+    public static final int TASKS_STATUS_COMPLETED = 3;
+    public static final int TASKS_STATUS_UPDATE_COMPLETED = 4;
 
     private static TimerViewModel instance;
 
@@ -224,7 +225,11 @@ public class TimerViewModel extends AndroidViewModel {
         if (newValue == null) {
             return TASKS_STATUS_IDLE;
         } else if ((oldCompleted == null) && (newCompleted == null)) {
-            return TASKS_STATUS_PROCESSING;
+            if ((oldValue == null) || (oldValue.size() != newValue.size())) {
+                return TASKS_STATUS_UPDATE_PROCESSING;
+            } else {
+                return TASKS_STATUS_PROCESSING;
+            }
         } else if ((oldCompleted != null) && (newCompleted != null) && (oldCompleted.getId() != newCompleted.getId())) {
             return TASKS_STATUS_UPDATE_COMPLETED;
         } else {
