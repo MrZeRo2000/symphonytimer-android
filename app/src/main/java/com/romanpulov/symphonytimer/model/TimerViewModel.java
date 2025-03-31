@@ -210,11 +210,11 @@ public class TimerViewModel extends AndroidViewModel {
         }
     }
 
-    public synchronized void removeTask(DMTimerRec item) {
+    public synchronized void removeTask(long id) {
         Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
         if (tasks != null) {
-            Log.d(TAG, "Removing task: " + item.getId());
-            tasks.remove(item.getId());
+            Log.d(TAG, "Removing task: " + id);
+            tasks.remove(id);
             setTasks(tasks.isEmpty() ? null : tasks);
         }
     }

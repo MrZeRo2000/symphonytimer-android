@@ -228,7 +228,7 @@ public class MainFragment extends Fragment {
         if (task == null) {
             model.addTask(item);
         } else {
-            model.removeTask(item);
+            model.removeTask(item.getId());
         }
     }
 }
