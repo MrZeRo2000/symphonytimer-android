@@ -46,6 +46,7 @@ public class TaskUpdateService extends Service {
             if ((taskStatus.first != TimerViewModel.TASKS_STATUS_IDLE) &&
                     (taskStatus.second == TimerViewModel.TASKS_STATUS_IDLE)) {
                 log("Task status changed to idle, stopping the service");
+
                 mTimerSignalHelper.stop();
                 mAlarm.cancelAlarms(this);
                 stopSelf();
@@ -54,26 +55,7 @@ public class TaskUpdateService extends Service {
                 mTimerSignalHelper.stop();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_PROCESSING) {
                 log("Task status changed to update processing");
-                long triggerTime = model.getFirstTriggerAtTime();
-                if (triggerTime < Long.MAX_VALUE) {
-                    log("setting new alarm to " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
-                    mAlarm.setExactTimer(this, triggerTime);
-
-                    WakeConfigHelper wakeConfigHelper = new WakeConfigHelper(getApplicationContext());
-                    if (wakeConfigHelper.isValidConfig()) {
-
-                        log("wake before config: " + wakeConfigHelper.getWakeBeforeTime());
-                        long wakeBefore = triggerTime - wakeConfigHelper.getWakeBeforeTime();
-
-                        log("wake before: " + DateFormatterHelper.formatLog(wakeBefore));
-                        mAlarm.setAdvanceTimer(this, wakeBefore, triggerTime);
-                    } else {
-                        log("wake config is invalid");
-                    }
-                } else {
-                    log("cancelling alarm: triggerTime = Long.MAX_VALUE");
-                    mAlarm.cancelAlarms(this);
-                }
+                updateAlarm();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_COMPLETED) {
                 Log.d(TAG, "task status changed to COMPLETED, need to do something ...");
                 ActivityWakeHelper.wakeAndStartActivity(this, MainActivity.class);
@@ -83,6 +65,8 @@ public class TaskUpdateService extends Service {
                     mTimerSignalHelper.setSoundFileName(firstTaskCompleted.getSoundFileName());
                     mTimerSignalHelper.start();
                 }
+
+                updateAlarm();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_COMPLETED) {
                 Log.d(TAG, "task status changed to UPDATE_COMPLETED");
                 DMTaskItem firstTaskCompleted = model.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
@@ -90,10 +74,35 @@ public class TaskUpdateService extends Service {
                     mTimerSignalHelper.setMultiple();
                     mTimerSignalHelper.changeSoundFileName(firstTaskCompleted.getSoundFileName());
                 }
+
+                updateAlarm();
             }
         };
 
         model.getTaskStatusChange().observeForever(mTaskStatusObserver);
+    }
+
+    private void updateAlarm() {
+        long triggerTime = model.getFirstTriggerAtTime();
+        if (triggerTime < Long.MAX_VALUE) {
+            log("setting new alarm to " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
+            mAlarm.setExactTimer(this, triggerTime);
+
+            WakeConfigHelper wakeConfigHelper = new WakeConfigHelper(getApplicationContext());
+            if (wakeConfigHelper.isValidConfig()) {
+
+                log("wake before config: " + wakeConfigHelper.getWakeBeforeTime());
+                long wakeBefore = triggerTime - wakeConfigHelper.getWakeBeforeTime();
+
+                log("wake before: " + DateFormatterHelper.formatLog(wakeBefore));
+                mAlarm.setAdvanceTimer(this, wakeBefore, triggerTime);
+            } else {
+                log("wake config is invalid");
+            }
+        } else {
+            log("cancelling alarm: triggerTime = Long.MAX_VALUE");
+            mAlarm.cancelAlarms(this);
+        }
     }
 
     private final Runnable updateTask = () -> {
