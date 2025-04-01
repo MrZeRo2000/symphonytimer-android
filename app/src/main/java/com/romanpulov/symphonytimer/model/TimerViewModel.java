@@ -250,6 +250,19 @@ public class TimerViewModel extends AndroidViewModel {
         }
     }
 
+    @NotNull
+    public Collection<DMTaskItem> getTaskItemsCompleted(Map<Long, DMTaskItem> value) {
+        if (value == null || value.isEmpty()) {
+            return List.of();
+        } else {
+            return value
+                    .values()
+                    .stream()
+                    .filter(DMTaskItem::getCompleted)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+    }
+
     public long getFirstTriggerAtTime() {
         Map<Long, DMTaskItem> value = mDMTaskMap.getValue();
         if (value == null) {

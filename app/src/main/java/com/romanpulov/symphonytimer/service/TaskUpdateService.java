@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
 import com.romanpulov.symphonytimer.helper.*;
+import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 
@@ -74,6 +75,10 @@ public class TaskUpdateService extends Service {
                             ", real time: " +
                             DateFormatterHelper.formatLog(System.currentTimeMillis())
                     );
+
+                    //save history
+                    model.getTaskItemsCompleted(model.getDMTaskMap().getValue())
+                            .forEach(v -> DBHelper.getInstance(this).insertTimerHistory(v));
                 }
 
                 updateAlarm();
@@ -90,6 +95,10 @@ public class TaskUpdateService extends Service {
                             ", real time: " +
                             DateFormatterHelper.formatLog(System.currentTimeMillis())
                     );
+
+                    //save history
+                    model.getTaskItemsCompleted(model.getDMTaskMap().getValue())
+                            .forEach(v -> DBHelper.getInstance(this).insertTimerHistory(v));
                 }
 
                 updateAlarm();
