@@ -25,6 +25,13 @@
                 app:exitAnim="@android:anim/slide_out_right"
                 app:popEnterAnim="@android:anim/slide_in_left"
                 app:popExitAnim="@android:anim/slide_out_right"/>
+        <action
+                android:id="@+id/action_main_to_history"
+                app:destination="@id/nav_history"
+                app:enterAnim="@android:anim/slide_in_left"
+                app:exitAnim="@android:anim/slide_out_right"
+                app:popEnterAnim="@android:anim/slide_in_left"
+                app:popExitAnim="@android:anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -44,6 +51,13 @@
             android:id="@+id/nav_settings"
             android:name="com.romanpulov.symphonytimer.fragment.SettingsFragment"
             android:label="@string/title_activity_settings">
+    </fragment>
+
+    <fragment
+            android:id="@+id/nav_history"
+            android:name="com.romanpulov.symphonytimer.fragment.HistoryFragment"
+            android:label="@string/title_activity_history"
+            tools:layout="@layout/fragment_history">
     </fragment>
 
 </navigation>
