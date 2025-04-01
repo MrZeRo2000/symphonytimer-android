@@ -39,6 +39,8 @@ public class MainFragment extends Fragment {
     // UI
     private ListViewSelector mListViewSelector;
 
+    private static final int WINDOW_SCREEN_ON_FLAGS = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -169,14 +171,23 @@ public class MainFragment extends Fragment {
            if ((taskStatus.first == TimerViewModel.TASKS_STATUS_IDLE) &&
                    (taskStatus.second != TimerViewModel.TASKS_STATUS_IDLE)) {
                Log.d(TAG, "Task status changed from idle, need to start the service");
+
                requireContext().startService(new Intent(requireContext(), TaskUpdateService.class));
                // prevent flickering on task status update
                Objects.requireNonNull(binding.mainListView.getItemAnimator()).setChangeDuration(0L);
             } else if ((taskStatus.first != TimerViewModel.TASKS_STATUS_IDLE) &&
                    (taskStatus.second == TimerViewModel.TASKS_STATUS_IDLE)) {
                Log.d(TAG, "Task status changed to idle, need to stop the service");
+
                // restore default animation
                Objects.requireNonNull(binding.mainListView.getItemAnimator()).setChangeDuration(250L);
+           }
+
+           if (taskStatus.second == TimerViewModel.TASKS_STATUS_COMPLETED) {
+               //prevent from sleeping while not turned off
+               requireActivity().getWindow().addFlags(WINDOW_SCREEN_ON_FLAGS);
+           } else {
+               requireActivity().getWindow().clearFlags(WINDOW_SCREEN_ON_FLAGS);
            }
         });
 

@@ -52,13 +52,16 @@ public class TaskUpdateService extends Service {
                 stopSelf();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_PROCESSING) {
                 log("Task status changed to processing");
+
                 updateAlarm();
                 mTimerSignalHelper.stop();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_PROCESSING) {
                 log("Task status changed to update processing");
+
                 updateAlarm();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_COMPLETED) {
                 Log.d(TAG, "task status changed to COMPLETED, need to do something ...");
+
                 ActivityWakeHelper.wakeAndStartActivity(this, MainActivity.class);
 
                 DMTaskItem firstTaskCompleted = model.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
@@ -76,6 +79,7 @@ public class TaskUpdateService extends Service {
                 updateAlarm();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_COMPLETED) {
                 Log.d(TAG, "task status changed to UPDATE_COMPLETED");
+
                 DMTaskItem firstTaskCompleted = model.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
                 if (firstTaskCompleted != null) {
                     mTimerSignalHelper.setMultiple();
