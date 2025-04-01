@@ -52,6 +52,7 @@ public class TaskUpdateService extends Service {
                 stopSelf();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_PROCESSING) {
                 log("Task status changed to processing");
+                updateAlarm();
                 mTimerSignalHelper.stop();
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_PROCESSING) {
                 log("Task status changed to update processing");
@@ -64,6 +65,12 @@ public class TaskUpdateService extends Service {
                 if (firstTaskCompleted != null) {
                     mTimerSignalHelper.setSoundFileName(firstTaskCompleted.getSoundFileName());
                     mTimerSignalHelper.start();
+
+                    log("Due time: " +
+                            DateFormatterHelper.formatLog(firstTaskCompleted.getTriggerAtTime()) +
+                            ", real time: " +
+                            DateFormatterHelper.formatLog(System.currentTimeMillis())
+                    );
                 }
 
                 updateAlarm();
@@ -73,6 +80,12 @@ public class TaskUpdateService extends Service {
                 if (firstTaskCompleted != null) {
                     mTimerSignalHelper.setMultiple();
                     mTimerSignalHelper.changeSoundFileName(firstTaskCompleted.getSoundFileName());
+
+                    log("Due time: " +
+                            DateFormatterHelper.formatLog(firstTaskCompleted.getTriggerAtTime()) +
+                            ", real time: " +
+                            DateFormatterHelper.formatLog(System.currentTimeMillis())
+                    );
                 }
 
                 updateAlarm();
@@ -84,6 +97,8 @@ public class TaskUpdateService extends Service {
 
     private void updateAlarm() {
         long triggerTime = model.getFirstTriggerAtTime();
+        log("firstTriggerAtTime = " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
+
         if (triggerTime < Long.MAX_VALUE) {
             log("setting new alarm to " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
             mAlarm.setExactTimer(this, triggerTime);
