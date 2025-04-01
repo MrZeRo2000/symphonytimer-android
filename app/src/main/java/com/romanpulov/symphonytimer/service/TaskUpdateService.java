@@ -76,9 +76,7 @@ public class TaskUpdateService extends Service {
                             DateFormatterHelper.formatLog(System.currentTimeMillis())
                     );
 
-                    //save history
-                    model.getTaskItemsCompleted(model.getDMTaskMap().getValue())
-                            .forEach(v -> DBHelper.getInstance(this).insertTimerHistory(v));
+                    saveHistory();
                 }
 
                 updateAlarm();
@@ -96,9 +94,7 @@ public class TaskUpdateService extends Service {
                             DateFormatterHelper.formatLog(System.currentTimeMillis())
                     );
 
-                    //save history
-                    model.getTaskItemsCompleted(model.getDMTaskMap().getValue())
-                            .forEach(v -> DBHelper.getInstance(this).insertTimerHistory(v));
+                    saveHistory();
                 }
 
                 updateAlarm();
@@ -106,6 +102,11 @@ public class TaskUpdateService extends Service {
         };
 
         model.getTaskStatusChange().observeForever(mTaskStatusObserver);
+    }
+
+    private void saveHistory() {
+        model.getTaskItemsCompleted(model.getDMTaskMap().getValue())
+                .forEach(v -> DBHelper.getInstance(this).insertTimerHistory(v));
     }
 
     private void updateAlarm() {

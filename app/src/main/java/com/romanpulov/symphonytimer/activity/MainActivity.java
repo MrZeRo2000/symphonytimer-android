@@ -38,10 +38,7 @@ import com.romanpulov.symphonytimer.helper.LoggerHelper;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
 import com.romanpulov.symphonytimer.helper.PermissionRequestHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.model.DMTaskItem;
-import com.romanpulov.symphonytimer.model.DMTasks;
-import com.romanpulov.symphonytimer.model.DMTimerRec;
-import com.romanpulov.symphonytimer.model.DMTimers;
+import com.romanpulov.symphonytimer.model.*;
 import com.romanpulov.symphonytimer.service.TaskService;
 import com.romanpulov.symphonytimer.service.TaskServiceManager;
 
@@ -109,6 +106,14 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+
+        TimerViewModel model = TimerViewModel.getInstance(getApplication());
+        model.getTaskStatusChange().observe(this, taskStatus -> {
+           if ((taskStatus.second == TimerViewModel.TASKS_STATUS_COMPLETED) ||
+                   (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_COMPLETED)) {
+               navController.navigate(R.id.nav_main);
+           }
+        });
 
         /*
 		final SymphonyArrayAdapter adapter = new SymphonyArrayAdapter(this, this, mDMTimers, mDMTasks, (item, position) -> {
