@@ -17,6 +17,8 @@ import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.FragmentMainBinding;
+import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
+import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
@@ -43,6 +45,11 @@ public class MainFragment extends Fragment {
 
     public MainFragment() {
         // Required empty public constructor
+    }
+
+    private void performMediaCleanup() {
+        List<String> mediaNameList = DBHelper.getInstance(requireContext().getApplicationContext()).getMediaFileNameList();
+        MediaStorageHelper.getInstance(requireContext().getApplicationContext()).cleanupMedia(mediaNameList);
     }
 
     public class ActionBarCallBack implements ActionMode.Callback {
@@ -90,6 +97,7 @@ public class MainFragment extends Fragment {
                         if (null != dmTimerRec) {
                             model.deleteTimer(dmTimerRec);
                             actionMode.finish();
+                            performMediaCleanup();
                         }
                     }
                 });
@@ -229,6 +237,7 @@ public class MainFragment extends Fragment {
                         } else {
                             model.editTimer(item);
                         }
+                        performMediaCleanup();
                     }
                 });
     }
