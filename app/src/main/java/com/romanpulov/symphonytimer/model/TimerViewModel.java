@@ -86,6 +86,11 @@ public class TimerViewModel extends AndroidViewModel {
         return mDMTimers;
     }
 
+    public Map<Long, DMTimerRec> getCurrentDMTimerMap() {
+        List<DMTimerRec> value = mDMTimers.getValue();
+        return value == null ? null : value.stream().collect(Collectors.toMap(DMTimerRec::getId, d -> d));
+    }
+
     public LiveData<Map<Long, DMTaskItem>> getDMTaskMap() {
         return mDMTaskMap;
     }

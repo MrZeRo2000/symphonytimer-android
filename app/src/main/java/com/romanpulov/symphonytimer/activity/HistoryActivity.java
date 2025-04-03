@@ -34,13 +34,6 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
     //storage
     public final static String TIMERS_NAME = "timers";
     private final static String HISTORY_NAVIGATION_INDEX = "history_navigation_index";
-    //underlying fragments for creation
-    private final static List<Class<? extends HistoryFragment>> HISTORY_FRAGMENT_CLASS_LIST =
-            Arrays.asList(
-                    HistoryListFragment.class,
-                    HistoryTopChartFragment.class,
-                    HistoryDynamicsChartFragment.class
-            );
 
     private DMTimers mDMTimers;
 
@@ -73,16 +66,21 @@ public class HistoryActivity extends AppCompatActivity implements AdapterView.On
         @Override
         @NonNull
         public Fragment getItem(int index) {
+            /*
             HistoryFragment historyFragment = HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(index), mDMTimers,  mSelectedHistoryIndex);
             mFragments[index] = historyFragment;
             //historyFragment.setHistoryFilterId(mViewPager.getCurrentItem());
             historyFragment.setHistoryFilterId(mSelectedHistoryIndex);
             return historyFragment;
+
+             */
+            return null;
         }
 
         @Override
         public int getCount() {
-            return HISTORY_FRAGMENT_CLASS_LIST.size();
+            //return HISTORY_FRAGMENT_CLASS_LIST.size();
+            return 3;
         }
 
         @Override

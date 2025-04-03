@@ -308,8 +308,8 @@ public class DBHelper implements DBController {
 		}	
 	}
 	
-	public void fillHistList(List<DMTimerHistRec> dmList, int filterId) {
-		dmList.clear();
+	public List<DMTimerHistRec> getHistList(int filterId) {
+		List<DMTimerHistRec> result = new ArrayList<>();
 		Cursor c = null;
 		
 		try {
@@ -341,15 +341,16 @@ public class DBHelper implements DBController {
 				dmRec.mTimerId = c.getLong(1);
 				dmRec.mStartTime = c.getLong(2);
 				dmRec.mEndTime = c.getLong(3);
-                dmRec.mRealTime = c.getLong(4);
+				dmRec.mRealTime = c.getLong(4);
 				
-				dmList.add(dmRec);
+				result.add(dmRec);
 			}
 		} finally {
 			if (null != c && !c.isClosed()) {
 				c.close();
 			}
 		}
+		return result;
 	}	
 	
 	public DMTimerExecutionList getHistTopList(int filterId) {

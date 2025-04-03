@@ -181,8 +181,8 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             super(view);
             mTitleTextView = binding.titleTextView;
             mImageView = binding.imageImageView;
-			mProgressTextView = binding.progressTextView;
-			mProgressCircle = binding.progressCircle;
+            mProgressTextView = binding.progressTextView;
+            mProgressCircle = binding.progressCircle;
 
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);

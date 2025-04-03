@@ -13,16 +13,28 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 
 import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.databinding.FragmentHistoryBinding;
 import com.romanpulov.symphonytimer.model.DMTimers;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 
 public class HistoryFragment extends Fragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
     private static final String ARG_TIMERS = "timers";
     private static final String ARG_HISTORY_FILTER_ID = "history_filter_id";
+
+    //underlying fragments for creation
+    private final static List<Class<? extends Fragment>> HISTORY_FRAGMENT_CLASS_LIST =
+            Arrays.asList(
+                    HistoryListFragment.class,
+                    HistoryTopChartFragment.class,
+                    HistoryDynamicsChartFragment.class
+            );
 
     private FragmentHistoryBinding binding;
 
@@ -30,8 +42,25 @@ public class HistoryFragment extends Fragment {
     protected int mHistoryFilterId = -1;
 	protected ArrayAdapter<?> mAdapter;
 
+    private static class HistoryFragmentStateAdapter extends FragmentStateAdapter {
+        public HistoryFragmentStateAdapter(@NonNull Fragment fragment) {
+            super(fragment);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return HISTORY_FRAGMENT_CLASS_LIST.size();
+        }
+    }
+
 	@NonNull
-    public static <T extends HistoryFragment> T newInstance(Class<T> historyFragmentClass, DMTimers dmTimers, int historyFilterId) {
+    public static <T extends Fragment> T newInstance(Class<T> historyFragmentClass) {
         T fragment;
         try {
             fragment = historyFragmentClass.getDeclaredConstructor().newInstance();
@@ -40,10 +69,6 @@ public class HistoryFragment extends Fragment {
             Log.e(TAG, "Error creating fragment from class", e);
             throw new RuntimeException(e.getMessage());
         }
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_TIMERS, dmTimers);
-        args.putInt(ARG_HISTORY_FILTER_ID, historyFilterId);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -72,6 +97,17 @@ public class HistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+
+        HistoryFragmentStateAdapter fragmentStateAdapter = new HistoryFragmentStateAdapter(this);
+        binding.pager.setAdapter(fragmentStateAdapter);
+
+        new TabLayoutMediator(binding.tabLayout, binding.pager, (tab, position) -> {
+            String tabText = position == 0 ? requireContext().getResources().getString(R.string.tab_history_list) :
+                position == 1 ? requireContext().getResources().getString(R.string.tab_history_top) :
+                position == 2 ? requireContext().getResources().getString(R.string.tab_history_dynamics) :
+                "";
+            tab.setText(tabText);
+        }).attach();
 
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {
