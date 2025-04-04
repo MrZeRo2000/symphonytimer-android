@@ -3,6 +3,7 @@ package com.romanpulov.symphonytimer.fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import android.widget.Spinner;
@@ -13,11 +14,13 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.databinding.FragmentHistoryBinding;
 import com.romanpulov.symphonytimer.model.DMTimers;
+import com.romanpulov.symphonytimer.model.TimerHistoryViewModel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -40,7 +43,6 @@ public class HistoryFragment extends Fragment {
 
     protected DMTimers mDMTimers;
     protected int mHistoryFilterId = -1;
-	protected ArrayAdapter<?> mAdapter;
 
     private static class HistoryFragmentStateAdapter extends FragmentStateAdapter {
         public HistoryFragmentStateAdapter(@NonNull Fragment fragment) {
@@ -109,6 +111,9 @@ public class HistoryFragment extends Fragment {
             tab.setText(tabText);
         }).attach();
 
+        final TimerHistoryViewModel model = new ViewModelProvider(this).get(TimerHistoryViewModel.class);
+        model.getFilterId().observe(this, filterId -> model.loadDMTimerHistList());
+
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {
             @Override
@@ -121,6 +126,17 @@ public class HistoryFragment extends Fragment {
                         requireContext(), R.array.history_filter, android.R.layout.simple_spinner_item);
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(spinnerAdapter);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        model.setFilterId(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             @Override

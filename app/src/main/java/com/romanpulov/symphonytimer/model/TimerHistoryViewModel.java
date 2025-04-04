@@ -8,6 +8,7 @@ import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TimerHistoryViewModel extends AndroidViewModel {
@@ -18,12 +19,17 @@ public class TimerHistoryViewModel extends AndroidViewModel {
         return mFilterId;
     }
 
+    public void setFilterId(int filterId) {
+        if (!Objects.equals(mFilterId.getValue(), filterId)) {
+            mFilterId.postValue(filterId);
+        }
+    }
+
     private MutableLiveData<List<DMTimerHistRec>> mDMTimerHistList;
 
     public LiveData<List<DMTimerHistRec>> getDMTimerHistList() {
         if (mDMTimerHistList == null) {
             mDMTimerHistList = new MutableLiveData<>();
-            loadDMTimerHistList();
         }
         return mDMTimerHistList;
     }
@@ -32,6 +38,9 @@ public class TimerHistoryViewModel extends AndroidViewModel {
         List<DMTimerHistRec> histList = DBHelper
                 .getInstance(getApplication().getApplicationContext())
                 .getHistList(Optional.ofNullable(mFilterId.getValue()).orElse(0));
+        if (mDMTimerHistList == null) {
+            mDMTimerHistList = new MutableLiveData<>();
+        }
         mDMTimerHistList.postValue(histList);
     }
 

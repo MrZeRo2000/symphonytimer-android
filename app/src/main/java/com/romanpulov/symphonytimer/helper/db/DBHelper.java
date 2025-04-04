@@ -115,7 +115,7 @@ public class DBHelper implements DBController {
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], dmTimerRec.getTimeSec());
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[3], dmTimerRec.getSoundFile());
 		cv.put(DBOpenHelper.TIMER_TABLE_COLS[4], dmTimerRec.getImageName());
-        cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.getAutoTimerDisableInterval());
+		cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], dmTimerRec.getAutoTimerDisableInterval());
 
 		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.getId(), null);
 	}
@@ -336,13 +336,13 @@ public class DBHelper implements DBController {
 						"start_time DESC");
 			
 			for(c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
-                DMTimerHistRec dmRec = new DMTimerHistRec();
-				dmRec.mId = c.getLong(0);
-				dmRec.mTimerId = c.getLong(1);
-				dmRec.mStartTime = c.getLong(2);
-				dmRec.mEndTime = c.getLong(3);
-				dmRec.mRealTime = c.getLong(4);
-				
+                DMTimerHistRec dmRec = new DMTimerHistRec(
+						c.getLong(0),
+						c.getLong(1),
+						c.getLong(2),
+						c.getLong(3),
+						c.getLong(4));
+
 				result.add(dmRec);
 			}
 		} finally {
@@ -372,7 +372,7 @@ public class DBHelper implements DBController {
                 DMTimerExecutionRec dmRec = new DMTimerExecutionRec();
 				dmRec.mTimerId = c.getLong(0);
 				dmRec.mExecCnt = c.getLong(1);
-                res.add(dmRec);
+				res.add(dmRec);
 			}
 
 		} finally {
@@ -467,9 +467,9 @@ public class DBHelper implements DBController {
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[1], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[1]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[2], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[2]));
 			cv.put(DBOpenHelper.TIMER_TABLE_COLS[5], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[5]));
-            cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[6]));
+			cv.put(DBOpenHelper.TIMER_TABLE_COLS[6], recItem.fields.get(DBOpenHelper.TIMER_TABLE_COLS[6]));
 
-			mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);						
+			mDB.insert(DBOpenHelper.TIMER_TABLE_NAME, null, cv);
 		}
 	}
 	

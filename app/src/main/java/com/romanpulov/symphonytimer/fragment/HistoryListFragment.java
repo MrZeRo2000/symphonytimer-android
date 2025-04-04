@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 
@@ -15,18 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.adapter.HistoryArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.FragmentHistoryListBinding;
-import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.model.DMTimerHistRec;
 import com.romanpulov.symphonytimer.model.TimerHistoryViewModel;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import com.romanpulov.symphonytimer.utils.SpaceItemDecoration;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HistoryListFragment extends Fragment {
-	private final List<DMTimerHistRec> mDMTimerHistList = new ArrayList<>();
 
 	private FragmentHistoryListBinding binding;
 
@@ -54,8 +46,13 @@ public class HistoryListFragment extends Fragment {
 
 		TimerHistoryViewModel historyModel = new ViewModelProvider(requireParentFragment()).get(TimerHistoryViewModel.class);
 		historyModel.getDMTimerHistList().observe(getViewLifecycleOwner(), histList -> {
-			HistoryArrayAdapter adapter = new HistoryArrayAdapter(requireContext(), histList, model.getCurrentDMTimerMap());
-			binding.historyListView.setAdapter(adapter);
+			if (binding.historyListView.getAdapter() == null) {
+				HistoryArrayAdapter adapter = new HistoryArrayAdapter(requireContext(), histList, model.getCurrentDMTimerMap());
+				binding.historyListView.setAdapter(adapter);
+			} else {
+				HistoryArrayAdapter adapter = (HistoryArrayAdapter)binding.historyListView.getAdapter();
+				adapter.updateDMTimerHistList(histList);
+			}
 		});
 	}
 

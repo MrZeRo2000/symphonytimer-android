@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.databinding.HistoryRowViewBinding;
@@ -38,9 +39,9 @@ public class HistoryArrayAdapter extends RecyclerView.Adapter<HistoryArrayAdapte
 	@Override
 	public void onBindViewHolder(@NonNull HistoryArrayAdapter.ViewHolder viewHolder, int position) {
 		DMTimerHistRec rec = mDMTimerHistList.get(position);
-		DMTimerRec dmTimerRec = mDMTimerMap.get(rec.mTimerId);
+		DMTimerRec dmTimerRec = mDMTimerMap.get(rec.timerId);
 
-		viewHolder.mTime.setText(DateFormatterHelper.format(rec.mStartTime));
+		viewHolder.mTime.setText(DateFormatterHelper.format(rec.startTime));
 		if (dmTimerRec != null) {
 			viewHolder.mTitle.setText(dmTimerRec.getTitle());
 			viewHolder.mImage.setImageURI(
@@ -49,13 +50,13 @@ public class HistoryArrayAdapter extends RecyclerView.Adapter<HistoryArrayAdapte
 
 		boolean hideTimeDetails = !PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_full_history_info", false);
 
-		if ((rec.mRealTime == 0) || hideTimeDetails) {
+		if ((rec.realTime == 0) || hideTimeDetails) {
 			viewHolder.mTimeDetails.setVisibility(View.GONE);
 		}
 		else {
 			viewHolder.mTimeDetails.setVisibility(View.VISIBLE);
 			String detailsText = mContext.getString(R.string.caption_due_real_time,
-					DateFormatterHelper.formatTime(rec.mEndTime), DateFormatterHelper.formatTime(rec.mRealTime));
+					DateFormatterHelper.formatTime(rec.endTime), DateFormatterHelper.formatTime(rec.realTime));
 			//viewHolder.mTimeDetails.setText("Due time : " + DateFormatterHelper.formatTime(rec.mEndTime) + ", real time : " + DateFormatterHelper.formatTime(rec.mRealTime));
 			viewHolder.mTimeDetails.setText(detailsText);
 		}
@@ -86,5 +87,34 @@ public class HistoryArrayAdapter extends RecyclerView.Adapter<HistoryArrayAdapte
 		mContext = context;
 		mDMTimerHistList = dmTimerHistList;
 		mDMTimerMap = dmTimerMap;
+	}
+
+	public void updateDMTimerHistList(List<DMTimerHistRec> dmTimerHistList) {
+		DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getDMTimerHistListDiffCallback(dmTimerHistList));
+		diffResult.dispatchUpdatesTo(this);
+	}
+
+	private DiffUtil.Callback getDMTimerHistListDiffCallback(List<DMTimerHistRec> newDMTimerHistList) {
+		return new DiffUtil.Callback() {
+			@Override
+			public int getOldListSize() {
+				return mDMTimerHistList.size();
+			}
+
+			@Override
+			public int getNewListSize() {
+				return newDMTimerHistList.size();
+			}
+
+			@Override
+			public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+				return mDMTimerHistList.get(oldItemPosition).id == newDMTimerHistList.get(newItemPosition).id;
+			}
+
+			@Override
+			public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+				return areItemsTheSame(oldItemPosition, newItemPosition);
+			}
+		};
 	}
 }
