@@ -2,11 +2,13 @@ package com.romanpulov.symphonytimer.fragment;
 
 import android.content.Context;
 
+import android.os.Bundle;
+import android.view.View;
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import com.romanpulov.library.view.BarChart;
 import com.romanpulov.symphonytimer.R;
-import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 
 import java.util.HashMap;
@@ -17,7 +19,7 @@ import java.util.Map;
 /**
  * Created on 04.01.2016.
  */
-public class HistoryDynamicsChartFragment extends HistoryChartFragment {
+public class HistoryDynamicsChartFragment extends HistoryChartFragment<List<LinkedHashMap<Long, Long>>> {
     private int mHistColor0;
     private int mHistColor1;
     private int mColor0;
@@ -27,28 +29,33 @@ public class HistoryDynamicsChartFragment extends HistoryChartFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mHistColor0 = getResources().getColor(R.color.chartGradientHist0Color);
-        mHistColor1 = getResources().getColor(R.color.chartGradientHistColor);
-        mColor0 = getResources().getColor(R.color.chartGradient0Color);
-        mColor1 = getResources().getColor(R.color.chartGradientColor);
+        mHistColor0 = context.getColor(R.color.chartGradientHist0Color);
+        mHistColor1 = context.getColor(R.color.chartGradientHistColor);
+        mColor0 = context.getColor(R.color.chartGradient0Color);
+        mColor1 = context.getColor(R.color.chartGradientColor);
     }
 
     @Override
-    protected void updateSeries() {
-        //calc data
-        //get from database
-        List<LinkedHashMap<Long, Long>> histList = DBHelper.getInstance(this.getActivity()).getHistList(mHistoryFilterId, 2);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        historyModel.getFilterId().observe(this, filterId -> historyModel.loadHistList());
+
+        historyModel.getHistList().observe(getViewLifecycleOwner(),
+                data -> updateBarChart(model.getCurrentDMTimerMap(), data));
+    }
+
+    @Override
+    protected void updateSeries(Map<Long, DMTimerRec> dmTimerMap, List<LinkedHashMap<Long, Long>> data) {
         //find unique entries in reverse order
         LinkedHashMap<Long, Long> uList = new LinkedHashMap<>();
-        for (int i = histList.size() - 1; i >= 0; i--) {
-            for (Map.Entry<Long, Long> item : histList.get(i).entrySet()) {
-                uList.put(item.getKey(), item.getValue());
-            }
+        for (int i = data.size() - 1; i >= 0; i--) {
+            uList.putAll(data.get(i));
         }
 
         boolean isHist = true;
-        for (HashMap<Long, Long> histItem : histList) {
-            BarChart.Series series = getBarChart().addSeries();
+        for (HashMap<Long, Long> histItem : data) {
+            BarChart.Series series = binding.historyTopBarChart.addSeries();
             if (isHist)
                 series.setGradientColors(
                         mHistColor0,
@@ -62,7 +69,7 @@ public class HistoryDynamicsChartFragment extends HistoryChartFragment {
             int position = 1;
             for (Map.Entry<Long, Long> argumentItem : uList.entrySet()) {
                 Long histItemValue = histItem.get(argumentItem.getKey());
-                DMTimerRec timer = mDMTimers.getItemById(argumentItem.getKey());
+                DMTimerRec timer = dmTimerMap.get(argumentItem.getKey());
                 if (timer != null)
                     series.addXY(position++, timer.getTitle(), histItemValue == null ? 0 : histItemValue);
             }

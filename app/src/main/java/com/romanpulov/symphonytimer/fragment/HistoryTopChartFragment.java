@@ -1,22 +1,39 @@
 package com.romanpulov.symphonytimer.fragment;
 
+import android.os.Bundle;
+import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.romanpulov.library.view.BarChart;
-import com.romanpulov.symphonytimer.helper.db.DBHelper;
-import com.romanpulov.symphonytimer.model.DMTimerExecutionList;
 import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
+import com.romanpulov.symphonytimer.model.DMTimerRec;
 
-public class HistoryTopChartFragment extends HistoryChartFragment {
+import java.util.List;
+import java.util.Map;
+
+public class HistoryTopChartFragment extends HistoryChartFragment<List<DMTimerExecutionRec>> {
+
     @Override
-    protected void updateSeries() {
-        //calc data
-        DMTimerExecutionList timerExecutionList =
-            DBHelper.getInstance(this.getActivity()).getHistTopList(mHistoryFilterId);
-        timerExecutionList.calcPercent();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        historyModel.getFilterId().observe(this, filterId -> historyModel.loadDMTimerExecutionList());
+
+        historyModel.getDMTimerExecutionList().observe(getViewLifecycleOwner(),
+                data -> updateBarChart(model.getCurrentDMTimerMap(), data));
+    }
+
+    @Override
+    protected void updateSeries(Map<Long, DMTimerRec> dmTimerMap, List<DMTimerExecutionRec> data) {
         //update data
-        BarChart.Series series = getBarChart().addSeries();
-        for (int position = 0; position < timerExecutionList.size(); position++) {
-            DMTimerExecutionRec rec =  timerExecutionList.get(position);
-            series.addXY(position + 1, mDMTimers.getItemById(rec.mTimerId).getTitle(), rec.mExecCnt);
+        BarChart.Series series = binding.historyTopBarChart.addSeries();
+        for (int position = 0; position < data.size(); position++) {
+            DMTimerExecutionRec rec =  data.get(position);
+
+            DMTimerRec dmTimer = dmTimerMap.get(rec.mTimerId);
+            String title = dmTimer == null ? "" : dmTimer.getTitle();
+
+            series.addXY(position + 1, title, rec.mExecCnt);
         }
     }
 }

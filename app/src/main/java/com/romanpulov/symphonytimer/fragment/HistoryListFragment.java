@@ -43,8 +43,10 @@ public class HistoryListFragment extends Fragment {
 		binding.historyListView.addItemDecoration(new SpaceItemDecoration((int)requireContext().getResources().getDimension(R.dimen.list_divider_height)));
 
 		TimerViewModel model = TimerViewModel.getInstance(requireActivity().getApplication());
-
 		TimerHistoryViewModel historyModel = new ViewModelProvider(requireParentFragment()).get(TimerHistoryViewModel.class);
+
+		historyModel.getFilterId().observe(this, filterId -> historyModel.loadDMTimerHistList());
+
 		historyModel.getDMTimerHistList().observe(getViewLifecycleOwner(), histList -> {
 			if (binding.historyListView.getAdapter() == null) {
 				HistoryArrayAdapter adapter = new HistoryArrayAdapter(requireContext(), histList, model.getCurrentDMTimerMap());

@@ -52,6 +52,7 @@ public class HistoryFragment extends Fragment {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+            Log.d(TAG, String.format("Creating fragment with position %d", position));
             return HistoryFragment.newInstance(HISTORY_FRAGMENT_CLASS_LIST.get(position));
         }
 
@@ -112,7 +113,6 @@ public class HistoryFragment extends Fragment {
         }).attach();
 
         final TimerHistoryViewModel model = new ViewModelProvider(this).get(TimerHistoryViewModel.class);
-        model.getFilterId().observe(this, filterId -> model.loadDMTimerHistList());
 
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {

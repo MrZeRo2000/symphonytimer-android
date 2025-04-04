@@ -15,7 +15,6 @@ import android.util.Log;
 import com.romanpulov.library.common.db.DBController;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
-import com.romanpulov.symphonytimer.model.DMTimerExecutionList;
 import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
 import com.romanpulov.symphonytimer.model.DMTimers;
@@ -86,11 +85,11 @@ public class DBHelper implements DBController {
             mDBHelperInstance = null;
 		}
 	}
-	
+
 	public boolean getDBDataChanged() {
         return this.mDBDataChanged;
 	}
-	
+
 	public void resetDBDataChanged() {
         this.mDBDataChanged = false;
 	}
@@ -353,8 +352,8 @@ public class DBHelper implements DBController {
 		return result;
 	}	
 	
-	public DMTimerExecutionList getHistTopList(int filterId) {
-        DMTimerExecutionList res = new DMTimerExecutionList();
+	public List<DMTimerExecutionRec> getHistTopList(int filterId) {
+		List<DMTimerExecutionRec> result = new ArrayList<>();
 		Cursor c = null;
 		
 		try {
@@ -372,7 +371,7 @@ public class DBHelper implements DBController {
                 DMTimerExecutionRec dmRec = new DMTimerExecutionRec();
 				dmRec.mTimerId = c.getLong(0);
 				dmRec.mExecCnt = c.getLong(1);
-				res.add(dmRec);
+				result.add(dmRec);
 			}
 
 		} finally {
@@ -380,7 +379,7 @@ public class DBHelper implements DBController {
 				c.close();
 			}
 		}
-        return res;
+        return result;
 	}
 
 	public List<LinkedHashMap<Long, Long>> getHistList(int filterId, int histCount) {

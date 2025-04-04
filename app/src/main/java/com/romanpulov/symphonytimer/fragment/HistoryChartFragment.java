@@ -8,67 +8,65 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 
-import com.romanpulov.library.view.BarChart;
-import com.romanpulov.symphonytimer.R;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import com.romanpulov.symphonytimer.databinding.FragmentHistoryTopChartBinding;
+import com.romanpulov.symphonytimer.model.DMTimerRec;
+import com.romanpulov.symphonytimer.model.TimerHistoryViewModel;
+import com.romanpulov.symphonytimer.model.TimerViewModel;
+
+import java.util.Map;
 
 /**
  * Created on 04.01.2016.
  */
-public abstract class HistoryChartFragment extends HistoryFragment {
-    private BarChart mBarChart;
+public abstract class HistoryChartFragment<T> extends Fragment {
 
-    protected BarChart getBarChart() {
-        return mBarChart;
-    }
+    protected FragmentHistoryTopChartBinding binding;
+
+    protected TimerViewModel model;
+    protected TimerHistoryViewModel historyModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_history_top_chart, container, false);
-        mBarChart = rootView.findViewById(R.id.history_top_bar_chart);
-        updateBarChart();
-
-        final Button scaleUpButton = rootView.findViewById(R.id.scaleUpButton);
-        final Button scaleDownButton = rootView.findViewById(R.id.scaleDownButton);
-        Button.OnClickListener buttonClickListener = new Button.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                int barChartWidth = mBarChart.getBarItemWidth();
-                int barChartDelta = v == scaleUpButton ? barChartWidth / 10 : -barChartWidth / 10;
-                mBarChart.setBarItemWidth(barChartWidth + barChartDelta);
-                mBarChart.updateChartLayout();
-                mBarChart.requestLayout();
-                mBarChart.invalidate();
-            }
-        };
-        scaleUpButton.setOnClickListener(buttonClickListener);
-        scaleDownButton.setOnClickListener(buttonClickListener);
-
-        return rootView;
+        binding = FragmentHistoryTopChartBinding.inflate(getLayoutInflater(), container, false);
+        return binding.getRoot();
     }
 
-    private void updateBarChart() {
-        //clear old data
-        mBarChart.clearSeries();
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        updateSeries();
+        Button.OnClickListener buttonClickListener = v -> {
+            int barChartWidth = binding.historyTopBarChart.getBarItemWidth();
+            int barChartDelta = v == binding.scaleUpButton ? barChartWidth / 10 : -barChartWidth / 10;
+            binding.historyTopBarChart.setBarItemWidth(barChartWidth + barChartDelta);
+            binding.historyTopBarChart.updateChartLayout();
+            binding.historyTopBarChart.requestLayout();
+            binding.historyTopBarChart.invalidate();
+        };
+        binding.scaleUpButton.setOnClickListener(buttonClickListener);
+        binding.scaleDownButton.setOnClickListener(buttonClickListener);
+
+        model = TimerViewModel.getInstance(requireActivity().getApplication());
+        historyModel = new ViewModelProvider(requireParentFragment()).get(TimerHistoryViewModel.class);
+    }
+
+    protected void updateBarChart(Map<Long, DMTimerRec> dmTimerMap, T data) {
+        //clear old data
+        binding.historyTopBarChart.clearSeries();
+
+        updateSeries(dmTimerMap, data);
 
         //update control
-        mBarChart.updateSeriesListValueBounds();
-        mBarChart.updateChartLayout();
-        mBarChart.requestLayout();
-        mBarChart.invalidate();
+        binding.historyTopBarChart.updateSeriesListValueBounds();
+        binding.historyTopBarChart.updateChartLayout();
+        binding.historyTopBarChart.requestLayout();
+        binding.historyTopBarChart.invalidate();
     }
 
     // to override for data retrieval
-    abstract protected void updateSeries();
-
-    @Override
-    public void setHistoryFilterId(int historyFilterId) {
-        super.setHistoryFilterId(historyFilterId);
-        if (mBarChart != null) {
-            updateBarChart();
-        }
-    }
+    abstract protected void updateSeries(Map<Long, DMTimerRec> dmTimerMap, T data);
 }
