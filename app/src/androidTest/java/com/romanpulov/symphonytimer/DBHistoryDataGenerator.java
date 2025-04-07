@@ -8,7 +8,6 @@ import androidx.test.filters.SmallTest;
 import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,7 +49,7 @@ public class DBHistoryDataGenerator {
         for (long i = 0; i < 400; i++) {
             long currentDate = startDate - i * 1000 * 60 * 60 * 24;
 
-            log(String.valueOf(i) + " - " + String.valueOf(currentDate) + " - " + DateFormatterHelper.formatLog(currentDate));
+            log(i + " - " + currentDate + " - " + DateFormatterHelper.formatLog(currentDate));
 
             String sql = "INSERT INTO timer_history (timer_id, start_time, end_time, real_time) VALUES(" +
             timerId + ", " + currentDate + ", " + (currentDate + 10000) + ", " + dummyRealTime + ")";

@@ -158,33 +158,4 @@ public class MainActivity extends AppCompatActivity {
         LoggerHelper.clearInstance();
         super.onDestroy();
     }
-
-    /*
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.action_add) {
-            startAddItemActivity(new DMTimerRec());
-            return true;
-        } else if (itemId == R.id.action_preferences) {
-            if (mDMTasks.getStatus() == DMTasks.STATUS_IDLE) {
-                startSettingsActivity();
-                return true;
-            } else
-                return super.onOptionsItemSelected(item);
-        } else if (itemId == R.id.action_history) {
-            startHistoryActivity();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-     */
-
-    private void startHistoryActivity() {
-    	Intent startHistoryIntent = new Intent(this, HistoryActivity.class);
-    	//startHistoryIntent.putExtra(HistoryActivity.TIMERS_NAME, mDMTimers);
-        startActivity(startHistoryIntent);
-    }
 }

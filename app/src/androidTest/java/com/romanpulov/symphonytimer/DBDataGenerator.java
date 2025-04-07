@@ -1,17 +1,14 @@
 package com.romanpulov.symphonytimer;
 
-import android.content.Context;
 import android.util.Log;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
+import com.romanpulov.symphonytimer.helper.DateFormatterHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
-@RunWith(AndroidJUnit4.class)
 @SmallTest
 public class DBDataGenerator {
     private static final String TAG = DBDataGenerator.class.getSimpleName();
@@ -37,6 +34,30 @@ public class DBDataGenerator {
             Log.d(TAG, sql);
             mDBHelper.executeSQL(sql);
         }
+
+        populateTimerHistory();
     }
 
+    public void populateTimerHistory() {
+        int dummyRealTime = 7777;
+
+        mDBHelper.executeSQL("DELETE FROM timer_history WHERE real_time = " + dummyRealTime);
+
+        int timerId = (int)mDBHelper.getLongSQL("SELECT MIN(_id) FROM timer");
+
+        long startDate = System.currentTimeMillis();
+
+        for (long i = 0; i < 400; i++) {
+            long currentDate = startDate - i * 1000 * 60 * 60 * 24;
+
+            Log.d(TAG, i + " - " + currentDate + " - " + DateFormatterHelper.formatLog(currentDate));
+
+            String sql = "INSERT INTO timer_history (timer_id, start_time, end_time, real_time) VALUES(" +
+                    timerId + ", " + currentDate + ", " + (currentDate + 10000) + ", " + dummyRealTime + ")";
+
+            mDBHelper.executeSQL(sql);
+        }
+        mDBHelper.closeDB();
+        Log.d(TAG, "Completed");
+    }
 }

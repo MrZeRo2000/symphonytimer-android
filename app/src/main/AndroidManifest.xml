@@ -69,12 +69,6 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".activity.MainActivity"/>
         </activity>
-
-        <service
-                android:name=".service.TaskService"
-                android:enabled="true"
-                android:exported="false"
-                android:foregroundServiceType="specialUse"/>
         <service
                 android:name=".service.TaskUpdateService"
                 android:enabled="true"
