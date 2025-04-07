@@ -2,15 +2,13 @@ package com.romanpulov.symphonytimer.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import com.romanpulov.symphonytimer.R;
+import org.jetbrains.annotations.NotNull;
 
 public class AlertOkCancelDialogFragment extends DialogFragment {
     private final static String STRING_MESSAGE = "MESSAGE";
@@ -50,7 +48,7 @@ public class AlertOkCancelDialogFragment extends DialogFragment {
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public @NotNull Dialog onCreateDialog(Bundle savedInstanceState) {
         if (null != savedInstanceState) {
             mMessage = savedInstanceState.getInt(AlertOkCancelDialogFragment.STRING_MESSAGE);
         }
@@ -58,12 +56,9 @@ public class AlertOkCancelDialogFragment extends DialogFragment {
         dialogBuilder
           .setMessage(mMessage)
           .setPositiveButton(R.string.caption_ok,
-                  new OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialog, int which) {
-                          if (null != okButtonClick) {
-                              okButtonClick.OnOkButtonClickEvent(AlertOkCancelDialogFragment.this);
-                          }
+                  (dialog, which) -> {
+                      if (null != okButtonClick) {
+                          okButtonClick.OnOkButtonClickEvent(AlertOkCancelDialogFragment.this);
                       }
                   }
           )

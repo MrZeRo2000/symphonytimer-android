@@ -17,7 +17,6 @@ import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerHistRec;
 import com.romanpulov.symphonytimer.model.DMTimerExecutionRec;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
-import com.romanpulov.symphonytimer.model.DMTimers;
 
 public class DBHelper implements DBController {
 	private static final String TAG = DBHelper.class.getSimpleName();
@@ -84,14 +83,6 @@ public class DBHelper implements DBController {
 			mDBHelperInstance.closeDB();
             mDBHelperInstance = null;
 		}
-	}
-
-	public boolean getDBDataChanged() {
-        return this.mDBDataChanged;
-	}
-
-	public void resetDBDataChanged() {
-        this.mDBDataChanged = false;
 	}
 
 	public long insertTimer(DMTimerRec dmTimerRec) {
@@ -222,32 +213,6 @@ public class DBHelper implements DBController {
 		return mDB.delete(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS[0] + "=" + id, null);
 	}
 
-	/* No longer needed
-	private DMTimerRec getTimerRecById(long id) {
-		Cursor c = null;
-		DMTimerRec dmTimerRec = null;
-		
-		try {
-			c = db.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, "_id=" + id, null, null, null, null);
-			if (1 == c.getCount()) {
-				c.moveToFirst();
-				dmTimerRec = new DMTimerRec();
-				dmTimerRec.id = c.getLong(0);
-				dmTimerRec.title = c.getString(1);
-				dmTimerRec.time_sec = c.getLong(2);
-				dmTimerRec.sound_file = c.getString(3);
-				dmTimerRec.image_name = c.getString(4);
-			}
-		} finally {
-			if (null != c && !c.isClosed()) {
-				c.close();
-			}
-		}
-		
-		return dmTimerRec;
-	}
-	*/
-
 	public List<DMTimerRec> getTimers() {
 		List<DMTimerRec> dmTimers = new ArrayList<>();
 
@@ -277,36 +242,6 @@ public class DBHelper implements DBController {
 		return dmTimers;
 	}
 
-	public void fillTimers(DMTimers dmTimers) {
-		// no need ...
-		openDB();
-		
-		dmTimers.clear();
-
-		Cursor c = null;
-		
-		try {
-			c = mDB.query(DBOpenHelper.TIMER_TABLE_NAME, DBOpenHelper.TIMER_TABLE_COLS, null, null, null, null, "order_id");
-			
-			for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext())	{
-                DMTimerRec dmTimerRec = new DMTimerRec(
-						c.getLong(0),
-						c.getString(1),
-						c.getLong(2),
-						c.getString(3),
-						c.getString(4),
-						c.getLong(5),
-						c.getInt(6));
-
-				dmTimers.add(dmTimerRec);
-			}
-		} finally {
-			if (null != c && !c.isClosed()) {
-				c.close();
-			}
-		}	
-	}
-	
 	public List<DMTimerHistRec> getHistList(int filterId) {
 		List<DMTimerHistRec> result = new ArrayList<>();
 		Cursor c = null;

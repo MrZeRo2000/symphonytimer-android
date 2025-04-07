@@ -19,7 +19,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.databinding.FragmentHistoryBinding;
-import com.romanpulov.symphonytimer.model.DMTimers;
 import com.romanpulov.symphonytimer.model.TimerHistoryViewModel;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,8 +27,6 @@ import java.util.List;
 
 public class HistoryFragment extends Fragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
-    private static final String ARG_TIMERS = "timers";
-    private static final String ARG_HISTORY_FILTER_ID = "history_filter_id";
 
     //underlying fragments for creation
     private final static List<Class<? extends Fragment>> HISTORY_FRAGMENT_CLASS_LIST =
@@ -40,9 +37,6 @@ public class HistoryFragment extends Fragment {
             );
 
     private FragmentHistoryBinding binding;
-
-    protected DMTimers mDMTimers;
-    protected int mHistoryFilterId = -1;
 
     private static class HistoryFragmentStateAdapter extends FragmentStateAdapter {
         public HistoryFragmentStateAdapter(@NonNull Fragment fragment) {
@@ -74,19 +68,6 @@ public class HistoryFragment extends Fragment {
         }
         return fragment;
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mDMTimers = getArguments().getParcelable(ARG_TIMERS);
-            mHistoryFilterId = getArguments().getInt(ARG_HISTORY_FILTER_ID);
-        }
-    }
-	
-	public void setHistoryFilterId(int historyFilterId) {
-		mHistoryFilterId = historyFilterId;
-	}
 
     @Nullable
     @Override

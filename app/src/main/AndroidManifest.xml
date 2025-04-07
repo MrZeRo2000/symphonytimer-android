@@ -57,18 +57,6 @@
         </activity> <!-- Broadcast receiver -->
         <receiver android:name=".receiver.ExactAlarmBroadcastReceiver"/>
         <receiver android:name=".receiver.AdvanceAlarmBroadcastReceiver"/>
-
-        <activity
-                android:name=".activity.HistoryActivity"
-                android:label="@string/title_activity_history"
-                android:parentActivityName=".activity.MainActivity"
-                android:theme="@style/ToolBarTheme.CompatTransparent">
-
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".activity.MainActivity"/>
-        </activity>
         <service
                 android:name=".service.TaskUpdateService"
                 android:enabled="true"
