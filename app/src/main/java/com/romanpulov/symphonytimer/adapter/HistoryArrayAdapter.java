@@ -26,7 +26,7 @@ public class HistoryArrayAdapter extends RecyclerView.Adapter<HistoryArrayAdapte
 
 	private final Context mContext;
 	private final Map<Long, DMTimerRec> mDMTimerMap;
-	private final List<DMTimerHistRec> mDMTimerHistList;
+	private List<DMTimerHistRec> mDMTimerHistList;
 
 	@NonNull
 	@Override
@@ -91,6 +91,7 @@ public class HistoryArrayAdapter extends RecyclerView.Adapter<HistoryArrayAdapte
 
 	public void updateDMTimerHistList(List<DMTimerHistRec> dmTimerHistList) {
 		DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getDMTimerHistListDiffCallback(dmTimerHistList));
+		mDMTimerHistList = dmTimerHistList;
 		diffResult.dispatchUpdatesTo(this);
 	}
 

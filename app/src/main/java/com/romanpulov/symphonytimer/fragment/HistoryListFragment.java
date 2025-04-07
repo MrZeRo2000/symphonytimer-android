@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.romanpulov.symphonytimer.model.TimerViewModel;
 import com.romanpulov.symphonytimer.utils.SpaceItemDecoration;
 
 public class HistoryListFragment extends Fragment {
+	private static final String TAG = HistoryListFragment.class.getSimpleName();
 
 	private FragmentHistoryListBinding binding;
 
@@ -48,6 +50,7 @@ public class HistoryListFragment extends Fragment {
 		historyModel.getFilterId().observe(this, filterId -> historyModel.loadDMTimerHistList());
 
 		historyModel.getDMTimerHistList().observe(getViewLifecycleOwner(), histList -> {
+			Log.d(TAG, "Obtained " + histList.size() + " rows");
 			if (binding.historyListView.getAdapter() == null) {
 				HistoryArrayAdapter adapter = new HistoryArrayAdapter(requireContext(), histList, model.getCurrentDMTimerMap());
 				binding.historyListView.setAdapter(adapter);
