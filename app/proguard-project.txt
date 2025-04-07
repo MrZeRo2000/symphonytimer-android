@@ -38,6 +38,7 @@
 -dontwarn edu.umd.cs.findbugs.annotations.Nullable
 -dontwarn edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 
+-keep class com.romanpulov.symphonytimer.model.** { *; }
 -keepclassmembers class com.romanpulov.symphonytimer.loader.** { *; }
 -keepclassmembers class com.onedrive.sdk.extensions.** { *; }
 -keepclassmembers class com.google.crypto.tink.subtle.** { *; }

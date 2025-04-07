@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import org.jetbrains.annotations.NotNull;
 
-public class DMTimerRec implements Parcelable{
+public class DMTimerRec implements Parcelable {
 	private final long mId;
 	private final String mTitle;
 	private final long mTimeSec;
