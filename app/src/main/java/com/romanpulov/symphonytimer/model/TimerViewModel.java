@@ -100,28 +100,33 @@ public class TimerViewModel extends AndroidViewModel {
     }
 
     public void addTimer(DMTimerRec item) {
-        getDBHelper().insertTimer(item);
-        loadTimers();
+        if (getDBHelper().insertTimer(item) != -1) {
+            loadTimers();
+        }
     }
 
     public void editTimer(DMTimerRec item) {
-        getDBHelper().updateTimer(item);
-        loadTimers();
+        if (getDBHelper().updateTimer(item) > 0) {
+            loadTimers();
+        }
     }
 
     public void deleteTimer(DMTimerRec item) {
-        getDBHelper().deleteTimer(item.getId());
-        loadTimers();
+        if (getDBHelper().deleteTimer(item.getId()) > 0) {
+            loadTimers();
+        }
     }
 
     public void moveTimerUp(DMTimerRec item) {
-        getDBHelper().moveTimerUp(item.getOrderId());
-        loadTimers();
+        if (getDBHelper().moveTimerUp(item.getOrderId())) {
+            loadTimers();
+        }
     }
 
     public void moveTimerDown(DMTimerRec item) {
-        getDBHelper().moveTimerDown(item.getOrderId());
-        loadTimers();
+        if (getDBHelper().moveTimerDown(item.getOrderId())) {
+            loadTimers();
+        }
     }
 
     private void setTasks(@Nullable Map<Long, DMTaskItem> value) {

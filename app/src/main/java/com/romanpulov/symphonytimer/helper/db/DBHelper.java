@@ -25,7 +25,7 @@ public class DBHelper implements DBController {
 	private SQLiteDatabase mDB;
 	private final DBOpenHelper mDBOpenHelper;
 	private boolean mDBDataChanged = false;
-	
+
 	public static class RawRecItem {
 		
 		private final Map<String, String> fields = new HashMap<>();
@@ -110,7 +110,7 @@ public class DBHelper implements DBController {
 		return mDB.update(DBOpenHelper.TIMER_TABLE_NAME, cv, "_id=" + dmTimerRec.getId(), null);
 	}
 	
-	public long insertTimerHistory(DMTaskItem dmTaskItem) {
+	public void insertTimerHistory(DMTaskItem dmTaskItem) {
 		ContentValues cv = new ContentValues();
 
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[1], dmTaskItem.getId());
@@ -118,7 +118,7 @@ public class DBHelper implements DBController {
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[3], dmTaskItem.getCurrentTime());
 		cv.put(DBOpenHelper.TIMER_HISTORY_TABLE_COLS[4], System.currentTimeMillis());
 
-		return mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);		
+		mDB.insert(DBOpenHelper.TIMER_HISTORY_TABLE_NAME, null, cv);
 	}
 	
 	public long getLongSQL(String sql) {
