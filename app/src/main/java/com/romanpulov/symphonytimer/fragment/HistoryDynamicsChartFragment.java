@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created on 04.01.2016.
  */
-public class HistoryDynamicsChartFragment extends HistoryChartFragment<List<LinkedHashMap<Long, Long>>> {
+public class HistoryDynamicsChartFragment extends AbstractHistoryChartFragment<List<LinkedHashMap<Long, Long>>> {
     private int mHistColor0;
     private int mHistColor1;
     private int mColor0;

@@ -11,7 +11,7 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 import java.util.List;
 import java.util.Map;
 
-public class HistoryTopChartFragment extends HistoryChartFragment<List<DMTimerExecutionRec>> {
+public class HistoryTopChartFragment extends AbstractHistoryChartFragment<List<DMTimerExecutionRec>> {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
