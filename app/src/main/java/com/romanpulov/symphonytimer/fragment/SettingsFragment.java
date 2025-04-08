@@ -14,17 +14,20 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
 import androidx.preference.Preference.OnPreferenceClickListener;
 import androidx.preference.PreferenceFragmentCompat;
 
+import androidx.work.WorkInfo;
 import com.romanpulov.library.common.account.AbstractCloudAccountManager;
 import com.romanpulov.library.common.network.NetworkUtils;
 import com.romanpulov.symphonytimer.R;
@@ -36,6 +39,7 @@ import com.romanpulov.symphonytimer.loader.gdrive.BackupGDriveUploader;
 import com.romanpulov.symphonytimer.loader.gdrive.RestoreGDriveDownloader;
 import com.romanpulov.symphonytimer.loader.msgraph.BackupMSGraphUploader;
 import com.romanpulov.symphonytimer.loader.msgraph.RestoreMSGraphDownloader;
+import com.romanpulov.symphonytimer.model.TimerViewModel;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceBackupLocalProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
@@ -44,12 +48,15 @@ import com.romanpulov.symphonytimer.preference.PreferenceRestoreCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRestoreLocalProcessor;
 import com.romanpulov.symphonytimer.service.LoaderService;
 import com.romanpulov.symphonytimer.service.LoaderServiceManager;
+import com.romanpulov.symphonytimer.worker.LoaderWorker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
+    private final static String TAG = SettingsFragment.class.getSimpleName();
 
     private PreferenceBackupCloudProcessor mPreferenceBackupCloudProcessor;
     private PreferenceRestoreCloudProcessor mPreferenceRestoreCloudProcessor;
@@ -69,6 +76,36 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 preferenceLoaderProcessor.postExecute(errorMessage);
         }
     };
+
+    private final Observer<List<WorkInfo>> mLoaderWorkerObserver = workInfos -> {
+        Log.d(TAG, "WorkerObserver: " + workInfos.size() + " items");
+        Log.d(TAG, "WorkerObserver: " + workInfos);
+        if (workInfos.size() == 1) {
+            WorkInfo workInfo = workInfos.get(0);
+
+            switch (workInfo.getState()) {
+                case RUNNING -> {
+                    String loaderClassName = LoaderWorker.getLoaderClassName(workInfo.getProgress());
+                    PreferenceLoaderProcessor preferenceLoaderProcessor = mPreferenceLoadProcessors.get(loaderClassName);
+                    if (preferenceLoaderProcessor != null) {
+                        preferenceLoaderProcessor.preExecute();
+                    }
+                }
+                case SUCCEEDED, FAILED -> {
+                    String loaderClassName = LoaderWorker.getLoaderClassName(workInfo.getOutputData());
+                    String errorMessage = LoaderWorker.getErrorMessage(workInfo.getOutputData());
+                    PreferenceLoaderProcessor preferenceLoaderProcessor = mPreferenceLoadProcessors.get(loaderClassName);
+                    if (preferenceLoaderProcessor != null) {
+                        preferenceLoaderProcessor.postExecute(errorMessage);
+                    }
+
+                    TimerViewModel model = TimerViewModel.getInstance(requireActivity().getApplication());
+                    model.loadTimers();
+                }
+            }
+        }
+    };
+
 
     private LoaderService mBoundService;
     private boolean mIsBound;
