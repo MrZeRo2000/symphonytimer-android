@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -138,6 +137,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         super.onViewCreated(view, savedInstanceState);
 
         requireActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+        LoaderWorker.getWorkInfosLiveData(requireContext()).observe(this, mLoaderWorkerObserver);
     }
 
     @Override
@@ -224,11 +224,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    public void executeLocalBackup() {
-        mPreferenceBackupLocalProcessor.preExecute();
-        mLoaderServiceManager.startLoader(mPreferenceBackupLocalProcessor.getLoaderClass().getName());
-    }
-
     /**
      * Local backup using service
      */
@@ -238,24 +233,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_BACKUP);
         if (pref != null) {
             pref.setOnPreferenceClickListener(preference -> {
-                if (mLoaderServiceManager == null)
-                    return true;
-                else {
-                    if (mLoaderServiceManager.isLoaderServiceRunning())
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    else {
-                        executeLocalBackup();
-                    }
-
-                    return true;
+                if (LoaderWorker.isRunning(requireContext())) {
+                    PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                } else {
+                    mPreferenceBackupLocalProcessor.preExecute();
+                    LoaderWorker.scheduleWorker(requireContext(), mPreferenceBackupLocalProcessor.getLoaderClass().getName());
                 }
+                return true;
             });
         }
-    }
-
-    public void executeLocalRestore() {
-        mPreferenceRestoreLocalProcessor.preExecute();
-        mLoaderServiceManager.startLoader(mPreferenceRestoreLocalProcessor.getLoaderClass().getName());
     }
 
     /**
@@ -267,25 +253,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference pref = findPreference(PreferenceRepository.PREF_KEY_LOCAL_RESTORE);
         if (pref != null) {
             pref.setOnPreferenceClickListener(preference -> {
-                if (mLoaderServiceManager == null)
-                    return true;
-                else {
-                    if (mLoaderServiceManager.isLoaderServiceRunning())
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    else {
-                        Context context = getActivity();
-                        if (context != null) {
-                            final AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                            alert
-                                    .setTitle(R.string.question_are_you_sure)
-                                    .setPositiveButton(R.string.caption_ok,
-                                            (dialog, which) -> executeLocalRestore())
-                                    .setNegativeButton(R.string.caption_cancel, null)
-                                    .show();
-                        }
+                if (LoaderWorker.isRunning(requireContext())) {
+                    PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                } else {
+                    Context context = getActivity();
+                    if (context != null) {
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                        alert
+                                .setTitle(R.string.question_are_you_sure)
+                                .setPositiveButton(R.string.caption_ok,
+                                        (dialog, which) -> {
+                                            mPreferenceRestoreLocalProcessor.preExecute();
+                                            LoaderWorker.scheduleWorker(requireContext(), mPreferenceRestoreLocalProcessor.getLoaderClass().getName());
+                                        })
+                                .setNegativeButton(R.string.caption_cancel, null)
+                                .show();
                     }
                 }
-
                 return true;
             });
         }
