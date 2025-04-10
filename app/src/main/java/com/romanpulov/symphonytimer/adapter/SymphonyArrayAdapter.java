@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.databinding.SymphonyRowViewBinding;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
+import com.romanpulov.symphonytimer.model.TimerViewModel;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
 import com.romanpulov.library.view.ProgressCircle;
 import com.romanpulov.symphonytimer.helper.UriHelper;
@@ -256,6 +257,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
     }
 
     public void updateValues(List<DMTimerRec> values, RecyclerView recyclerView) {
+        Log.d(TAG, "Adapter updating values");
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getValuesDiffCallback(values));
 
         int selectedPos = -1;
@@ -286,14 +288,31 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         diffResult.dispatchUpdatesTo(this);
 
         if (selectedPos != -1) {
+            Log.d(TAG, "Adapter scrolling to selected position " + selectedPos);
             recyclerView.scrollToPosition(selectedPos);
         }
     }
 
-    public void updateTasks(Map<Long, DMTaskItem> taskMap) {
+    public void updateTasks(Map<Long, DMTaskItem> taskMap, RecyclerView recyclerView) {
+        Log.d(TAG, "Adapter updating tasks");
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(getTasksDiffCallback(taskMap));
+
+        DMTaskItem beforeLastTaskItemCompleted = TimerViewModel.getLastTaskItemCompleted(mTaskMap);
+        DMTaskItem afterLastTaskItemCompleted = TimerViewModel.getLastTaskItemCompleted(taskMap);
+
         mTaskMap = taskMap == null ? null : new HashMap<>(taskMap);
+        Log.d(TAG, "Adapter dispatching updates");
         diffResult.dispatchUpdatesTo(this);
+
+        if ((!Objects.equals(beforeLastTaskItemCompleted, afterLastTaskItemCompleted)) &&
+                (afterLastTaskItemCompleted != null)) {
+                for (int i = 0; i < mValues.size(); i++) {
+                    if (mValues.get(i).getId() == afterLastTaskItemCompleted.getId()) {
+                        Log.d(TAG, "Adapter scrolling to position " + i);
+                        recyclerView.scrollToPosition(i);
+                    }
+                }
+        }
     }
 
     private DiffUtil.Callback getValuesDiffCallback(List<DMTimerRec> newValues) {

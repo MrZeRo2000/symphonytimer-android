@@ -154,17 +154,18 @@ public class MainFragment extends Fragment {
         model = TimerViewModel.getInstance(requireActivity().getApplication());
         model.getDMTimers().observe(this, dmTimers -> {
             if (mAdapter == null) {
+                Log.d(TAG, "Creating a new adapter");
                 mAdapter = new SymphonyArrayAdapter(
                         requireContext(),
                         new ActionBarCallBack(),
                         dmTimers,
                         null,
                         this::onTimerInteraction);
+                binding.mainListView.setAdapter(mAdapter);
             } else {
                 mAdapter.updateValues(dmTimers, binding.mainListView);
             }
             mListViewSelector = mAdapter.getListViewSelector();
-            binding.mainListView.setAdapter(mAdapter);
         });
         model.getDMTaskMap().observe(this, dmTasks -> {
             Log.d(TAG, "tasks updated");
@@ -172,7 +173,7 @@ public class MainFragment extends Fragment {
                 if (dmTasks != null) {
                     Log.d(TAG, "first task execution percent:" + dmTasks.values().iterator().next().getExecutionPercent());
                 }
-                mAdapter.updateTasks(dmTasks);
+                mAdapter.updateTasks(dmTasks, binding.mainListView);
             }
         });
         model.getTaskStatusChange().observe(this, taskStatus -> {
@@ -192,6 +193,7 @@ public class MainFragment extends Fragment {
            }
 
            if (taskStatus.second == TimerViewModel.TASKS_STATUS_COMPLETED) {
+               Log.d(TAG, "Task status set to completed");
                //prevent from sleeping while not turned off
                requireActivity().getWindow().addFlags(WINDOW_SCREEN_ON_FLAGS);
            } else {

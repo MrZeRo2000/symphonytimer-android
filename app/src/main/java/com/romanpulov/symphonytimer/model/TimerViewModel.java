@@ -247,7 +247,7 @@ public class TimerViewModel extends AndroidViewModel {
         }
     }
 
-    public DMTaskItem getFirstTaskItemCompleted(Map<Long, DMTaskItem> value) {
+    public static DMTaskItem getFirstTaskItemCompleted(Map<Long, DMTaskItem> value) {
         if (value == null || value.isEmpty()) {
             return null;
         } else {
@@ -256,6 +256,19 @@ public class TimerViewModel extends AndroidViewModel {
                     .stream()
                     .filter(DMTaskItem::getCompleted)
                     .min(Comparator.comparingLong(DMTaskItem::getTriggerAtTime))
+                    .orElse(null);
+        }
+    }
+
+    public static DMTaskItem getLastTaskItemCompleted(Map<Long, DMTaskItem> value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        } else {
+            return value
+                    .values()
+                    .stream()
+                    .filter(DMTaskItem::getCompleted)
+                    .max(Comparator.comparingLong(DMTaskItem::getTriggerAtTime))
                     .orElse(null);
         }
     }
