@@ -3,10 +3,12 @@ package com.romanpulov.symphonytimer.cloud;
 import android.app.Activity;
 
 import com.romanpulov.library.common.account.AbstractCloudAccountManager;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractCloudAccountFacade {
-    public abstract void setupAccount(Activity activity);
-    public abstract AbstractCloudAccountManager<?> getAccountManager(Activity activity);
-    public abstract String getBackupLoaderClassName();
-    public abstract String getRestoreLoaderClassName();
+public interface AbstractCloudAccountFacade {
+    void setupAccount(Activity activity);
+    @NotNull AbstractCloudAccountManager<?> getAccountManager(Activity activity);
+    @NotNull String getBackupLoaderClassName();
+    @NotNull String getSilentBackupLoaderClassName();
+    @NotNull String getRestoreLoaderClassName();
 }

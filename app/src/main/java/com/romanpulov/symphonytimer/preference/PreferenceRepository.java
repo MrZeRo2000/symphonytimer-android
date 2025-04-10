@@ -31,7 +31,7 @@ public final class PreferenceRepository {
     public static final int PREF_CLOUD_ACCOUNT_TYPE_GDRIVE = 3;
 
     public static final String PREF_KEY_CLOUD_BACKUP = "pref_cloud_backup";
-    private static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_cloud_backup_last_loaded";
+    public static final String PREF_KEY_CLOUD_BACKUP_LAST_LOADED = "pref_cloud_backup_last_loaded";
 
     public static final String PREF_KEY_CLOUD_RESTORE =  "pref_cloud_restore";
     private static final String PREF_KEY_CLOUD_RESTORE_LAST_LOADED =  "pref_cloud_restore_last_loaded";
@@ -101,7 +101,8 @@ public final class PreferenceRepository {
         if (value == PREF_LOAD_LOADING)
             prefLoad.setSummary(R.string.caption_loading);
         else {
-            long displayValue = prefLoad.getPreferenceManager().getSharedPreferences().getLong(preferenceLastLoadedKey, PreferenceRepository.PREF_LOAD_NEVER);
+            long displayValue = Objects.requireNonNull(prefLoad.getPreferenceManager().getSharedPreferences())
+                    .getLong(preferenceLastLoadedKey, PreferenceRepository.PREF_LOAD_NEVER);
             if (displayValue == PREF_LOAD_NEVER)
                 prefLoad.setSummary(R.string.pref_message_last_loaded_never);
             else

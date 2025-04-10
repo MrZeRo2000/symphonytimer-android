@@ -9,9 +9,11 @@ import com.romanpulov.library.gdrive.OnGDActionListener;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.loader.gdrive.BackupGDriveUploader;
 import com.romanpulov.symphonytimer.loader.gdrive.RestoreGDriveDownloader;
+import com.romanpulov.symphonytimer.loader.gdrive.SilentBackupGDriveUploader;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
+import org.jetbrains.annotations.NotNull;
 
-public class GDAccountFacade extends AbstractCloudAccountFacade {
+public class GDAccountFacade implements AbstractCloudAccountFacade {
     @Override
     public void setupAccount(Activity activity) {
         final AlertDialog.Builder alert = new AlertDialog.Builder(activity);
@@ -48,17 +50,22 @@ public class GDAccountFacade extends AbstractCloudAccountFacade {
     }
 
     @Override
-    public AbstractCloudAccountManager<?> getAccountManager(Activity activity) {
+    public @NotNull AbstractCloudAccountManager<?> getAccountManager(Activity activity) {
         return new GDCloudAccountManager(activity);
     }
 
     @Override
-    public String getBackupLoaderClassName() {
+    public @NotNull String getBackupLoaderClassName() {
         return BackupGDriveUploader.class.getName();
     }
 
     @Override
-    public String getRestoreLoaderClassName() {
+    public @NotNull String getSilentBackupLoaderClassName() {
+        return SilentBackupGDriveUploader.class.getName();
+    }
+
+    @Override
+    public @NotNull String getRestoreLoaderClassName() {
         return RestoreGDriveDownloader.class.getName();
     }
 }
