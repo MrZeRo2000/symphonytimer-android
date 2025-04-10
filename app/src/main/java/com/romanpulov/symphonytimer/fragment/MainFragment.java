@@ -163,8 +163,12 @@ public class MainFragment extends Fragment {
                         this::onTimerInteraction);
                 binding.mainListView.setAdapter(mAdapter);
             } else {
+                if (!Objects.equals(binding.mainListView.getAdapter(), mAdapter)) {
+                    binding.mainListView.setAdapter(mAdapter);
+                }
                 mAdapter.updateValues(dmTimers, binding.mainListView);
             }
+
             mListViewSelector = mAdapter.getListViewSelector();
         });
         model.getDMTaskMap().observe(this, dmTasks -> {

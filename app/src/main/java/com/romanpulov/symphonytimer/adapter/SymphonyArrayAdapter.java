@@ -61,7 +61,30 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
                     ViewHolder viewHolder = (ViewHolder) v.getTag();
                     viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
                     viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+
+                    int selectedItemPos = SymphonyArrayAdapter.this.mListViewSelector.getSelectedItemPos();
+                    DMTimerRec item = mValues.get(viewHolder.getBindingAdapterPosition());
+                    DMTaskItem taskItem = mTaskMap != null ? mTaskMap.get(item.getId()) : null;
+
+                    int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
+                    final long displayProgress = item.getTimeSec() - timerProgress;
+
+                    Drawable bgDrawable;
+                    if (selectedItemPos == -1) {
+                        bgDrawable = 0 == displayProgress ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
+                    } else if (viewHolder.getBindingAdapterPosition() == selectedItemPos) {
+                        bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
+                    } else {
+                        bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
+                    }
+                    v.setBackground(bgDrawable);
+
+                    /*
+                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
                     v.setBackground(viewHolder.mNormalDrawable);
+
+                     */
                 }
             }
         } else {
@@ -142,12 +165,13 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             }
             //update bitmap background
             Drawable bgDrawable;
-            if (selectedItemPos == -1)
-                bgDrawable = 0 == displayProgress  ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
-            else if (position == selectedItemPos) {
+            if (selectedItemPos == -1) {
+                bgDrawable = 0 == displayProgress ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
+            } else if (position == selectedItemPos) {
                 bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
-            } else
+            } else {
                 bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
+            }
 
             viewHolder.itemView.setBackground(bgDrawable);
         } else {
