@@ -2,16 +2,9 @@ package com.romanpulov.symphonytimer.fragment;
 
 import static com.romanpulov.symphonytimer.preference.PreferenceRepository.PREF_KEY_CLOUD_ACCOUNT_TYPE;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
 
 import android.util.Log;
 import android.view.View;
@@ -21,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.Preference;
 import androidx.preference.Preference.OnPreferenceClickListener;
 import androidx.preference.PreferenceFragmentCompat;
@@ -45,14 +37,13 @@ import com.romanpulov.symphonytimer.preference.PreferenceLoaderProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRepository;
 import com.romanpulov.symphonytimer.preference.PreferenceRestoreCloudProcessor;
 import com.romanpulov.symphonytimer.preference.PreferenceRestoreLocalProcessor;
-import com.romanpulov.symphonytimer.service.LoaderService;
-import com.romanpulov.symphonytimer.service.LoaderServiceManager;
 import com.romanpulov.symphonytimer.worker.LoaderWorker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     private final static String TAG = SettingsFragment.class.getSimpleName();
@@ -63,18 +54,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private PreferenceRestoreLocalProcessor  mPreferenceRestoreLocalProcessor;
 
     private final Map<String, PreferenceLoaderProcessor> mPreferenceLoadProcessors = new HashMap<>();
-    private LoaderServiceManager mLoaderServiceManager;
-    private final BroadcastReceiver mLoaderServiceBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String loaderClassName = intent.getStringExtra(LoaderService.SERVICE_RESULT_LOADER_NAME);
-            String errorMessage = intent.getStringExtra(LoaderService.SERVICE_RESULT_ERROR_MESSAGE);
-
-            PreferenceLoaderProcessor preferenceLoaderProcessor = mPreferenceLoadProcessors.get(loaderClassName);
-            if (preferenceLoaderProcessor != null)
-                preferenceLoaderProcessor.postExecute(errorMessage);
-        }
-    };
 
     private final Observer<List<WorkInfo>> mLoaderWorkerObserver = workInfos -> {
         Log.d(TAG, "WorkerObserver: " + workInfos.size() + " items");
@@ -105,33 +84,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     };
 
-
-    private LoaderService mBoundService;
-    private boolean mIsBound;
-
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the service object we can use to
-            // interact with the service.  Because we have bound to a explicit
-            // service that we know is running in our own process, we can
-            // cast its IBinder to a concrete class and directly access it.
-            mBoundService = ((LoaderService.LoaderBinder)service).getService();
-
-            PreferenceLoaderProcessor preferenceLoaderProcessor = mPreferenceLoadProcessors.get(mBoundService.getLoaderClassName());
-            if (preferenceLoaderProcessor != null)
-                preferenceLoaderProcessor.preExecute();
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            // Because it is running in our same process, we should never
-            // see this happen.
-            mBoundService = null;
-        }
-    };
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -142,9 +94,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        final SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
-        //sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-
         addPreferencesFromResource(R.xml.preferences);
 
         Preference preference;
@@ -175,6 +124,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         preference = findPreference("pref_cloud_account");
         if (null != preference) {
             preference.setOnPreferenceClickListener(preference1 -> {
+                SharedPreferences sharedPreferences = Objects.requireNonNull(getPreferenceManager().getSharedPreferences());
                 int cloudAccountType = Integer.parseInt(sharedPreferences.getString("pref_cloud_account_type", "-1"));
                 if (cloudAccountType == -1) {
                     PreferenceRepository.displayMessage(SettingsFragment.this, getString(R.string.error_cloud_account_type_not_set_up));
@@ -299,13 +249,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         }
                         else {
                             mPreferenceBackupCloudProcessor.preExecute();
-                            mLoaderServiceManager.startLoader(cloudAccountFacade.getBackupLoaderClassName());
+                            LoaderWorker.scheduleWorker(requireContext(), cloudAccountFacade.getBackupLoaderClassName());
                         }
                     }
 
                     @Override
                     public void onAccountSetupFailure(String errorText) {
-                        PreferenceRepository.displayMessage(getActivity(), errorText);
+                        PreferenceRepository.displayMessage(getActivity(), R.string.error_cloud_account, errorText);
                         mPreferenceBackupCloudProcessor.postExecute(errorText);
                     }
                 });
@@ -319,7 +269,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         int result = -1;
         final Preference prefCloudAccountType = findPreference(PREF_KEY_CLOUD_ACCOUNT_TYPE);
         if (prefCloudAccountType != null) {
-            result = Integer.parseInt(prefCloudAccountType.getSharedPreferences().getString(prefCloudAccountType.getKey(), "-1"));
+            result = Integer.parseInt(
+                    Objects.requireNonNull(prefCloudAccountType.getSharedPreferences())
+                    .getString(prefCloudAccountType.getKey(), "-1"));
         }
         return result;
     }
@@ -328,7 +280,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
      * Cloud backup using service
      */
     private void setupPrefCloudBackupLoadService() {
-        PreferenceRepository.updatePreferenceKeySummary(this, PreferenceRepository.PREF_KEY_CLOUD_BACKUP, PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
+        PreferenceRepository.updatePreferenceKeySummary(
+                this,
+                PreferenceRepository.PREF_KEY_CLOUD_BACKUP,
+                PreferenceRepository.PREF_LOAD_CURRENT_VALUE);
 
         final Preference pref = findPreference(PreferenceRepository.PREF_KEY_CLOUD_BACKUP);
         if (pref != null) {
@@ -336,7 +291,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 //check if cloud account type is set up
                 final int cloudAccountType = getCloudAccountType();
                 if (cloudAccountType == -1) {
-                    PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_cloud_account_type_not_set_up));
+                    PreferenceRepository.displayMessage(
+                            SettingsFragment.this,
+                            getText(R.string.error_cloud_account_type_not_set_up));
                     return true;
                 }
 
@@ -344,17 +301,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 if (!checkInternetConnection())
                     return true;
 
-                if (mLoaderServiceManager == null)
-                    return true;
-                else {
-                    if (mLoaderServiceManager.isLoaderServiceRunning()) {
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    } else {
-                        executeCloudBackup(cloudAccountType);
-                    }
-
-                    return true;
+                if (LoaderWorker.isRunning(requireContext())) {
+                    PreferenceRepository.displayMessage(
+                            SettingsFragment.this,
+                            getText(R.string.error_load_process_running));
+                } else {
+                    executeCloudBackup(cloudAccountType);
                 }
+
+                return true;
             });
         }
     }
@@ -371,12 +326,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     @Override
                     public void onAccountSetupSuccess() {
                         mPreferenceRestoreCloudProcessor.preExecute();
-                        mLoaderServiceManager.startLoader(cloudAccountFacade.getRestoreLoaderClassName());
+                        LoaderWorker.scheduleWorker(requireContext(), cloudAccountFacade.getRestoreLoaderClassName());
                     }
 
                     @Override
                     public void onAccountSetupFailure(String errorText) {
-                        PreferenceRepository.displayMessage(getActivity(), errorText);
+                        PreferenceRepository.displayMessage(getActivity(), R.string.error_cloud_account, errorText);
                         mPreferenceRestoreCloudProcessor.postExecute(errorText);
                     }
                 });
@@ -407,66 +362,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 if (!checkInternetConnection())
                     return true;
 
-                if (mLoaderServiceManager == null)
-                    return true;
-                else {
-
-                    if (mLoaderServiceManager.isLoaderServiceRunning())
-                        PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
-                    else {
-                        Context context = getContext();
-                        if (context != null) {
-                            final AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                            alert
-                                    .setTitle(R.string.question_are_you_sure)
-                                    .setPositiveButton(R.string.caption_ok,
-                                            (dialog, which) -> executeCloudRestore(cloudAccountType))
-                                    .setNegativeButton(R.string.caption_cancel, null)
-                                    .show();
-                        }
+                if (LoaderWorker.isRunning(requireContext())) {
+                    PreferenceRepository.displayMessage(SettingsFragment.this, getText(R.string.error_load_process_running));
+                } else {
+                    Context context = getContext();
+                    if (context != null) {
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                        alert
+                                .setTitle(R.string.question_are_you_sure)
+                                .setPositiveButton(R.string.caption_ok,
+                                        (dialog, which) -> executeCloudRestore(cloudAccountType))
+                                .setNegativeButton(R.string.caption_cancel, null)
+                                .show();
                     }
                 }
-
                 return true;
             });
         }
-    }
-
-    private void doBindService(Context context) {
-        // Establish a connection with the service.  We use an explicit
-        // class name because we want a specific service implementation that
-        // we know will be running in our own process (and thus won't be
-        // supporting component replacement by other applications).
-        mIsBound = context.bindService(new Intent(context,
-                LoaderService.class), mConnection, 0);
-    }
-
-    private void doUnbindService() {
-        if (mIsBound) {
-            // Detach our existing connection.
-            Activity activity = getActivity();
-            if (activity != null) {
-                activity.unbindService(mConnection);
-            }
-            mIsBound = false;
-        }
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        LocalBroadcastManager.getInstance(context).registerReceiver(mLoaderServiceBroadcastReceiver, new IntentFilter(LoaderService.SERVICE_RESULT_INTENT_NAME));
-        mLoaderServiceManager = new LoaderServiceManager(context);
-        doBindService(context);
-    }
-
-    @Override
-    public void onDetach() {
-        Context context = getContext();
-        if (context != null) {
-            LocalBroadcastManager.getInstance(context).unregisterReceiver(mLoaderServiceBroadcastReceiver);
-        }
-        doUnbindService();
-        super.onDetach();
     }
 }

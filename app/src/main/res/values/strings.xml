@@ -85,6 +85,7 @@
     <string name="error_load_process_running">Load process is already running</string>
     <string name="error_backup">Error creating backup</string>
     <string name="error_restore">Error restoring backup</string>
+    <string name="error_cloud_account">Cloud account error: %s</string>
     <string name="error_cloud_account_type_not_set_up">Please, set up cloud account type</string>
     <string name="error_onedrive_login">Error logging in to OneDrive: %s</string>
     <string name="error_onedrive_logout">Error logging out from OneDrive: %s</string>

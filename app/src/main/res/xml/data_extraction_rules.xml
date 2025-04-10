@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+
+    <!-- Cloud Backup (Google Drive) -->
+    <cloud-backup include="false">
+        <include domain="database" />
+        <include domain="sharedpref" />
+    </cloud-backup>
+
+    <!-- Device-to-device transfer -->
+    <device-transfer include="false">
+        <include domain="database" />
+        <include domain="sharedpref" />
+    </device-transfer>
+
+</data-extraction-rules>

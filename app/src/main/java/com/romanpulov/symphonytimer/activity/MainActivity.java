@@ -20,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.romanpulov.symphonytimer.R;
+import com.romanpulov.symphonytimer.cloud.GDHelper;
 import com.romanpulov.symphonytimer.databinding.ActivityAppHostBinding;
 import com.romanpulov.symphonytimer.helper.AssetsHelper;
 import com.romanpulov.symphonytimer.helper.LoggerHelper;
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        GDHelper.getInstance().registerActivity(this);
     }
 
     @Override

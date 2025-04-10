@@ -1,7 +1,6 @@
 package com.romanpulov.symphonytimer.cloud;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -19,42 +18,32 @@ public class GDAccountFacade extends AbstractCloudAccountFacade {
 
         alert
                 .setTitle(R.string.title_confirmation)
-                .setPositiveButton(R.string.caption_login, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        GDHelper.getInstance().login(
-                                activity, new OnGDActionListener<Void>() {
-                                    @Override
-                                    public void onActionSuccess(Void unused) {
+                .setPositiveButton(R.string.caption_login, (dialog, which) -> GDHelper.getInstance().login(
+                        new OnGDActionListener<>() {
+                            @Override
+                            public void onActionSuccess(Void unused) {
+                                PreferenceRepository.displayMessage(activity, R.string.notification_gdrive_successfully_logged_in);
+                            }
 
-                                    }
+                            @Override
+                            public void onActionFailure(Exception e) {
+                                PreferenceRepository.displayMessage(activity, R.string.error_gdrive_login, e.getMessage());
+                            }
+                        }
+                ))
+                .setNegativeButton(R.string.caption_logout, (dialog, which) -> GDHelper.getInstance().logout(
+                        activity, new OnGDActionListener<>() {
+                            @Override
+                            public void onActionSuccess(Void unused) {
+                                PreferenceRepository.displayMessage(activity, R.string.notification_gdrive_successfully_logged_out);
+                            }
 
-                                    @Override
-                                    public void onActionFailure(Exception e) {
-
-                                    }
-                                }
-                        );
-                    }
-                })
-                .setNegativeButton(R.string.caption_logout, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        GDHelper.getInstance().logout(
-                                activity, new OnGDActionListener<Void>() {
-                                    @Override
-                                    public void onActionSuccess(Void unused) {
-                                        PreferenceRepository.displayMessage(activity, R.string.notification_gdrive_successfully_logged_out);
-                                    }
-
-                                    @Override
-                                    public void onActionFailure(Exception e) {
-                                        PreferenceRepository.displayMessage(activity, R.string.error_gdrive_logout, e.getMessage());
-                                    }
-                                }
-                        );
-                    }
-                })
+                            @Override
+                            public void onActionFailure(Exception e) {
+                                PreferenceRepository.displayMessage(activity, R.string.error_gdrive_logout, e.getMessage());
+                            }
+                        }
+                ))
                 .show();
     }
 
