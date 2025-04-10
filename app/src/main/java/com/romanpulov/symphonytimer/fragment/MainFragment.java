@@ -162,8 +162,13 @@ public class MainFragment extends Fragment {
                         null,
                         this::onTimerInteraction);
                 binding.mainListView.setAdapter(mAdapter);
+                // prevent flickering on timer update
+                if (model.getDMTaskMap().getValue() != null) {
+                    Objects.requireNonNull(binding.mainListView.getItemAnimator()).setChangeDuration(0L);
+                }
             } else {
                 if (!Objects.equals(binding.mainListView.getAdapter(), mAdapter)) {
+                    Log.d(TAG, "Updating to new adapter");
                     binding.mainListView.setAdapter(mAdapter);
                 }
                 mAdapter.updateValues(dmTimers, binding.mainListView);
