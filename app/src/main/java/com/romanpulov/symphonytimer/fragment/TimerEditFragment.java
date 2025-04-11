@@ -14,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.romanpulov.symphonytimer.model.DMTimerRec;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -145,6 +147,8 @@ public class TimerEditFragment extends Fragment {
         if (editItem == null) {
             updateSoundImageFromFile(null, null);
         } else {
+            Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar())
+                    .setTitle(R.string.title_activity_edit_item);
             binding.titleEditText.setText(editItem.getTitle());
 
             long hours =  editItem.getTimeSec() / 3600;
