@@ -62,29 +62,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
                     viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
                     viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
 
-                    int selectedItemPos = SymphonyArrayAdapter.this.mListViewSelector.getSelectedItemPos();
-                    DMTimerRec item = mValues.get(viewHolder.getBindingAdapterPosition());
-                    DMTaskItem taskItem = mTaskMap != null ? mTaskMap.get(item.getId()) : null;
-
-                    int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
-                    final long displayProgress = item.getTimeSec() - timerProgress;
-
-                    Drawable bgDrawable;
-                    if (selectedItemPos == -1) {
-                        bgDrawable = 0 == displayProgress ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
-                    } else if (viewHolder.getBindingAdapterPosition() == selectedItemPos) {
-                        bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
-                    } else {
-                        bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
-                    }
-                    v.setBackground(bgDrawable);
-
-                    /*
-                    viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-                    viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
-                    v.setBackground(viewHolder.mNormalDrawable);
-
-                     */
+                    v.setBackground(getBackgroungDrawable(viewHolder, viewHolder.getBindingAdapterPosition()));
                 }
             }
         } else {
@@ -92,6 +70,16 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
             v.removeOnLayoutChangeListener(SymphonyArrayAdapter.this.mOnLayoutChangeListener);
         }
     };
+
+    private Drawable getBackgroungDrawable(@NonNull SymphonyArrayAdapter.ViewHolder viewHolder, int position) {
+        if (viewHolder.mSelectedItemPos == -1) {
+            return  0 == viewHolder.mDisplayProgress ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
+        } else if (position == viewHolder.mSelectedItemPos) {
+            return mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
+        } else {
+            return mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
+        }
+    }
 
     @NonNull
     @Override
@@ -116,26 +104,28 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         //background drawer
         mIsBitmapBackground = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("pref_bitmap_background", false);
 
+        DMTimerRec item = mValues.get(position);
+
+        //calculate progress
+        DMTaskItem taskItem = mTaskMap != null ? mTaskMap.get(item.getId()) : null;
+        int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
+
+        //calculate date used for display
+        viewHolder.mDisplayProgress = item.getTimeSec() - timerProgress;
+        viewHolder.mSelectedItemPos = mListViewSelector.getSelectedItemPos();
+
+        //create and store backgrounds for better performance
+        if (mIsBitmapBackground && (null != mBackgroundBuilder)) {
+            viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
+            viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
+        }
+
         if ((mItemHeight == 0) || (mItemWidth == 0)) {
             Log.d(TAG, "Adding LayoutChangeListener for position " + position);
             viewHolder.itemView.addOnLayoutChangeListener(mOnLayoutChangeListener);
             viewHolder.itemView.setTag(viewHolder);
         } else {
             Log.d(TAG, "Position " + position + ": height and width known");
-        }
-
-        DMTimerRec item = mValues.get(position);
-
-        //calculate progress
-        DMTaskItem taskItem = mTaskMap != null ? mTaskMap.get(item.getId()) : null;
-
-        int timerProgress = taskItem == null ? 0 : (int)taskItem.getProgressInSec();
-        final long displayProgress = item.getTimeSec() - timerProgress;
-
-        //create and store backgrounds for better performance
-        if (mIsBitmapBackground && (null != mBackgroundBuilder)) {
-            viewHolder.mNormalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL);
-            viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
         }
 
         viewHolder.mTitleTextView.setText(item.getTitle());
@@ -145,16 +135,17 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
                 null != item.getImageName() ? UriHelper.fileNameToUri(mContext, item.getImageName()) : null);
 
         //display text
-        viewHolder.mProgressTextView.setText(String.format(Locale.getDefault(), "%02d:%02d:%02d", displayProgress / 3600, displayProgress % 3600 / 60, displayProgress % 60));
+        viewHolder.mProgressTextView.setText(String.format(Locale.getDefault(),
+                "%02d:%02d:%02d",
+                viewHolder.mDisplayProgress / 3600,
+                viewHolder.mDisplayProgress % 3600 / 60,
+                viewHolder.mDisplayProgress % 60));
 
         //display circle bar
         viewHolder.mProgressCircle.setMax((int) item.getTimeSec());
         viewHolder.mProgressCircle.setProgress(timerProgress);
         //ensure minimum progress for active item
         viewHolder.mProgressCircle.setAlwaysVisible(((taskItem != null) && (timerProgress == 0)));
-
-        //background change depending on selection
-        int selectedItemPos = mListViewSelector.getSelectedItemPos();
 
         if (mIsBitmapBackground ) {
             if ((viewHolder.mNormalDrawable == null) || (viewHolder.mFinalDrawable == null)) {
@@ -163,23 +154,14 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
                     viewHolder.mFinalDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_FINAL);
                 }
             }
-            //update bitmap background
-            Drawable bgDrawable;
-            if (selectedItemPos == -1) {
-                bgDrawable = 0 == displayProgress ? viewHolder.mFinalDrawable : viewHolder.mNormalDrawable;
-            } else if (position == selectedItemPos) {
-                bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_PRESSED_ONLY);
-            } else {
-                bgDrawable = mBackgroundBuilder.buildDrawable(RoundedBitmapBackgroundBuilder.BG_NORMAL_ONLY);
-            }
 
-            viewHolder.itemView.setBackground(bgDrawable);
+            viewHolder.itemView.setBackground(getBackgroungDrawable(viewHolder, position));
         } else {
             //update solid background
             int bgResId;
-            if (selectedItemPos == -1)
-                bgResId =  0 == displayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector;
-            else if (position == selectedItemPos) {
+            if (viewHolder.mSelectedItemPos == -1)
+                bgResId =  0 == viewHolder.mDisplayProgress ? R.drawable.main_list_bg_final_selector : R.drawable.main_list_bg_selector;
+            else if (position == viewHolder.mSelectedItemPos) {
                 bgResId = R.drawable.main_list_shape_selected;
             } else
                 bgResId = R.drawable.main_list_shape;
@@ -201,6 +183,9 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
 
         Drawable mNormalDrawable;
         Drawable mFinalDrawable;
+
+        long mDisplayProgress;
+        int mSelectedItemPos;
 
         public ViewHolder(View view, SymphonyRowViewBinding binding) {
             super(view);
