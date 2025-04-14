@@ -20,6 +20,7 @@ import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFIC
 
 public class TaskUpdateService extends Service {
     private static final String TAG = TaskUpdateService.class.getSimpleName();
+    private static final long WAKE_ADVANCE_MILLIS = 1000;
 
     private void log(String message) {
         LoggerHelper.logContext(this, "TaskUpdateService", message);
@@ -65,7 +66,7 @@ public class TaskUpdateService extends Service {
 
                 ActivityWakeHelper.wakeAndStartActivity(this, MainActivity.class);
 
-                DMTaskItem firstTaskCompleted = model.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
+                DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
                 if (firstTaskCompleted != null) {
                     mTimerSignalHelper.setSoundFileName(firstTaskCompleted.getSoundFileName());
                     mTimerSignalHelper.start();
@@ -83,7 +84,7 @@ public class TaskUpdateService extends Service {
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_UPDATE_COMPLETED) {
                 Log.d(TAG, "task status changed to UPDATE_COMPLETED");
 
-                DMTaskItem firstTaskCompleted = model.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
+                DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
                 if (firstTaskCompleted != null) {
                     mTimerSignalHelper.setMultiple();
                     mTimerSignalHelper.changeSoundFileName(firstTaskCompleted.getSoundFileName());
@@ -114,8 +115,10 @@ public class TaskUpdateService extends Service {
         log("firstTriggerAtTime = " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
 
         if (triggerTime < Long.MAX_VALUE) {
-            log("setting new alarm to " + triggerTime + " " + DateFormatterHelper.formatLog(triggerTime));
-            mAlarm.setExactTimer(this, triggerTime);
+            // wake a bit earlier
+            long wakeTime = triggerTime - WAKE_ADVANCE_MILLIS;
+            log("setting new alarm to " + wakeTime + " " + DateFormatterHelper.formatLog(wakeTime));
+            mAlarm.setExactTimer(this, wakeTime);
 
             WakeConfigHelper wakeConfigHelper = new WakeConfigHelper(getApplicationContext());
             if (wakeConfigHelper.isValidConfig()) {
@@ -137,7 +140,7 @@ public class TaskUpdateService extends Service {
     private final Runnable updateTask = () -> {
         Log.d(TAG, "updateTask");
 
-        DMTaskItem firstTaskCompleted = model.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
+        DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
         if ((firstTaskCompleted != null) &&
                 (model.getDMTaskMap().getValue() != null) &&
                 (model.getDMTaskMap().getValue().size() == 1) &&

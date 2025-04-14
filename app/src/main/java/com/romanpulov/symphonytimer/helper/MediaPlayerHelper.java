@@ -1,6 +1,7 @@
 package com.romanpulov.symphonytimer.helper;
 
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -39,13 +40,13 @@ public class MediaPlayerHelper {
     }
 	
 	public void stop() {
-        log("stop");
+		log("stop");
 		if (null != mMediaPlayer) {
 			if (mMediaPlayer.isPlaying()) {
 				mMediaPlayer.stop();				
 			}
 			mMediaPlayer.reset();
-            mMediaPlayer.release();
+			mMediaPlayer.release();
 			mMediaPlayer = null;
 
 			if (mOriginalVolume != -1) {
@@ -65,11 +66,12 @@ public class MediaPlayerHelper {
 	private void startSoundFile(String soundFileName) {
 		int soundVolume = PreferenceManager.getDefaultSharedPreferences(mContext).getInt("pref_sound_volume", 100);
 
-        if (soundVolume == 0)
-            return;
+		if (soundVolume == 0) {
+			return;
+		}
 
 		stop();
-        log("startSoundFile");
+		log("startSoundFile");
 		if (null == soundFileName) {
 			mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
 		} else {
@@ -78,7 +80,11 @@ public class MediaPlayerHelper {
                 mMediaPlayer = MediaPlayer.create(mContext, R.raw.default_sound);
             else {
                 mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+				AudioAttributes audioAttributes = new AudioAttributes.Builder()
+						.setUsage(AudioAttributes.USAGE_MEDIA)
+						.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+						.build();
+                mMediaPlayer.setAudioAttributes(audioAttributes);
                 try {
                     mMediaPlayer.setDataSource(mContext, uri);
                     mMediaPlayer.prepare();

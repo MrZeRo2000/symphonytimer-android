@@ -44,7 +44,6 @@
         <activity
                 android:name=".activity.MainActivity"
                 android:exported="true"
-                android:label="@string/app_name"
                 android:launchMode="singleTask"
                 android:theme="@style/ToolBarTheme.CompatTransparent">
             <intent-filter>
