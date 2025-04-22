@@ -18,6 +18,7 @@ import com.romanpulov.symphonytimer.adapter.ListViewSelector;
 import com.romanpulov.symphonytimer.adapter.SymphonyArrayAdapter;
 import com.romanpulov.symphonytimer.databinding.FragmentMainBinding;
 import com.romanpulov.symphonytimer.helper.MediaStorageHelper;
+import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.DMTimerRec;
@@ -152,7 +153,7 @@ public class MainFragment extends Fragment {
         binding.mainListView.addItemDecoration(new SpaceItemDecoration((int)requireContext().getResources().getDimension(R.dimen.list_divider_height)));
 
         model = TimerViewModel.getInstance(requireActivity().getApplication());
-        model.getDMTimers().observe(this, dmTimers -> {
+        model.getDMTimers().observe(getViewLifecycleOwner(), dmTimers -> {
             if (mAdapter == null) {
                 Log.d(TAG, "Creating a new adapter");
                 mAdapter = new SymphonyArrayAdapter(
@@ -176,7 +177,7 @@ public class MainFragment extends Fragment {
 
             mListViewSelector = mAdapter.getListViewSelector();
         });
-        model.getDMTaskMap().observe(this, dmTasks -> {
+        model.getDMTaskMap().observe(getViewLifecycleOwner(), dmTasks -> {
             Log.d(TAG, "tasks updated");
             if (mAdapter != null) {
                 if (dmTasks != null) {
@@ -185,7 +186,7 @@ public class MainFragment extends Fragment {
                 mAdapter.updateTasks(dmTasks, binding.mainListView);
             }
         });
-        model.getTaskStatusChange().observe(this, taskStatus -> {
+        model.getTaskStatusChange().observe(getViewLifecycleOwner(), taskStatus -> {
            if ((taskStatus.first == TimerViewModel.TASKS_STATUS_IDLE) &&
                    (taskStatus.second != TimerViewModel.TASKS_STATUS_IDLE)) {
                Log.d(TAG, "Task status changed from idle, need to start the service");
@@ -258,6 +259,7 @@ public class MainFragment extends Fragment {
     }
 
     private void onTimerInteraction(DMTimerRec item, int position) {
+        VibratorHelper.shortVibrate(binding.mainListView);
         Map<Long, DMTaskItem> taskValue = model.getDMTaskMap().getValue();
         DMTaskItem task = taskValue == null ? null : taskValue.get(item.getId());
         if (task == null) {

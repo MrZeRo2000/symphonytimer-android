@@ -6,12 +6,14 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
+import android.view.View;
 import androidx.preference.PreferenceManager;
 
 public class VibratorHelper {
 	private static final String TAG = VibratorHelper.class.getSimpleName();
 
-	// private final static long VIBRATE_SHORT_TIME = 100;
+	private final static long VIBRATE_SHORT_TIME = 100;
 	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
 	
 	private static boolean allowedVibrate(Context context) {
@@ -41,17 +43,19 @@ public class VibratorHelper {
             Log.d(TAG, "vibrate not allowed");
 	}
 
-	/*
-	public static void shortVibrate(Context context) {
-		if (allowedVibrate(context)) {
-            log("shortVibrate");
-            getVibrator(context).vibrate(VIBRATE_SHORT_TIME);
+	@SuppressWarnings("deprecation")
+	public static void shortVibrate(View view) {
+		if (allowedVibrate(view.getContext())) {
+			Log.d(TAG, "shortVibrate");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				view.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            } else {
+				getVibrator(view.getContext()).vibrate(VIBRATE_SHORT_TIME);
+			}
 		} else
-            log("vibrate not allowed");
+			Log.d(TAG, "vibrate not allowed");
     }
 
-	 */
-	
 	public static void cancel(Context context) {
 		Log.d(TAG, "cancel");
 		getVibrator(context).cancel();

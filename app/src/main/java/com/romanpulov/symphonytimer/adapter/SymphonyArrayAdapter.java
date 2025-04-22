@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.databinding.SymphonyRowViewBinding;
+import com.romanpulov.symphonytimer.helper.VibratorHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 import com.romanpulov.symphonytimer.utils.RoundedBitmapBackgroundBuilder;
@@ -221,6 +222,7 @@ public class SymphonyArrayAdapter extends RecyclerView.Adapter<SymphonyArrayAdap
         @Override
         public void onClick(View v) {
             if (validateClickDelay()) {
+                VibratorHelper.shortVibrate(v);
                 if (mListViewSelector.getSelectedItemPos() == -1) {
                     if (mTimerInteractionListener != null) {
                         mTimerInteractionListener.accept(mValues.get(getBindingAdapterPosition()), getBindingAdapterPosition());
