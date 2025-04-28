@@ -16,7 +16,9 @@ public class VibratorHelper {
 	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
 
 	private static int getVibrationAmplitude(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getInt("pref_vibration_amplitude", -1);
+		return Integer.parseInt(PreferenceManager
+				.getDefaultSharedPreferences(context)
+				.getString("pref_vibration_amplitude", "-1"));
 	}
 	
 	private static boolean allowedVibrate(Context context) {
