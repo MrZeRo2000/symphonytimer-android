@@ -6,9 +6,10 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
 import android.util.Log;
-import android.view.HapticFeedbackConstants;
 import android.view.View;
 import androidx.preference.PreferenceManager;
+
+import static android.os.VibrationEffect.EFFECT_CLICK;
 
 public class VibratorHelper {
 	private static final String TAG = VibratorHelper.class.getSimpleName();
@@ -48,8 +49,10 @@ public class VibratorHelper {
 		if (allowedVibrate(view.getContext())) {
 			Log.d(TAG, "shortVibrate");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				view.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
-            } else {
+				//view.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+				VibrationEffect vibrationEffect = VibrationEffect.createPredefined(EFFECT_CLICK);
+				getVibrator(view.getContext()).vibrate(vibrationEffect);
+			} else {
 				getVibrator(view.getContext()).vibrate(VIBRATE_SHORT_TIME);
 			}
 		} else
