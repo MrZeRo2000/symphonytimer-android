@@ -4,14 +4,17 @@
 	<PreferenceCategory
 	    android:title="@string/pref_cat_settings"
 		app:iconSpaceReserved="false"
-	    >    
-		<SwitchPreference
-		    android:key="pref_vibrate"
-		    android:title="@string/pref_vibrate"
-            android:summary="@string/pref_summary_vibrate"
-		    android:defaultValue="true"
-			app:iconSpaceReserved="false"
-		    />
+	    >
+		<ListPreference
+				android:key="pref_vibration_amplitude"
+				android:title="@string/pref_vibration_amplitude"
+				android:dialogTitle="@string/pref_vibration_amplitude"
+				android:summary="@string/pref_vibration_amplitude_summary"
+				android:entries="@array/vibration_amplitude_entries"
+				android:entryValues="@array/vibration_amplitude_entry_values"
+				android:defaultValue="@string/pref_vibration_amplitude_default"
+				app:iconSpaceReserved="false"
+		/>
 		<SeekBarPreference
 			android:key="pref_sound_volume"
 			android:title="@string/pref_sound_volume"

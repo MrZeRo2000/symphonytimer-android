@@ -9,16 +9,18 @@ import android.util.Log;
 import android.view.View;
 import androidx.preference.PreferenceManager;
 
-import static android.os.VibrationEffect.EFFECT_CLICK;
-
 public class VibratorHelper {
 	private static final String TAG = VibratorHelper.class.getSimpleName();
 
 	private final static long VIBRATE_SHORT_TIME = 100;
 	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
+
+	private static int getVibrationAmplitude(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context).getInt("pref_vibration_amplitude", -1);
+	}
 	
 	private static boolean allowedVibrate(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_vibrate", false);
+		return getVibrationAmplitude(context) != 0;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -35,7 +37,14 @@ public class VibratorHelper {
 		if (allowedVibrate(context)) {
             Log.d(TAG, "vibrate");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                VibrationEffect vibrationEffect = VibrationEffect.createWaveform(VIBRATE_PATTERN, 0);
+				// set up amplitudes
+				int amplitude = getVibrationAmplitude(context);
+				int[] amplitudes = new int[VIBRATE_PATTERN.length];
+				for (int i = 0; i < VIBRATE_PATTERN.length; i++) {
+					amplitudes[i] = amplitude;
+				}
+
+                VibrationEffect vibrationEffect = VibrationEffect.createWaveform(VIBRATE_PATTERN, amplitudes,0);
 				getVibrator(context).vibrate(vibrationEffect);
             } else {
 				getVibrator(context).vibrate(VIBRATE_PATTERN, 0);
@@ -49,8 +58,8 @@ public class VibratorHelper {
 		if (allowedVibrate(view.getContext())) {
 			Log.d(TAG, "shortVibrate");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-				//view.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
-				VibrationEffect vibrationEffect = VibrationEffect.createPredefined(EFFECT_CLICK);
+				VibrationEffect vibrationEffect = VibrationEffect.createOneShot(VIBRATE_SHORT_TIME,
+						getVibrationAmplitude(view.getContext()));
 				getVibrator(view.getContext()).vibrate(vibrationEffect);
 			} else {
 				getVibrator(view.getContext()).vibrate(VIBRATE_SHORT_TIME);

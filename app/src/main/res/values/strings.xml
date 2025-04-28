@@ -55,6 +55,10 @@
     </string>
     <string name="pref_wake_before_default">0</string>
 
+    <string name="pref_vibration_amplitude">Vibration amplitude</string>
+    <string name="pref_vibration_amplitude_summary">Amplitude of vibration on timer click and completion</string>
+    <string name="pref_vibration_amplitude_default">-1</string>
+
     <string name="pref_reset_data">Reset data</string>
     <string name="pref_summary_reset_data">Removes all data, use with great care</string>
     <string name="pref_cat_interface">Interface</string>
