@@ -13,7 +13,17 @@ public class VibratorHelper {
 	private static final String TAG = VibratorHelper.class.getSimpleName();
 
 	private final static long VIBRATE_SHORT_TIME = 100;
-	private final static long[] VIBRATE_PATTERN = {0, 500, 500, 500, 500, 300, 300, 300, 300};
+	private final static long VIBRATE_PAUSE_DURATION = 200;
+	private final static long[] VIBRATE_PATTERN = {
+			0,
+			500, VIBRATE_PAUSE_DURATION,
+			500, VIBRATE_PAUSE_DURATION,
+			500, VIBRATE_PAUSE_DURATION,
+			500, VIBRATE_PAUSE_DURATION,
+			300, VIBRATE_PAUSE_DURATION,
+			300, VIBRATE_PAUSE_DURATION,
+			300, VIBRATE_PAUSE_DURATION,
+			300};
 
 	private static int getVibrationAmplitude(Context context) {
 		return Integer.parseInt(PreferenceManager
@@ -43,7 +53,7 @@ public class VibratorHelper {
 				int amplitude = getVibrationAmplitude(context);
 				int[] amplitudes = new int[VIBRATE_PATTERN.length];
 				for (int i = 0; i < VIBRATE_PATTERN.length; i++) {
-					amplitudes[i] = amplitude;
+					amplitudes[i] = VIBRATE_PATTERN[i] > VIBRATE_PAUSE_DURATION ? amplitude : 0;
 				}
 
                 VibrationEffect vibrationEffect = VibrationEffect.createWaveform(VIBRATE_PATTERN, amplitudes,0);
