@@ -66,7 +66,9 @@ public final class TimerSignalHelper {
         mStartTime = System.currentTimeMillis();
 
         mMediaPlayerHelper.start();
+        log("Media player started");
         VibratorHelper.vibrate(mContext);
+        log("Vibration started");
     }
 
     public void stop() {

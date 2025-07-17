@@ -4,7 +4,6 @@ import android.content.Context;
 import androidx.preference.PreferenceManager;
 
 import android.os.Build;
-import android.os.Environment;
 import android.util.Log;
 
 import com.romanpulov.library.common.logger.AbstractLogger;
@@ -43,8 +42,9 @@ public class LoggerHelper {
     private String mLogFolderName;
 
     public void log(String tag, String message) {
-        if (mEnableLogging)
+        if (mEnableLogging) {
             internalLog(tag, message);
+        }
     }
 
     private void internalLog(String tag, String message) {
@@ -60,8 +60,6 @@ public class LoggerHelper {
         if (mLogger != null) {
             mLogger.log(tag, message, 0);
         }
-
-        Log.d(tag, message);
     }
 
     public void unconditionalLog(String tag, String message) {
@@ -69,8 +67,10 @@ public class LoggerHelper {
     }
 
     public static void logContext(Context context, String tag, String message) {
-        if (context != null)
+        if (context != null) {
             getInstance(context).log(tag, message);
+            Log.d(tag, message);
+        }
     }
 
     public static void unconditionalLogContext(Context context, String tag, String message) {

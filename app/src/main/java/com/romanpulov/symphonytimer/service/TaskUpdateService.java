@@ -66,8 +66,10 @@ public class TaskUpdateService extends Service {
 
                 ActivityWakeHelper.wakeAndStartActivity(this, MainActivity.class);
 
+                Log.d(TAG, "Looking for first completed task");
                 DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
                 if (firstTaskCompleted != null) {
+                    Log.d(TAG, "First task completed:" + firstTaskCompleted);
                     mTimerSignalHelper.setSoundFileName(firstTaskCompleted.getSoundFileName());
                     mTimerSignalHelper.start();
 
