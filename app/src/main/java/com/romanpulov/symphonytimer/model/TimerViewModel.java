@@ -301,6 +301,11 @@ public class TimerViewModel extends AndroidViewModel {
         }
     }
 
+    public long getTimeToFirstTrigger() {
+        long result = getFirstTriggerAtTime() - System.currentTimeMillis();
+        return result < 0 ? 0 : result;
+    }
+
     public int getCurrentTasksStatus() {
         return Optional.ofNullable(mTaskStatusChange.getValue())
                 .orElse(Pair.create(TASKS_STATUS_IDLE, TASKS_STATUS_IDLE))

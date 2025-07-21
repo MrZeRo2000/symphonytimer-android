@@ -14,13 +14,16 @@ import com.romanpulov.symphonytimer.helper.db.DBHelper;
 import com.romanpulov.symphonytimer.model.DMTaskItem;
 import com.romanpulov.symphonytimer.model.TimerViewModel;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_ONGOING;
 
 public class TaskUpdateService extends Service {
     private static final String TAG = TaskUpdateService.class.getSimpleName();
-    private static final long WAKE_ADVANCE_MILLIS = 1000;
+    private static final long WAKE_ADVANCE_MILLIS = 0;
+    private static final long UPDATE_PERIOD_MILLIS = 1000;
 
     private void log(String message) {
         LoggerHelper.logContext(this, "TaskUpdateService", message);
@@ -29,6 +32,7 @@ public class TaskUpdateService extends Service {
     private TimerViewModel model;
     private Observer<Pair<Integer, Integer>> mTaskStatusObserver;
     private final ScheduledThreadPoolExecutor mScheduleExecutor = new ScheduledThreadPoolExecutor(1);
+    private final ExecutorService mSingleThreadExecutor = Executors.newSingleThreadExecutor();
     private final AlarmManagerHelper mAlarm = new AlarmManagerHelper();
     private TimerSignalHelper mTimerSignalHelper;
     private int mAutoTimerDisableInterval = 0;
@@ -70,8 +74,11 @@ public class TaskUpdateService extends Service {
                 DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
                 if (firstTaskCompleted != null) {
                     Log.d(TAG, "First task completed:" + firstTaskCompleted);
-                    mTimerSignalHelper.setSoundFileName(firstTaskCompleted.getSoundFileName());
-                    mTimerSignalHelper.start();
+                    mSingleThreadExecutor.execute(() -> {
+                        mTimerSignalHelper.setSoundFileName(firstTaskCompleted.getSoundFileName());
+                        mTimerSignalHelper.start();
+
+                    });
 
                     log("Due time: " +
                             DateFormatterHelper.formatLog(firstTaskCompleted.getTriggerAtTime()) +
@@ -140,7 +147,7 @@ public class TaskUpdateService extends Service {
     }
 
     private final Runnable updateTask = () -> {
-        Log.d(TAG, "updateTask");
+        Log.d(TAG, "updateTask started");
 
         DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
         if ((firstTaskCompleted != null) &&
@@ -159,7 +166,18 @@ public class TaskUpdateService extends Service {
             }
         } else {
             model.updateTasks();
+            long timeToFirstTrigger = model.getTimeToFirstTrigger();
+            if (timeToFirstTrigger < UPDATE_PERIOD_MILLIS) {
+                Log.d(TAG, "scheduling another update in " + timeToFirstTrigger + " milliseconds");
+                try {
+                    Thread.sleep(timeToFirstTrigger);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "Interrupted while waiting for tasks to complete", e);
+                }
+                model.updateTasks();
+            }
         }
+        Log.d(TAG, "updateTask completed");
     };
 
     @Override
@@ -171,7 +189,7 @@ public class TaskUpdateService extends Service {
                     ProgressNotificationHelper.getInstance(this).getNotification(
                             model.getTaskTitles(),
                             model.getExecutionPercent()));
-            mScheduleExecutor.scheduleWithFixedDelay(updateTask, 0, 1, TimeUnit.SECONDS);
+            mScheduleExecutor.scheduleWithFixedDelay(updateTask, 0, UPDATE_PERIOD_MILLIS, TimeUnit.MILLISECONDS);
         }
 
         String prefAutoTimerDisable = PreferenceManager.getDefaultSharedPreferences(this).getString("pref_auto_timer_disable", getString(R.string.pref_wake_before_default));
@@ -208,6 +226,16 @@ public class TaskUpdateService extends Service {
         } catch (InterruptedException e) {
             Log.e(TAG, "executor awaitTermination error", e);
         }
+
+        mSingleThreadExecutor.shutdown();
+        try {
+            if (!mSingleThreadExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                Log.d(TAG, "task did not terminate in 60 seconds");
+            }
+        } catch (InterruptedException e) {
+            Log.e(TAG, "executor awaitTermination error", e);
+        }
+
 
         Log.d(TAG, "stop foreground");
         stopForeground(STOP_FOREGROUND_REMOVE);

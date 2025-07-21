@@ -56,8 +56,9 @@ public class HistoryArrayAdapter extends RecyclerView.Adapter<HistoryArrayAdapte
 		else {
 			viewHolder.mTimeDetails.setVisibility(View.VISIBLE);
 			String detailsText = mContext.getString(R.string.caption_due_real_time,
-					DateFormatterHelper.formatTime(rec.endTime), DateFormatterHelper.formatTime(rec.realTime));
-			//viewHolder.mTimeDetails.setText("Due time : " + DateFormatterHelper.formatTime(rec.mEndTime) + ", real time : " + DateFormatterHelper.formatTime(rec.mRealTime));
+					DateFormatterHelper.formatTime(rec.endTime),
+					DateFormatterHelper.formatTime(rec.realTime),
+					rec.realTime - rec.endTime);
 			viewHolder.mTimeDetails.setText(detailsText);
 		}
 	}

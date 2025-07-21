@@ -28,7 +28,7 @@
     <string name="caption_logout">Logout</string>
     <string name="caption_loading">Loading &#8230;</string>
     <string name="caption_saving">Saving &#8230;</string>
-    <string name="caption_due_real_time">Due time : %1$s, real time : %2$s</string>
+    <string name="caption_due_real_time">Due time : %1$s, real time : %2$s\nDifference: %3$d ms</string>
     <string name="action_add">Add</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>

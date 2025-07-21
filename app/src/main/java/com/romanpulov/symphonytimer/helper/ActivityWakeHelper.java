@@ -75,7 +75,7 @@ public class ActivityWakeHelper {
         try {
             logContext(context, "Waking activity");
             Intent activityIntent = new Intent(context.getApplicationContext(), activityClass);
-            activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
             context.getApplicationContext().startActivity(activityIntent);
         } finally {
             wakeLock.release();
