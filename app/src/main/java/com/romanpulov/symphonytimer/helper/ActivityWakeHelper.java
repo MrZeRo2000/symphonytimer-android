@@ -61,6 +61,11 @@ public class ActivityWakeHelper {
         wakeLock.acquire(wakeDuration);
     }
 
+    public static void startActivity(Context context, Class<?> activityClass) {
+        Intent activityIntent = new Intent(context, activityClass);
+        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        context.getApplicationContext().startActivity(activityIntent);
+    }
 
     /**
      * Wakes the device and starts activity
@@ -74,9 +79,7 @@ public class ActivityWakeHelper {
         wakeLock.acquire();
         try {
             logContext(context, "Waking activity");
-            Intent activityIntent = new Intent(context.getApplicationContext(), activityClass);
-            activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            context.getApplicationContext().startActivity(activityIntent);
+            startActivity(context, activityClass);
         } finally {
             wakeLock.release();
         }

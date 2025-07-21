@@ -2,6 +2,7 @@ package com.romanpulov.symphonytimer.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.util.Pair;
@@ -68,7 +69,11 @@ public class TaskUpdateService extends Service {
             } else if (taskStatus.second == TimerViewModel.TASKS_STATUS_COMPLETED) {
                 Log.d(TAG, "task status changed to COMPLETED, need to do something ...");
 
-                ActivityWakeHelper.wakeAndStartActivity(this, MainActivity.class);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    ActivityWakeHelper.startActivity(this, MainActivity.class);
+                } else {
+                    ActivityWakeHelper.wakeAndStartActivity(this, MainActivity.class);
+                }
 
                 Log.d(TAG, "Looking for first completed task");
                 DMTaskItem firstTaskCompleted = TimerViewModel.getFirstTaskItemCompleted(model.getDMTaskMap().getValue());
