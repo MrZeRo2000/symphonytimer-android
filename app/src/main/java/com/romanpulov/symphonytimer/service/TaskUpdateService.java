@@ -27,7 +27,7 @@ public class TaskUpdateService extends Service {
     private static final long UPDATE_PERIOD_MILLIS = 1000;
 
     private void log(String message) {
-        LoggerHelper.logContext(this, "TaskUpdateService", message);
+        LoggerHelper.logContext(this, TAG, message);
     }
 
     private TimerViewModel model;
@@ -172,8 +172,10 @@ public class TaskUpdateService extends Service {
         } else {
             model.updateTasks();
             long timeToFirstTrigger = model.getTimeToFirstTrigger();
-            if (timeToFirstTrigger < UPDATE_PERIOD_MILLIS) {
-                Log.d(TAG, "scheduling another update in " + timeToFirstTrigger + " milliseconds");
+            if (timeToFirstTrigger < UPDATE_PERIOD_MILLIS * 1.5) {
+                log("Time left to trigger: " +
+                        timeToFirstTrigger +
+                        " milliseconds, scheduling another update");
                 try {
                     Thread.sleep(timeToFirstTrigger);
                 } catch (InterruptedException e) {
