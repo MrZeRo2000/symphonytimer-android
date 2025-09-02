@@ -7,12 +7,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.romanpulov.symphonytimer.R;
 import com.romanpulov.symphonytimer.activity.MainActivity;
-
-import java.lang.ref.WeakReference;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFICATION_ID_ONGOING;
@@ -22,28 +22,20 @@ import static com.romanpulov.symphonytimer.common.NotificationRepository.NOTIFIC
  */
 
 public class ProgressNotificationHelper {
-    private void log(String message) {
-        LoggerHelper.logContext(mContext.get(), "ProgressNotificationHelper", message);
-    }
+    private final static String TAG = ProgressNotificationHelper.class.getSimpleName();
 
     private static final String CHANNEL_PROGRESS_ID = "PROGRESS_CHANNEL";
     private static final String CHANNEL_PROGRESS_NAME = "Progress channel";
     private static final String CHANNEL_PROGRESS_DESCRIPTION = "Channel for progress notification";
 
-    private static ProgressNotificationHelper mProgressNotificationHelper;
+    private static boolean mNotificationChannelNeeded = true;
 
-    public static ProgressNotificationHelper getInstance(Context context) {
-        if (mProgressNotificationHelper == null) {
-            mProgressNotificationHelper = new ProgressNotificationHelper(context);
-            createNotificationChannel(context);
+    private static void checkNotificationChannel(Context context) {
+        if (mNotificationChannelNeeded) {
+            createNotificationChannel(context.getApplicationContext());
+            mNotificationChannelNeeded = false;
         }
-        return mProgressNotificationHelper;
     }
-
-    private final WeakReference<Context> mContext;
-    private final NotificationManager mNotificationManager;
-    private final PendingIntent mContentIntent;
-    private NotificationInfo mNotificationInfo;
 
     private static void createNotificationChannel(Context context) {
         // Create the NotificationChannel, but only on API 26+ because
@@ -65,7 +57,7 @@ public class ProgressNotificationHelper {
 
     private static class NotificationInfo {
         private String mContent;
-        private int mProgress;
+        private long mProgress;
         private boolean mModified = true;
 
         public boolean isModified() {
@@ -84,50 +76,45 @@ public class ProgressNotificationHelper {
         }
     }
 
-    private ProgressNotificationHelper(Context context) {
-        mContext = new WeakReference<>(context);
-        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+    private static NotificationInfo mLastNotificationInfo;
+
+    public static Notification buildNotification(@NonNull Context context, String titles, int executionProgress) {
+        Log.d(TAG, "Notification execution progress: " + executionProgress);
+        checkNotificationChannel(context);
+
         Intent notificationIntent = new Intent(context, MainActivity.class);
-        mContentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context, CHANNEL_PROGRESS_ID)
+                        .setSmallIcon(R.drawable.wait_notification_white)
+                        .setAutoCancel(false)
+                        .setOngoing(true)
+                        .setContentTitle(context.getString(R.string.app_name))
+                        .setContentText(titles + (executionProgress > 0 ? ": " + DateFormatterHelper.formatTimeSeconds(executionProgress) : ""))
+                        .setContentIntent(pendingIntent)
+                        .setOnlyAlertOnce(true)
+                ;
+        return builder.build();
     }
 
-    public Notification getNotification(String titles, int executionPercent) {
-        if (mContext.get() != null) {
-            NotificationCompat.Builder builder =
-                    new NotificationCompat.Builder(mContext.get(), CHANNEL_PROGRESS_ID)
-                            .setSmallIcon(R.drawable.wait_notification_white)
-                            .setAutoCancel(false)
-                            .setOngoing(true)
-                            .setContentTitle(mContext.get().getString(R.string.app_name))
-                            .setContentText(titles)
-                            .setProgress(100, executionPercent, false)
-                            .setContentIntent(mContentIntent)
-                            .setOnlyAlertOnce(true)
-                    ;
-            return builder.build();
-        } else {
-            log("No context");
-            return null;
-        }
-    }
-
-    public void notify(String titles, int executionPercent) {
+    public static void notify(Context context, String titles, int executionProgress) {
         // get modification info
-        if (mNotificationInfo == null)
-            mNotificationInfo = new NotificationInfo(titles, executionPercent);
+        if (mLastNotificationInfo == null)
+            mLastNotificationInfo = new NotificationInfo(titles, executionProgress);
         else
-            mNotificationInfo.updateNotificationInfo(titles, executionPercent);
+            mLastNotificationInfo.updateNotificationInfo(titles, executionProgress);
 
-        if (mNotificationInfo.isModified()) {
-            Notification notification = getNotification(titles, executionPercent);
-            if (notification != null)
-                mNotificationManager.notify(NOTIFICATION_ID_ONGOING, notification);
-        } else {
-            log("No change, skipping notification");
+        if (mLastNotificationInfo.isModified()) {
+            Notification notification = buildNotification(context, titles, executionProgress);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.notify(NOTIFICATION_ID_ONGOING, notification);
+            }
         }
     }
 
-    public void cancel() {
-        mNotificationManager.cancel(NOTIFICATION_ID_ONGOING);
+    public static void cancel() {
+        mLastNotificationInfo = null;
     }
 }

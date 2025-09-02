@@ -184,6 +184,12 @@ public class TaskUpdateService extends Service {
                 model.updateTasks();
             }
         }
+
+        ProgressNotificationHelper.notify(
+                getApplicationContext(),
+                model.getTaskTitles(),
+                firstTaskCompleted == null ? model.getTimeToFirstTriggerInSeconds() : 0);
+
         Log.d(TAG, "updateTask completed");
     };
 
@@ -193,9 +199,10 @@ public class TaskUpdateService extends Service {
         if (model.getDMTaskMap().getValue() != null) {
             log("Tasks are available, starting");
             startForeground(NOTIFICATION_ID_ONGOING,
-                    ProgressNotificationHelper.getInstance(this).getNotification(
+                    ProgressNotificationHelper.buildNotification(
+                            getApplicationContext(),
                             model.getTaskTitles(),
-                            model.getExecutionPercent()));
+                            model.getTimeToFirstTriggerInSeconds()));
             mScheduleExecutor.scheduleWithFixedDelay(updateTask, 0, UPDATE_PERIOD_MILLIS, TimeUnit.MILLISECONDS);
         }
 
@@ -214,6 +221,8 @@ public class TaskUpdateService extends Service {
         if (mTimerSignalHelper != null) {
             mTimerSignalHelper.stop();
         }
+
+        ProgressNotificationHelper.cancel();
 
         super.onDestroy();
 
@@ -242,7 +251,6 @@ public class TaskUpdateService extends Service {
         } catch (InterruptedException e) {
             Log.e(TAG, "executor awaitTermination error", e);
         }
-
 
         Log.d(TAG, "stop foreground");
         stopForeground(STOP_FOREGROUND_REMOVE);

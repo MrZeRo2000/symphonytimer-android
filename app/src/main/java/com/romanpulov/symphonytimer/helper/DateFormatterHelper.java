@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Format date routines
@@ -29,6 +31,15 @@ public class DateFormatterHelper {
     private static DateFormat getTimeFormat() {
         if (mTimeFormat == null)
             mTimeFormat = new SimpleDateFormat(TIME_FORMAT, Locale.getDefault());
+
+        return mTimeFormat;
+    }
+
+    private static DateFormat getTimeFormatGMT() {
+        if (mTimeFormat == null) {
+            mTimeFormat = new SimpleDateFormat(TIME_FORMAT, Locale.getDefault());
+            mTimeFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        }
 
         return mTimeFormat;
     }
@@ -65,6 +76,15 @@ public class DateFormatterHelper {
      */
     public static String formatTime(long milliseconds) {
         return java.text.DateFormat.getTimeInstance().format(new Date(milliseconds));
+    }
+
+    /**
+     * Format time only
+     * @param seconds date in seconds
+     * @return formatted time string
+     */
+    public static String formatTimeSeconds(int seconds) {
+        return getTimeFormatGMT().format(new Date(TimeUnit.SECONDS.toMillis(seconds)));
     }
 
     /**

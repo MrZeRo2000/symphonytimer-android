@@ -306,35 +306,14 @@ public class TimerViewModel extends AndroidViewModel {
         return result < 0 ? 0 : result;
     }
 
+    public int getTimeToFirstTriggerInSeconds() {
+        return (int)(this.getTimeToFirstTrigger() / 1000);
+    }
+
     public int getCurrentTasksStatus() {
         return Optional.ofNullable(mTaskStatusChange.getValue())
                 .orElse(Pair.create(TASKS_STATUS_IDLE, TASKS_STATUS_IDLE))
                 .second;
-    }
-
-    public int getExecutionPercent() {
-        Map<Long, DMTaskItem> tasks = mDMTaskMap.getValue();
-        if (tasks == null) {
-            return 0;
-        } else {
-            long currentTime = System.currentTimeMillis();
-            long minStartTime = currentTime;
-            long maxEndTime = minStartTime;
-
-            for (DMTaskItem taskItem : tasks.values()) {
-                long startTime = taskItem.getStartTime();
-                if (startTime < minStartTime)
-                    minStartTime = startTime;
-                long endTime = taskItem.getTriggerAtTime();
-                if (endTime > maxEndTime)
-                    maxEndTime = endTime;
-            }
-            long timeRange = maxEndTime - minStartTime;
-            if (timeRange == 0)
-                return 0;
-            else
-                return (int) ((currentTime - minStartTime) * 100 / timeRange);
-        }
     }
 
     public String getTaskTitles() {
